@@ -26,6 +26,8 @@ void UniversalPicker::batchSelect(const Options& options, EntityProcessor proces
     // 使用事务管理器开始
     AcDbTransactionManager* pTransMgr = acdbHostApplicationServices()->workingDatabase()->transactionManager();
     AcTransaction* pTrans = pTransMgr->startTransaction();
+    // 记录处理过的 ID，用于后续批量刷新图形
+    std::vector<AcDbObjectId> processedIds;
 
     try 
     {
@@ -51,11 +53,30 @@ void UniversalPicker::batchSelect(const Options& options, EntityProcessor proces
                 }
             }
             processor(id);
+            processedIds.push_back(id);
         }
         if (pTrans) // 提交修改
         {
             pTransMgr->endTransaction();
         }
+
+        // --- 批量强制刷新逻辑 ---
+        for (const auto& id : processedIds)
+        {
+            AcDbDimension* pDim = nullptr;
+            // 以写模式打开，强制触发标注块重绘
+            if (acdbOpenObject(pDim, id, AcDb::kForWrite) == Acad::eOk)
+            {
+                pDim->recomputeDimBlock();      // 重新生成带方框的匿名块
+                pDim->recordGraphicsModified(); // 标记图形已更新
+                pDim->draw();                   // 显式推送至渲染管线
+                pDim->close();
+            }
+        }
+
+        // 刷新屏幕缓冲区并更新显示
+        actrTransactionManager->flushGraphics();
+        acedUpdateDisplay();
     }
     catch (...)
     {

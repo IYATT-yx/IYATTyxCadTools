@@ -11,5 +11,9 @@ private:
 	static void cmdDimensionResume();
 	static void cmdiAddSurroundingCharsForDimension();
 	static void cmdiRemoveSurroundingCharsForDimension();
+	static void cmdSetBasicBox();
+	static void cmdUnsetBasicBox();
+	static void cmdSetRefDim();
+	static void cmdUnsetRefDim();
 };
 

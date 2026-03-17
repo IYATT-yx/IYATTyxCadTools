@@ -5,9 +5,7 @@
 #include "BuildingTime.hpp"
 #include "EntityStyle.hpp"
 #include "Dimension.hpp"
-//
 #include "GenericPairEditDlg.hpp"
-//
 
 void Interface::init()
 {
@@ -22,6 +20,14 @@ void Interface::init()
     acedRegCmds->addCommand(L"IYATTyxCadTools", L"yxASCFD", L"yxASCFD", ACRX_CMD_MODAL | ACRX_CMD_USEPICKSET, Interface::cmdiAddSurroundingCharsForDimension);
     acedRegCmds->addCommand(L"IYATTyxCadTools", L"yxRemoveSurroundingCharsForDimension", L"yxRemoveSurroundingCharsForDimension", ACRX_CMD_MODAL | ACRX_CMD_USEPICKSET, Interface::cmdiRemoveSurroundingCharsForDimension);
     acedRegCmds->addCommand(L"IYATTyxCadTools", L"yxRSCFD", L"yxRSCFD", ACRX_CMD_MODAL | ACRX_CMD_USEPICKSET, Interface::cmdiRemoveSurroundingCharsForDimension);
+    acedRegCmds->addCommand(L"IYATTyxCadTools", L"yxSetBasicBox", L"yxSetBasicBox", ACRX_CMD_MODAL | ACRX_CMD_USEPICKSET, Interface::cmdSetBasicBox);
+    acedRegCmds->addCommand(L"IYATTyxCadTools", L"yxSBB", L"yxSBB", ACRX_CMD_MODAL | ACRX_CMD_USEPICKSET, Interface::cmdSetBasicBox);
+    acedRegCmds->addCommand(L"IYATTyxCadTools", L"yxUnsetBasicBox", L"yxUnsetBasicBox", ACRX_CMD_MODAL | ACRX_CMD_USEPICKSET, Interface::cmdUnsetBasicBox);
+    acedRegCmds->addCommand(L"IYATTyxCadTools", L"yxUBB", L"yxUBB", ACRX_CMD_MODAL | ACRX_CMD_USEPICKSET, Interface::cmdUnsetBasicBox);
+    acedRegCmds->addCommand(L"IYATTyxCadTools", L"yxSetRefDim", L"yxSetRefDim", ACRX_CMD_MODAL | ACRX_CMD_USEPICKSET, Interface::cmdSetRefDim);
+    acedRegCmds->addCommand(L"IYATTyxCadTools", L"yxSRD", L"yxSRD", ACRX_CMD_MODAL | ACRX_CMD_USEPICKSET, Interface::cmdSetRefDim);
+    acedRegCmds->addCommand(L"IYATTyxCadTools", L"yxUnsetRefDim", L"yxUnsetRefDim", ACRX_CMD_MODAL | ACRX_CMD_USEPICKSET, Interface::cmdUnsetRefDim);
+    acedRegCmds->addCommand(L"IYATTyxCadTools", L"yxURD", L"yxURD", ACRX_CMD_MODAL | ACRX_CMD_USEPICKSET, Interface::cmdUnsetRefDim);
 }
 
 void Interface::unload()
@@ -139,6 +145,86 @@ void Interface::cmdiRemoveSurroundingCharsForDimension()
         [left, right](AcDbObjectId objId)
         {
             Dimension::removeSurroundingCharsForDimension(objId, left, right);
+        },
+        prompt,
+        UniversalPicker::SelectMode::Immediate
+    );
+}
+
+void Interface::cmdSetBasicBox()
+{
+    AcString filter;
+    filter.format(L"%s", AcDbDimension::desc()->dxfName());
+    UniversalPicker::Options options
+    {
+        .filter = filter.kACharPtr(),
+    };
+    const ACHAR* prompt = L"\n功能：设置理论尺寸框\n";
+    UniversalPicker::run(
+        options,
+        [](AcDbObjectId objId)
+        {
+            Dimension::setAndUnsetBasicBox(objId, true);
+        },
+        prompt,
+        UniversalPicker::SelectMode::Immediate
+    );
+}
+
+void Interface::cmdUnsetBasicBox()
+{
+    AcString filter;
+    filter.format(L"%s", AcDbDimension::desc()->dxfName());
+    UniversalPicker::Options options
+    {
+        .filter = filter.kACharPtr(),
+    };
+    const ACHAR* prompt = L"\n功能：取消理论尺寸框\n";
+    UniversalPicker::run(
+        options,
+        [](AcDbObjectId objId)
+        {
+            Dimension::setAndUnsetBasicBox(objId, false);
+        },
+        prompt,
+        UniversalPicker::SelectMode::Immediate
+    );
+}
+
+void Interface::cmdSetRefDim()
+{
+    AcString filter;
+    filter.format(L"%s", AcDbDimension::desc()->dxfName());
+    UniversalPicker::Options options
+    {
+        .filter = filter.kACharPtr(),
+    };
+    const ACHAR* prompt = L"\n功能：设置参考尺寸括号\n";
+    UniversalPicker::run(
+        options,
+        [](AcDbObjectId objId)
+        {
+            Dimension::setAndUnsetRefDim(objId, true);
+        },
+        prompt,
+        UniversalPicker::SelectMode::Immediate
+    );
+}
+
+void Interface::cmdUnsetRefDim()
+{
+    AcString filter;
+    filter.format(L"%s", AcDbDimension::desc()->dxfName());
+    UniversalPicker::Options options
+    {
+        .filter = filter.kACharPtr(),
+    };
+    const ACHAR* prompt = L"\n功能：取消参考尺寸括号\n";
+    UniversalPicker::run(
+        options,
+        [](AcDbObjectId objId)
+        {
+            Dimension::setAndUnsetRefDim(objId, false);
         },
         prompt,
         UniversalPicker::SelectMode::Immediate

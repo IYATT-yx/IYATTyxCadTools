@@ -26,5 +26,19 @@ namespace Dimension
 	 * @param right 右字符
 	 */
 	void removeSurroundingCharsForDimension(AcDbObjectId objId, const ACHAR* left, const ACHAR* right);
+
+	/**
+	 * @brief 设置或取消标注的理论尺寸框
+	 * @param objId 标注对象ID
+	 * @param isSet 是否设置
+	 */
+	void setAndUnsetBasicBox(AcDbObjectId objId, bool isSet);
+
+	/**
+	 * @brief 设置或取消标注的参考尺寸括号
+	 * @param objId 标注对象ID
+	 * @param isSet 是否设置
+	 */
+	void setAndUnsetRefDim(AcDbObjectId objId, bool isSet);
 }
 

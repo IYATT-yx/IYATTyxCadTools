@@ -15,6 +15,10 @@
 * yxAddSurroundingCharsForDimension 或 yxASCFD：在标注前后添加指定符号（各自指定）
 * yxRemoveSurroundingCharsForDimension 或 yxRSCFD：在标注前后移除指定符号（各自指定），可以只移除前或后，不移除的不填。  
 ![alt text](doc/image.png)
+* yxSetBasicBox 或 yxSBB：为标注设置理论尺寸框
+* yxUnsetBasicBox 或 yxUBB：为标注取消理论尺寸框
+* yxSetRefDim 或 yxSRD：为标注设置参考尺寸括号
+* yxUnsetRefDim 或 yxURD：为标注取消参考尺寸括号
 
 ## 测试环境
 

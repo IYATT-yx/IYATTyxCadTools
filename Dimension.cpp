@@ -161,4 +161,37 @@ namespace Dimension
 			}
 		}
 	}
+
+	void setAndUnsetBasicBox(AcDbObjectId objId, bool isSet)
+	{
+		AcDbDimension* pDim = Common::getObject<AcDbDimension>(objId, AcDb::kForWrite);
+		if (pDim == nullptr)
+		{
+			return;
+		}
+
+		double absDimgap = abs(pDim->dimgap());
+		if (isSet)
+		{
+			pDim->setDimgap(-absDimgap);
+		}
+		else
+		{
+			pDim->setDimgap(absDimgap);
+		}
+	}
+
+	void setAndUnsetRefDim(AcDbObjectId objId, bool isSet)
+	{
+		const ACHAR* left = L"(";
+        const ACHAR* right = L")";
+		if (isSet)
+		{
+			Dimension::addSurroundingCharsForDimension(objId, left, right);
+		}
+		else
+		{
+            Dimension::removeSurroundingCharsForDimension(objId, left, right);
+		}
+	}
 }
