@@ -202,3 +202,38 @@ bool GenericPairEditDlg::getGdtCheckStatus(int idx)
 	return this->GdtCheckedStatus[idx];
 }
 
+BOOL GenericPairEditDlg::PreTranslateMessage(MSG* pMsg)
+{
+	// 拦截 Tab 键按下消息
+	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_TAB)
+	{
+		CWnd* pFocus = GetFocus();
+
+		// 如果当前焦点在第一个编辑框
+		if (pFocus == &editControl1)
+		{
+			// 如果不是单输入模式，跳到第二个编辑框
+			if (!this->singleMode)
+			{
+				editControl2.SetFocus();
+				editControl2.SetSel(0, -1);
+			}
+			// 如果是单输入模式，保持在 editControl1（或跳回自己）
+			else
+			{
+				editControl1.SetFocus();
+				editControl1.SetSel(0, -1);
+			}
+			return TRUE; // 表示消息已处理，不再向下传递
+		}
+		// 如果当前焦点在第二个编辑框
+		else if (pFocus == &editControl2)
+		{
+			editControl1.SetFocus();
+			editControl1.SetSel(0, -1);
+			return TRUE;
+		}
+	}
+
+	return CAcUiDialog::PreTranslateMessage(pMsg);
+}

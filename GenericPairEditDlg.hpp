@@ -70,6 +70,12 @@ public:
 	afx_msg void OnBnClickedCheck1();
 	afx_msg void OnBnClickedCheck2();
 	/**
+	 * @brief 拦截 Tab 键消息，使焦点在编辑框之间切换
+	 * @param pMsg 消息指针
+	 * @return true 告诉系统我已处理消息；false 告诉系统我未处理消息
+	 */
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	/**
 	 * @brief 获取 GDT 复选框状态
 	 * @param idx 0 为第 1 行复选框；1 为第 2 行复选框
 	 * @return true 选中；false 未选中
