@@ -40,8 +40,8 @@ BEGIN_MESSAGE_MAP(GenericPairEditDlg, CAcUiDialog)
 END_MESSAGE_MAP()
 
 //-----------------------------------------------------------------------------
-GenericPairEditDlg::GenericPairEditDlg (CString title, CString label1, CString label2, bool singleMode, CWnd *pParent /*=NULL*/, HINSTANCE hInstance /*=NULL*/) : CAcUiDialog (GenericPairEditDlg::IDD, pParent, hInstance)
-, title(title), label1(label1), label2(label2), singleMode(singleMode)
+GenericPairEditDlg::GenericPairEditDlg (CString title, CString label1, CString label2, bool singleMode, bool disableGdt, CWnd *pParent /*=NULL*/, HINSTANCE hInstance /*=NULL*/) : CAcUiDialog (GenericPairEditDlg::IDD, pParent, hInstance)
+, title(title), label1(label1), label2(label2), singleMode(singleMode), disableGdt(disableGdt)
 {
 
 }
@@ -112,6 +112,14 @@ BOOL GenericPairEditDlg::OnInitDialog()
 		this->staticText2.ShowWindow(SW_HIDE);
         this->editControl2.ShowWindow(SW_HIDE);
 		GetDlgItem(IDC_CHECK2)->ShowWindow(SW_HIDE);
+	}
+
+	// 禁用 GDT 选项
+	if (this->disableGdt)
+	{
+		GetDlgItem(IDC_CHECK1)->ShowWindow(SW_HIDE);
+        GetDlgItem(IDC_CHECK2)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_BUTTON1)->ShowWindow(SW_HIDE);
 	}
 
 	// 第 1 个编辑框获取焦点
