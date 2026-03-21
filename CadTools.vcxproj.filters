@@ -66,6 +66,12 @@
     <ClCompile Include="Dimension.ixx">
       <Filter>头文件</Filter>
     </ClCompile>
+    <ClCompile Include="Block.ixx">
+      <Filter>头文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Block.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StdAfx.h">

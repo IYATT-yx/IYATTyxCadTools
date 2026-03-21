@@ -12,6 +12,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="acrxEntryPoint.cpp" />
+    <ClCompile Include="Block.cpp" />
+    <ClCompile Include="Block.ixx" />
     <ClCompile Include="BuildingTime.ixx" />
     <ClCompile Include="CadTools.cpp" />
     <ClCompile Include="Common-Inline.ixx" />
