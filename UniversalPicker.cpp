@@ -24,10 +24,10 @@ resbuf* UniversalPicker::buildFilter(const ACHAR* filterStr)
 	}
 	return acutBuildList(RTDXF0, filterStr, RTNONE);
 }
-void UniversalPicker::batchSelect(const Options& options, EntityProcessor processor)
+void UniversalPicker::batchSelect(const ACHAR* filter, EntityProcessor processor)
 {
     ads_name ss;
-    resbuf* filterRb = buildFilter(options.filter);
+    resbuf* filterRb = buildFilter(filter);
 
     if (acedSSGet(nullptr, nullptr, nullptr, filterRb, ss) != RTNORM)
     {
@@ -45,7 +45,6 @@ void UniversalPicker::batchSelect(const Options& options, EntityProcessor proces
     {
         Adesk::Int32 len = 0;
         acedSSLength(ss, &len);
-        std::unordered_set<AcDbObjectId> seen;
 
         for (Adesk::Int32 i = 0; i < len; ++i)
         {
@@ -57,13 +56,6 @@ void UniversalPicker::batchSelect(const Options& options, EntityProcessor proces
                 continue;
             }
 
-            if (!options.allowDuplicates)
-            {
-                if (!seen.insert(id).second)
-                {
-                    continue;
-                }
-            }
             processor(id);
             processedIds.push_back(id);
         }
@@ -99,16 +91,14 @@ void UniversalPicker::batchSelect(const Options& options, EntityProcessor proces
     UniversalPicker::freeFilter(filterRb);
 }
 
-void UniversalPicker::immediateSelect(const Options& options, EntityProcessor processor)
+void UniversalPicker::immediateSelect(const ACHAR* filter, EntityProcessor processor)
 {
-    std::unordered_set<AcDbObjectId> seen;
     AcDbTransactionManager* pTransMgr = acdbHostApplicationServices()->workingDatabase()->transactionManager();
-    resbuf* filterRb = buildFilter(options.filter);
+    resbuf* filterRb = buildFilter(filter);
 
     while (true)
     {
         ads_name ss;
-
         int rc = acedSSGet(L":S", nullptr, nullptr, filterRb, ss);
         if (rc == RTCAN) // 用户按了 ESC
         {
@@ -126,17 +116,6 @@ void UniversalPicker::immediateSelect(const Options& options, EntityProcessor pr
             AcDbObjectId id;
             if (acdbGetObjectId(id, ent) == Acad::eOk)
             {
-
-                // 防重复逻辑
-                if (!options.allowDuplicates)
-                {
-                    if (!seen.insert(id).second)
-                    {
-                        acedSSFree(ss); // 别忘了释放当前选择集
-                        continue;
-                    }
-                }
-
                 // 执行业务逻辑（包裹在事务中）
                 AcTransaction* pTrans = pTransMgr->startTransaction();
                 if (pTrans != nullptr)
@@ -178,7 +157,7 @@ void UniversalPicker::immediateSelect(const Options& options, EntityProcessor pr
 }
 
 
-void UniversalPicker::run(const Options& options, EntityProcessor processor, const ACHAR* prompt, UniversalPicker::SelectMode defaultSelectMode)
+void UniversalPicker::run(const ACHAR* filter, EntityProcessor processor, const ACHAR* prompt, UniversalPicker::SelectMode defaultSelectMode)
 {
     acutPrintf(L"\n%s", prompt);
 
@@ -223,11 +202,11 @@ void UniversalPicker::run(const Options& options, EntityProcessor processor, con
 
     if (inputMode == UniversalPicker::SelectMode::Batch)
     {
-        UniversalPicker::batchSelect(options, processor);
+        UniversalPicker::batchSelect(filter, processor);
     }
     else
     {
-        UniversalPicker::immediateSelect(options, processor);
+        UniversalPicker::immediateSelect(filter, processor);
     }
 }
 
