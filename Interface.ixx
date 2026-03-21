@@ -19,5 +19,6 @@ private:
 	static void cmdUnsetBasicBox();
 	static void cmdSetRefDim();
 	static void cmdUnsetRefDim();
+	static void cmdInsertSerialNumberBlockWithStartNumber();
 };
 
