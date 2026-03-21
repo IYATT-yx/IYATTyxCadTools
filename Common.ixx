@@ -60,11 +60,29 @@ export namespace Common
 	 * @return 包裹后的字符串
 	 */
 	AcString wrapWithGdtFont(const ACHAR* input);
+
+	/**
+	 * @brief 获取命令的简名
+	 * @param cmdName 命令全名
+	 * @return 命令简名。yx 开头，加命令全名中的大写字母拼接。
+	 */
+	AcString getShortCommandName(const ACHAR* cmdName);
+
+	/**
+	 * @brief 注册命令
+	 * @param cmdName 命令全名
+	 * @param flags 命令标志
+	 * @param proc 命令处理函数
+	 */
+	void registerYxCmd(const ACHAR* cmdName, int flags, AcRxFunctionPtr proc);
 }
 
 // 常量
 export namespace Common
 {
+	// 命令组
+	constexpr const ACHAR* commandGroup = L"IYATTyxCadTools";
+
 	// 标注符号
 	namespace DimSymbol
 	{
@@ -94,5 +112,15 @@ export namespace Common
 		constexpr const WCHAR* key = L"Font";
 		constexpr const WCHAR* font = L"GDT";
 		constexpr const WCHAR* programName = L"charmap.exe";
+	}
+
+	// 序号圆
+	namespace SerialNumberCircleBlock
+	{
+		constexpr const ACHAR* blockName = L"SerialNumberCircle";
+		constexpr const ACHAR* AttTag = L"number";
+		constexpr const ACHAR* AttPrompt = L"输入序号：";
+		constexpr double circleRadius = 2.5;
+		constexpr double textHeight = 2.5;
 	}
 }
