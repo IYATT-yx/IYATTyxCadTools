@@ -122,6 +122,10 @@ BOOL GenericPairEditDlg::OnInitDialog()
 		GetDlgItem(IDC_BUTTON1)->ShowWindow(SW_HIDE);
 	}
 
+	// 设置编辑框默认值
+	this->editControl1.SetWindowTextW(this->csEdit1Input);
+    this->editControl2.SetWindowTextW(this->csEdit2Input);
+
 	// 第 1 个编辑框获取焦点
 	this->editControl1.SetFocus();
 	this->editControl1.SetSel(0, -1);
@@ -245,4 +249,9 @@ BOOL GenericPairEditDlg::PreTranslateMessage(MSG* pMsg)
 	}
 
 	return CAcUiDialog::PreTranslateMessage(pMsg);
+}
+void GenericPairEditDlg::modifyEditControl(CString edit1Value, CString edit2Value)
+{
+	this->csEdit1Input = edit1Value;
+    this->csEdit2Input = edit2Value;
 }

@@ -202,12 +202,17 @@ void Interface::cmdInsertSerialNumberBlockWithStartNumber()
     acutPrintf(L"\n功能：插入序号块，并自动递增序号\n");
 
     CAcModuleResourceOverride resOverride;
-    GenericPairEditDlg dlg(L"设置序号块起始序号", L"起始序号：", L"", true, true);
+    GenericPairEditDlg dlg(L"设置序号块起始序号", L"起始序号：", L"序号字高：", false, true);
+    // 设置默认字高
+    CString csTextHeight;
+    csTextHeight.Format(L"%f", Common::SerialNumberCircleBlock::defaultTextHeight);
+    dlg.modifyEditControl(L"", csTextHeight);
 
-    CString edit1Result;
+    CString edit1Result, edit2Result;
     if (dlg.DoModal() == IDOK)
     {
         edit1Result = dlg.getEdit1Result();
+        edit2Result = dlg.getEdit2Result();
     }
     else
     {
@@ -228,6 +233,28 @@ void Interface::cmdInsertSerialNumberBlockWithStartNumber()
 
     int startNum = _wtoi(edit1Result);
 
+    if (edit2Result.IsEmpty())
+    {
+        AfxMessageBox(L"必须输入序号字高", MB_OK | MB_ICONERROR);
+        return;
+    }
+
+    if (edit2Result.SpanIncluding(L"0123456789.") != edit2Result)
+    {
+        AfxMessageBox(L"序号字高必须为非负数", MB_OK | MB_ICONERROR);
+        return;
+    }
+
+    double dTextHeight = _wtof(edit2Result);
+    if (dTextHeight <= 0)
+    {
+        AfxMessageBox(L"序号字高必须为非负数", MB_OK | MB_ICONERROR);
+        return;
+    }
+
+    // 序号块比例
+    double dScale = dTextHeight / Common::SerialNumberCircleBlock::defaultTextHeight;
+
     Block::createSerialNumberBlock();
-    Block::insertSerialNumberBlockWithStartNumber(startNum);
+    Block::insertSerialNumberBlockWithStartNumber(startNum, dScale);
 }

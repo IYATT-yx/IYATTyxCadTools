@@ -47,7 +47,7 @@ namespace Block
 			pNewBTR->setOrigin(AcGePoint3d::kOrigin);
 
 			// 创建圆
-			AcDbCircle* pCircle = new AcDbCircle(AcGePoint3d::kOrigin, AcGeVector3d::kZAxis, Common::SerialNumberCircleBlock::circleRadius);
+			AcDbCircle* pCircle = new AcDbCircle(AcGePoint3d::kOrigin, AcGeVector3d::kZAxis, Common::SerialNumberCircleBlock::defaultCircleRadius);
 			pNewBTR->appendAcDbEntity(pCircle);
             pCircle->setColorIndex(3);
 			pCircle->close();
@@ -56,7 +56,7 @@ namespace Block
 			AcDbAttributeDefinition* pAttDef = new AcDbAttributeDefinition();
 			pAttDef->setTag(Common::SerialNumberCircleBlock::AttTag);
 			pAttDef->setPrompt(Common::SerialNumberCircleBlock::AttPrompt);
-			pAttDef->setHeight(Common::SerialNumberCircleBlock::textHeight);
+			pAttDef->setHeight(Common::SerialNumberCircleBlock::defaultTextHeight);
 			pAttDef->setHorizontalMode(AcDb::kTextCenter);
 			pAttDef->setVerticalMode(AcDb::kTextVertMid);
 			pAttDef->setAlignmentPoint(AcGePoint3d::kOrigin);
@@ -105,7 +105,7 @@ namespace Block
     //|      |-- 16. pBT->close()
     //|
     //|-- 17. pBlkRef->close() -- > (关闭块参照对象)
-    void insertSerialNumber(AcGePoint3d insPt, unsigned int num)
+    void insertSerialNumber(AcGePoint3d insPt, unsigned int num, double dScale)
     {
         std::wstring wsNumber = std::to_wstring(num);
         const ACHAR* numStr = wsNumber.c_str();
@@ -132,6 +132,8 @@ namespace Block
 
         // 创建块参照
         AcDbBlockReference* pBlkRef = new AcDbBlockReference(insPt, blockDefineId);
+        // 修改比例
+        pBlkRef->setScaleFactors(AcGeScale3d(dScale));
 
         AcDbBlockTableRecord* pBlockDef = nullptr;
         if (acdbOpenObject(pBlockDef, blockDefineId, AcDb::kForRead) == Acad::eOk)
@@ -175,7 +177,7 @@ namespace Block
         pBlkRef->close();
     }
 
-    void insertSerialNumberBlockWithStartNumber(int num)
+    void insertSerialNumberBlockWithStartNumber(int num, double dScale)
     {
         if (num < 0)
         {
@@ -183,17 +185,23 @@ namespace Block
             return;
         }
 
+        if (dScale <= 0)
+        {
+            AfxMessageBox(L"比例必须大于 0", MB_OK | MB_ICONERROR);
+            return;
+        }
+
         AcString asPrompt;
 
         while (true)
         {
-            Block::SerialNumberJig jig(static_cast<unsigned int>(num));
-            asPrompt.format(L"指定序号 %d 的插入点[退出(Esc)]：", num);
+            Block::SerialNumberJig jig(static_cast<unsigned int>(num), dScale);
+            asPrompt.format(L"\n指定序号 %d 的插入点[退出(Esc)]：\n", num);
             jig.setDispPrompt(asPrompt);
 
             if (jig.drag() == AcEdJig::kNormal)
             {
-                Block::insertSerialNumber(jig.getPoint(), static_cast<unsigned int>(num));
+                Block::insertSerialNumber(jig.getPoint(), static_cast<unsigned int>(num), dScale);
                 ++num;
             }
             else
@@ -203,7 +211,7 @@ namespace Block
         }
     }
 
-    SerialNumberJig::SerialNumberJig(unsigned int num) : mNum(num)
+    SerialNumberJig::SerialNumberJig(unsigned int num, double dScale) : mNum(num), mdScale(dScale)
     {
         this->mCurPt = AcGePoint3d::kOrigin;
 
@@ -225,6 +233,7 @@ namespace Block
         this->mpBlockReference = new AcDbBlockReference();
         this->mpBlockReference->setBlockTableRecord(this->mBlockDefineId);
         this->mpBlockReference->setPosition(this->mCurPt);
+        this->mpBlockReference->setScaleFactors(AcGeScale3d(this->mdScale));
 
         this->setupAttributes();
     }

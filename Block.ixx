@@ -16,8 +16,9 @@ export namespace Block
 	 * @brief 插入序列号块
 	 * @param insPt 插入点
 	 * @param numStr 序列号
+	 * @param dScale 比例
 	 */
-	void insertSerialNumber(AcGePoint3d insPt, unsigned int num);
+	void insertSerialNumber(AcGePoint3d insPt, unsigned int num, double dScale = 1.0);
 
 	/**
 	 * @brief 用于动态拖拽插入序号块，可以实时预览块
@@ -28,8 +29,9 @@ export namespace Block
 		/**
 		 * @brief 构造函数，初始化序号块
 		 * @param num 序号
+		 * @param dScale 比例
 		 */
-		SerialNumberJig(unsigned int num);
+		SerialNumberJig(unsigned int num, double dScale = 1.0);
 
 		/**
 		 * @brief 析构函数,释放分配的块参照对象
@@ -68,12 +70,14 @@ export namespace Block
 		AcDbObjectId mBlockDefineId; // 块定义 ID
 		AcGePoint3d mCurPt; // 当前鼠标点
 		unsigned int mNum; // 当前序列号
+		double mdScale; // 比例
 	};
 
 	/**
 	 * @brief 从指定序号开始插入
 	 * @param num 开始序号
+	 * @param dScale 比例
 	 */
-	void insertSerialNumberBlockWithStartNumber(int num);
+	void insertSerialNumberBlockWithStartNumber(int num, double dScale);
 }
 

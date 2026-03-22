@@ -57,6 +57,8 @@ private:
 	CEdit editControl2; // 编辑框2变量
 	CString edit1Result; // 编辑框1传出结果
     CString edit2Result; // 编辑框2传出结果
+	CString csEdit1Input = ""; // 编辑框1传入结果
+	CString csEdit2Input = ""; // 编辑框2传入结果
 
 	CFont fontNormal; // 常规字体
 	CFont fontGDT; // AutoCAD GDT 字体
@@ -82,4 +84,10 @@ public:
 	 * @return true 选中；false 未选中
 	 */
 	bool getGdtCheckStatus(int idx);
+	/**
+	 * @brief 修改编辑框的值
+	 * @param edit1Value 编辑框1的值
+	 * @param edit2Value 编辑框2的值
+	 */
+	void modifyEditControl(CString edit1Value = L"", CString edit2Value = L"");
 } ;

@@ -120,7 +120,7 @@ export namespace Common
 		constexpr const ACHAR* blockName = L"SerialNumberCircle";
 		constexpr const ACHAR* AttTag = L"number";
 		constexpr const ACHAR* AttPrompt = L" ‰»Î–Ú∫≈£∫";
-		constexpr double circleRadius = 2.5;
-		constexpr double textHeight = 2.5;
+		constexpr double defaultCircleRadius = 2.5;
+		constexpr double defaultTextHeight = 2.5;
 	}
 }
