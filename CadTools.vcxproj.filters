@@ -72,6 +72,12 @@
     <ClCompile Include="Block.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="GeometricTolerance.ixx">
+      <Filter>头文件</Filter>
+    </ClCompile>
+    <ClCompile Include="GeometricTolerance.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StdAfx.h">

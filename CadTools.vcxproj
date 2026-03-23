@@ -30,6 +30,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="GenericPairEditDlg.cpp" />
+    <ClCompile Include="GeometricTolerance.cpp" />
+    <ClCompile Include="GeometricTolerance.ixx" />
     <ClCompile Include="Interface.cpp" />
     <ClCompile Include="Interface.ixx" />
     <ClCompile Include="StdAfx.cpp">
@@ -89,6 +91,7 @@
   <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="Autodesk.arx-2026.props" />
+    <Import Project="Autodesk.mechanical-2026.props" />
   </ImportGroup>
   <PropertyGroup Label="Configuration">
     <PlatformToolset Condition="'$(ArxSDKPlatform)'=='v143'">v143</PlatformToolset>
