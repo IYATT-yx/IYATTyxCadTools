@@ -16,56 +16,44 @@ namespace Dimension
 			return;
 		}
 
-		// 获取当前的标注文本
-		AcString dimensionOriginText;
-		pDim->dimensionText(dimensionOriginText);
+		Dimension::DimensionData dimData{}; // 存储标注数据
+		AcString measurementValueText; // 存储测量值文本（带符号、单位）
 
-		// 获取标注的实体实际尺寸值
-		double measurementValue = .0;
-		if (pDim->measurement(measurementValue) != Acad::eOk)
+		Dimension::readDim(objId, dimData);
+		if (dimData.isAngle)
 		{
-			return;
-		 }
-
-		AcString measurementValueText;
-
-		if (pDim->isKindOf(AcDb2LineAngularDimension::desc())) // 角度
-		{
-			int precision = pDim->dimadec();
-			measurementValue = Common::rad2deg(measurementValue);
-			Common::double2AcString(measurementValue, measurementValueText, precision);
-			measurementValueText += Common::DimSymbol::Degree;
+			Common::double2AcString(
+				Common::rad2deg(dimData.measuredValue),
+				measurementValueText,
+				dimData.measuredValuePrecision
+			);
+			measurementValueText += dimData.suffix;
 		}
 		else
 		{
-			int precision = pDim->dimdec();
-			Common::double2AcString(measurementValue, measurementValueText, precision);
-
-			if (pDim->isKindOf(AcDbDiametricDimension::desc())) // 直径
-			{
-				measurementValueText = Common::DimSymbol::Diameter + measurementValueText;
-			}
-			else if (pDim->isKindOf(AcDbRadialDimension::desc())) // 半径
-			{
-				measurementValueText = Common::DimSymbol::Radius + measurementValueText;
-			}
+			Common::double2AcString(
+				dimData.measuredValue,
+				measurementValueText,
+				dimData.measuredValuePrecision
+			);
+			measurementValueText = dimData.prefix + measurementValueText + dimData.suffix;
 		}
 
-		if (dimensionOriginText.isEmpty()) // 没有手改过标注内容的情况
+		if (dimData.dimText.empty())
 		{
 			pDim->setDimensionText(measurementValueText);
 		}
 		else
 		{
-			if (dimensionOriginText.find(Common::ACDB_DIM_TEXT_DEFAULT) == -1)
+			if (dimData.dimText.find(Common::ACDB_DIM_TEXT_DEFAULT) == -1)
 			{
 				// 已经是固定文本，跳过处理
 				return;
 			}
 			else
 			{
-				dimensionOriginText.replace(Common::ACDB_DIM_TEXT_DEFAULT, measurementValueText.kACharPtr());
-				pDim->setDimensionText(dimensionOriginText.kACharPtr());
+				dimData.dimText.replace(Common::ACDB_DIM_TEXT_DEFAULT, measurementValueText.kACharPtr());
+                pDim->setDimensionText(dimData.dimText.kACharPtr());
 			}
 		}
 	}
@@ -236,7 +224,7 @@ namespace Dimension
 		{
 			data.measuredValuePrecision = pDim->dimadec();
 			data.isAngle = true;
-			data.suffix = L"°";
+			data.suffix = Common::SymbolCodes::Degree;
 		}
 		else // 线性精度
 		{
@@ -244,15 +232,17 @@ namespace Dimension
 			data.isAngle = false;
 			if (pDim->isKindOf(AcDbDiametricDimension::desc()))
 			{
-                data.prefix = L"⌀";
+                data.prefix = Common::SymbolCodes::Diameter;
 			}
 			else if (pDim->isKindOf(AcDbRadialDimension::desc()))
 			{
-				data.prefix = L"R";
+				data.prefix = Common::SymbolCodes::Radius;
 			}
 		}
 		data.tolPrecision = pDim->dimtdec(); // 极限偏差精度
-
 		data.status = true;
+
+		pDim->close();
+		pObj->close();
 	}
 }
