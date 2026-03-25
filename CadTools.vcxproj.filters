@@ -84,6 +84,12 @@
     <ClCompile Include="MText.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="CsvWriter.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CsvWriter.ixx">
+      <Filter>头文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StdAfx.h">

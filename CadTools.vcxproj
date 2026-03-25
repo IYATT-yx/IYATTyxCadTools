@@ -19,6 +19,8 @@
     <ClCompile Include="Common-Inline.ixx" />
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="Common.ixx" />
+    <ClCompile Include="CsvWriter.cpp" />
+    <ClCompile Include="CsvWriter.ixx" />
     <ClCompile Include="Dimension.cpp" />
     <ClCompile Include="Dimension.ixx" />
     <ClCompile Include="DocData.cpp" />
