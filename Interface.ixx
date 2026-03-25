@@ -21,5 +21,7 @@ private:
 	static void cmdUnsetRefDim();
 	static void cmdInsertSerialNumberBlockWithStartNumber();
 	static void cmdPrintClassHierarchy();
+	static void test();
+	static void cmdExtractAnnotations();
 };
 

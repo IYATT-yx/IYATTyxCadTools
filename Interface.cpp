@@ -10,12 +10,15 @@ import UniversalPicker;
 import Dimension;
 import Common;
 import Block;
+import CsvWriter;
+import GeometricTolerance;
 
 void Interface::init()
 {
     int baseFlags = ACRX_CMD_MODAL;
     int pickFlags = ACRX_CMD_MODAL | ACRX_CMD_USEPICKSET;
     Common::registerYxCmd(L"yx", baseFlags, Interface::cmdHelp);
+    Common::registerYxCmd(L"yxTest", baseFlags, test);
     Common::registerYxCmd(L"yxSetByLayer", pickFlags, Interface::cmdSetByLayer);
     Common::registerYxCmd(L"yxDimensionFx", pickFlags, Interface::cmdDimensionFix);
     Common::registerYxCmd(L"yxDimensionResume", pickFlags, Interface::cmdDimensionResume);
@@ -27,6 +30,52 @@ void Interface::init()
     Common::registerYxCmd(L"yxUnsetRefDim", pickFlags, Interface::cmdUnsetRefDim);
     Common::registerYxCmd(L"yxInsertSerialNumberBlockWithStartNumber", baseFlags, Interface::cmdInsertSerialNumberBlockWithStartNumber);
     Common::registerYxCmd(L"yxPrintClassHierarchy", baseFlags, Interface::cmdPrintClassHierarchy);
+    Common::registerYxCmd(L"yxExtractAnnotations", baseFlags, Interface::cmdExtractAnnotations);
+    AcDbDimension::desc();
+}
+
+// 测试使用
+void Interface::test()
+{
+    const CString filePath = "C:\\Users\\iyatt\\Desktop\\test.csv";
+    CsvWriter csv(filePath);
+
+    UniversalPicker::run(
+        nullptr,
+        [&csv](AcDbObjectId objId) {
+            Dimension::DimensionData dimData{};
+            Dimension::readDim(objId, dimData);
+            GeometricTolerance::GeometricToleranceData gtData{};
+            GeometricTolerance::readFcf(objId, gtData);
+
+            if (dimData.status)
+            {
+                double measuredValue = dimData.measuredValue;
+                if (dimData.isAngle)
+                {
+                    measuredValue = dimData.degreeValue();
+                }
+                AcString measuredValueText;
+                measuredValueText.format(L"%f", measuredValue);
+                AcString tolUpperText;
+                tolUpperText.format(L"%f", dimData.tolUpper);
+                AcString tolLowerText;
+                tolLowerText.format(L"%f", dimData.tolLower);
+                std::vector<AcString> dim{measuredValueText, tolUpperText, tolLowerText};
+                csv.writeRow(dim);
+            }
+            else if (gtData.status)
+            {
+                std::vector<AcString> fcf{gtData.name[0], gtData.value[0], gtData.primary[0], gtData.secondary[0], gtData.tertiary[0]};
+                csv.writeRow(fcf);
+
+                fcf = {gtData.name[1], gtData.value[1], gtData.primary[1], gtData.secondary[1], gtData.tertiary[1]};
+                csv.writeRow(fcf);
+            }
+        },
+        L"test",
+        UniversalPicker::SelectMode::Immediate
+    );
 }
 
 void Interface::unload()
@@ -49,18 +98,16 @@ void Interface::cmdSetByLayer()
 
 void Interface::cmdDimensionFix()
 {
-    AcString filter;
-    filter.format(L"%s", AcDbDimension::desc()->dxfName());
+    const ACHAR* filter = AcDbDimension::desc()->dxfName();
     const ACHAR* prompt = L"\n功能：固定选中标注的文本\n";
-    UniversalPicker::run(filter.kACharPtr(), Dimension::dimensionFix, prompt);
+    UniversalPicker::run(filter, Dimension::dimensionFix, prompt);
 }
 
 void Interface::cmdDimensionResume()
 {
-    AcString filter;
-    filter.format(L"%s", AcDbDimension::desc()->dxfName());
+    const ACHAR* filter = AcDbDimension::desc()->dxfName();
     const ACHAR* prompt = L"\n功能：清空选中标注的文本，恢复关联标注。注意可能造成手动编辑的符号、公差等丢失。\n";
-    UniversalPicker::run(filter.kACharPtr(), Dimension::dimensionResume, prompt);
+    UniversalPicker::run(filter, Dimension::dimensionResume, prompt);
 }
 
 void Interface::cmdiAddSurroundingCharsForDimension()
@@ -80,8 +127,7 @@ void Interface::cmdiAddSurroundingCharsForDimension()
         return;
     }
 
-    AcString filter;
-    filter.format(L"%s", AcDbDimension::desc()->dxfName());
+    const ACHAR* filter = AcDbDimension::desc()->dxfName();
     const ACHAR* prompt = L"\n功能：在标注首末位置添加符号\n";
     const ACHAR* left = edit1Result.GetString();
     const ACHAR* right = edit2Result.GetString();
@@ -89,7 +135,7 @@ void Interface::cmdiAddSurroundingCharsForDimension()
     bool isRGdt = dlg.getGdtCheckStatus(1);
     acutPrintf(L"\n开始 %d %d \n", isLGdt, isRGdt);
     UniversalPicker::run(
-        filter.kACharPtr(),
+        filter,
         [left, right, isLGdt, isRGdt](AcDbObjectId objId)
         {
             Dimension::addSurroundingCharsForDimension(objId, left, right, isLGdt, isRGdt);
@@ -116,15 +162,14 @@ void Interface::cmdiRemoveSurroundingCharsForDimension()
         return;
     }
 
-    AcString filter;
-    filter.format(L"%s", AcDbDimension::desc()->dxfName());
+    const ACHAR* filter = AcDbDimension::desc()->dxfName();
     const ACHAR* prompt = L"\n功能：在标注首末位置移除符号\n";
     const ACHAR* left = edit1Result.GetString();
     const ACHAR* right = edit2Result.GetString();
     bool isLGdt = dlg.getGdtCheckStatus(0);
     bool isRGdt = dlg.getGdtCheckStatus(1);
     UniversalPicker::run(
-        filter.kACharPtr(),
+        filter,
         [left, right, isLGdt, isRGdt](AcDbObjectId objId)
         {
             Dimension::removeSurroundingCharsForDimension(objId, left, right, isLGdt, isRGdt);
@@ -136,11 +181,10 @@ void Interface::cmdiRemoveSurroundingCharsForDimension()
 
 void Interface::cmdSetBasicBox()
 {
-    AcString filter;
-    filter.format(L"%s", AcDbDimension::desc()->dxfName());
+    const ACHAR* filter = AcDbDimension::desc()->dxfName();
     const ACHAR* prompt = L"\n功能：设置理论尺寸框\n";
     UniversalPicker::run(
-        filter.kACharPtr(),
+        filter,
         [](AcDbObjectId objId)
         {
             Dimension::setAndUnsetBasicBox(objId, true);
@@ -152,11 +196,10 @@ void Interface::cmdSetBasicBox()
 
 void Interface::cmdUnsetBasicBox()
 {
-    AcString filter;
-    filter.format(L"%s", AcDbDimension::desc()->dxfName());
+    const ACHAR* filter = AcDbDimension::desc()->dxfName();
     const ACHAR* prompt = L"\n功能：取消理论尺寸框\n";
     UniversalPicker::run(
-        filter.kACharPtr(),
+        filter,
         [](AcDbObjectId objId)
         {
             Dimension::setAndUnsetBasicBox(objId, false);
@@ -168,11 +211,10 @@ void Interface::cmdUnsetBasicBox()
 
 void Interface::cmdSetRefDim()
 {
-    AcString filter;
-    filter.format(L"%s", AcDbDimension::desc()->dxfName());
+    const ACHAR* filter = AcDbDimension::desc()->dxfName();
     const ACHAR* prompt = L"\n功能：设置参考尺寸括号\n";
     UniversalPicker::run(
-        filter.kACharPtr(),
+        filter,
         [](AcDbObjectId objId)
         {
             Dimension::setAndUnsetRefDim(objId, true);
@@ -184,11 +226,10 @@ void Interface::cmdSetRefDim()
 
 void Interface::cmdUnsetRefDim()
 {
-    AcString filter;
-    filter.format(L"%s", AcDbDimension::desc()->dxfName());
+    const ACHAR* filter = AcDbDimension::desc()->dxfName();
     const ACHAR* prompt = L"\n功能：取消参考尺寸括号\n";
     UniversalPicker::run(
-        filter.kACharPtr(),
+        filter,
         [](AcDbObjectId objId)
         {
             Dimension::setAndUnsetRefDim(objId, false);
@@ -264,4 +305,102 @@ void Interface::cmdPrintClassHierarchy()
 {
     const ACHAR* prompt = L"\n功能：打印类层级关系\n";
     UniversalPicker::run(nullptr, Common::printClassHierarchy, prompt, UniversalPicker::SelectMode::Immediate);
+}
+
+void Interface::cmdExtractAnnotations()
+{
+    acutPrintf(L"\n请选择提取标注后保存的文件。");
+    CString filePath = Common::ShowSaveFileDialog(L"选择提取标注保存的文件路径");
+    if (filePath.IsEmpty())
+    {
+        acutPrintf(L"取消");
+        return;
+    }
+
+    CsvWriter csv(filePath);
+    if (!csv.isValid())
+    {
+        AfxMessageBox(L"文件路径打开失败，请检查是否被占用或不", MB_OK | MB_ICONERROR);
+        return;
+    }
+
+    const ACHAR* prompt = L"\n功能：提取标注到 csv 文件\n";
+    AcString filter;
+    filter.format(L"%s\0%s", AcDbDimension::desc()->dxfName(), AcmFCF::desc()->dxfName());
+    UniversalPicker::run(
+        filter.kACharPtr(),
+        [&csv](AcDbObjectId objId)
+        {
+            Dimension::DimensionData dimData{};
+            Dimension::readDim(objId, dimData);
+            GeometricTolerance::GeometricToleranceData gtData{};
+            GeometricTolerance::readFcf(objId, gtData);
+
+            if (dimData.status) // 尺寸
+            {
+                // 名义值
+                AcString asMeasuredValue;
+                double dMeasuredValue = dimData.measuredValue;
+                if (dimData.isAngle)
+                {
+                    dMeasuredValue = dimData.degreeValue();
+                }
+                Common::double2AcString(dMeasuredValue, asMeasuredValue, dimData.measuredValuePrecision);
+                // 公差
+                //acutPrintf(L"\n调试：%s %s %f %f ", dimData.prefix.kACharPtr(), dimData.suffix.kACharPtr(), dimData.tolUpper, dimData.tolLower);
+                AcString asTol;
+                if (dimData.tolUpper == 0 && dimData.tolLower == 0)
+                {
+                    asTol = L"";
+                }
+                else
+                {
+                    if (abs(dimData.tolUpper + dimData.tolLower) < 1e-6)
+                    {
+                        double dAbsTol = abs(dimData.tolUpper);
+                        asTol.format(L"%s%.*f", Common::Symbols::PlusMinus, dimData.tolPrecision, dAbsTol);
+                    }
+                    else
+                    {
+                        AcString asTolUpper, asTolLower;
+                        Common::double2AcString(dimData.tolUpper, asTolUpper, dimData.tolPrecision);
+                        Common::double2AcString(dimData.tolLower, asTolLower, dimData.tolPrecision);
+                        asTol.format(L"(+%s/%s)", asTolUpper.kACharPtr(), asTolLower.kACharPtr());
+                    }
+                }
+                AcString asPrefix = Common::getSymbol(dimData.prefix);
+                AcString asSuffix = Common::getSymbol(dimData.suffix);
+                AcString asDimText = asPrefix + asMeasuredValue + asTol + asSuffix;
+                acutPrintf(L"\n尺寸：%s", asDimText.kACharPtr());
+                std::vector<AcString> row = { asDimText };
+                csv.writeRow(row);
+            }
+            else if (gtData.status) // 形位公差
+            {
+                AcString row;
+                row.format(L"%s%s%s%s%s", gtData.name[0].kACharPtr(), gtData.value[0].kACharPtr(), gtData.primary[0].kACharPtr(), gtData.secondary[0].kACharPtr(), gtData.tertiary[0].kACharPtr());
+                acutPrintf(L"\n形位公差：%s", row.kACharPtr());
+                std::vector<AcString> rows = { row };
+                csv.writeRow(rows);
+
+                if (gtData.gdtSymbolType[1] != Acm::kNoType)
+                {
+                    row.format(L"%s%s%s%s%s", gtData.name[1].kACharPtr(), gtData.value[1].kACharPtr(), gtData.primary[1].kACharPtr(), gtData.secondary[1].kACharPtr(), gtData.tertiary[1].kACharPtr());
+                    acutPrintf(L"\n形位公差：%s", row.kACharPtr());
+                    rows = { row };
+                    csv.writeRow( rows );
+
+                    if (gtData.gdtSymbolType[2] != Acm::kNoType)
+                    {
+                        row.format(L"%s%s%s%s%s", gtData.name[2].kACharPtr(), gtData.value[2].kACharPtr(), gtData.primary[2].kACharPtr(), gtData.secondary[2].kACharPtr(), gtData.tertiary[2].kACharPtr());
+                        acutPrintf(L"\n形位公差：%s", row.kACharPtr());
+                        rows = { row };
+                        csv.writeRow( rows );
+                    }
+                }
+            }
+        },
+        prompt,
+        UniversalPicker::SelectMode::Immediate
+    );
 }
