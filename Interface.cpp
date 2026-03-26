@@ -313,7 +313,7 @@ void Interface::cmdExtractAnnotations()
     CString filePath = Common::ShowSaveFileDialog(L"选择提取标注保存的文件路径");
     if (filePath.IsEmpty())
     {
-        acutPrintf(L"取消");
+        acutPrintf(L"\n取消。");
         return;
     }
 
@@ -346,55 +346,77 @@ void Interface::cmdExtractAnnotations()
                     dMeasuredValue = dimData.degreeValue();
                 }
                 Common::double2AcString(dMeasuredValue, asMeasuredValue, dimData.measuredValuePrecision);
-                // 公差
+                
                 //acutPrintf(L"\n调试：%s %s %f %f ", dimData.prefix.kACharPtr(), dimData.suffix.kACharPtr(), dimData.tolUpper, dimData.tolLower);
-                AcString asTol;
-                if (dimData.tolUpper == 0 && dimData.tolLower == 0)
+                // 公差
+                AcString asTol,asTolUpper, asTolLower;
+                if (dimData.tolUpper == 0 && dimData.tolLower == 0) // 无公差
                 {
                     asTol = L"";
+                    asTolUpper = L"0";
+                    asTolLower = L"0";
                 }
                 else
                 {
-                    if (abs(dimData.tolUpper + dimData.tolLower) < 1e-6)
+                    if (abs(dimData.tolUpper + dimData.tolLower) < 1e-6) // 等双向公差
                     {
                         double dAbsTol = abs(dimData.tolUpper);
-                        asTol.format(L"%s%.*f", Common::Symbols::PlusMinus, dimData.tolPrecision, dAbsTol);
+                        asTol.format(L"%s%.*g", Common::Symbols::PlusMinus, dimData.tolPrecision, dAbsTol);
+                        asTolUpper.format(L"%.*g", dimData.tolPrecision, dAbsTol);
+                        asTolLower.format(L"-%.*g", dimData.tolPrecision, dAbsTol);
                     }
-                    else
+                    else // 双向公差
                     {
-                        AcString asTolUpper, asTolLower;
+                        
                         Common::double2AcString(dimData.tolUpper, asTolUpper, dimData.tolPrecision);
                         Common::double2AcString(dimData.tolLower, asTolLower, dimData.tolPrecision);
                         asTol.format(L"(+%s/%s)", asTolUpper.kACharPtr(), asTolLower.kACharPtr());
+                        asTolUpper.format(L"%.*g", dimData.tolPrecision, dimData.tolUpper);
+                        asTolLower.format(L"%.*g", dimData.tolPrecision, dimData.tolLower);
                     }
                 }
                 AcString asPrefix = Common::getSymbol(dimData.prefix);
                 AcString asSuffix = Common::getSymbol(dimData.suffix);
                 AcString asDimText = asPrefix + asMeasuredValue + asTol + asSuffix;
                 acutPrintf(L"\n尺寸：%s", asDimText.kACharPtr());
-                std::vector<AcString> row = { asDimText };
+                std::vector<AcString> row = { asDimText, asMeasuredValue, asTolUpper, asTolLower }; // 完整尺寸文本、名义值、上极限偏差、下极限偏差
                 csv.writeRow(row);
             }
             else if (gtData.status) // 形位公差
             {
-                AcString row;
-                row.format(L"%s%s%s%s%s", gtData.name[0].kACharPtr(), gtData.value[0].kACharPtr(), gtData.primary[0].kACharPtr(), gtData.secondary[0].kACharPtr(), gtData.tertiary[0].kACharPtr());
+                AcString name = gtData.name[0];
+                AcString value = gtData.value[0];
+                AcString primary = gtData.primary[0];
+                AcString secondary = gtData.secondary[0];
+                AcString tertiary = gtData.tertiary[0];
+                AcString row = name + value + primary + secondary + tertiary;
                 acutPrintf(L"\n形位公差：%s", row.kACharPtr());
-                std::vector<AcString> rows = { row };
+                std::vector<AcString> rows = { row, name, value, primary, secondary, tertiary };
                 csv.writeRow(rows);
 
                 if (gtData.gdtSymbolType[1] != Acm::kNoType)
                 {
-                    row.format(L"%s%s%s%s%s", gtData.name[1].kACharPtr(), gtData.value[1].kACharPtr(), gtData.primary[1].kACharPtr(), gtData.secondary[1].kACharPtr(), gtData.tertiary[1].kACharPtr());
+                    name = gtData.name[1];
+                    value = gtData.value[1];
+                    primary = gtData.primary[1];
+                    secondary = gtData.secondary[1];
+                    tertiary = gtData.tertiary[1];
+                    row = name + value + primary + secondary + tertiary;
                     acutPrintf(L"\n形位公差：%s", row.kACharPtr());
-                    rows = { row };
+                    rows = { row, name, value, primary, secondary, tertiary };
                     csv.writeRow( rows );
 
                     if (gtData.gdtSymbolType[2] != Acm::kNoType)
                     {
-                        row.format(L"%s%s%s%s%s", gtData.name[2].kACharPtr(), gtData.value[2].kACharPtr(), gtData.primary[2].kACharPtr(), gtData.secondary[2].kACharPtr(), gtData.tertiary[2].kACharPtr());
+                        name = gtData.name[2];
+                        value = gtData.value[2];
+                        primary = gtData.primary[2];
+                        secondary = gtData.secondary[2];
+                        tertiary = gtData.tertiary[2];
+                        row = name + value + primary + secondary + tertiary;
+                        rows = { name, value, primary, secondary, tertiary };
                         acutPrintf(L"\n形位公差：%s", row.kACharPtr());
-                        rows = { row };
+                        rows = { row, name, value, primary, secondary, tertiary };
                         csv.writeRow( rows );
                     }
                 }
