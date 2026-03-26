@@ -23,5 +23,6 @@ private:
 	static void cmdPrintClassHierarchy();
 	static void test();
 	static void cmdExtractAnnotations();
+	static void cmdUpdateSerialNumberBlock();
 };
 

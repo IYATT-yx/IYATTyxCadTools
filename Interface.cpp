@@ -31,47 +31,17 @@ void Interface::init()
     Common::registerYxCmd(L"yxInsertSerialNumberBlockWithStartNumber", baseFlags, Interface::cmdInsertSerialNumberBlockWithStartNumber);
     Common::registerYxCmd(L"yxPrintClassHierarchy", baseFlags, Interface::cmdPrintClassHierarchy);
     Common::registerYxCmd(L"yxExtractAnnotations", baseFlags, Interface::cmdExtractAnnotations);
-    AcDbDimension::desc();
+    Common::registerYxCmd(L"yxUpdateSerialNumberBlock", baseFlags, Interface::cmdUpdateSerialNumberBlock);
 }
 
 // 测试使用
 void Interface::test()
 {
-    const CString filePath = "C:\\Users\\iyatt\\Desktop\\test.csv";
-    CsvWriter csv(filePath);
-
     UniversalPicker::run(
         nullptr,
-        [&csv](AcDbObjectId objId) {
-            Dimension::DimensionData dimData{};
-            Dimension::readDim(objId, dimData);
-            GeometricTolerance::GeometricToleranceData gtData{};
-            GeometricTolerance::readFcf(objId, gtData);
-
-            if (dimData.status)
-            {
-                double measuredValue = dimData.measuredValue;
-                if (dimData.isAngle)
-                {
-                    measuredValue = dimData.degreeValue();
-                }
-                AcString measuredValueText;
-                measuredValueText.format(L"%f", measuredValue);
-                AcString tolUpperText;
-                tolUpperText.format(L"%f", dimData.tolUpper);
-                AcString tolLowerText;
-                tolLowerText.format(L"%f", dimData.tolLower);
-                std::vector<AcString> dim{measuredValueText, tolUpperText, tolLowerText};
-                csv.writeRow(dim);
-            }
-            else if (gtData.status)
-            {
-                std::vector<AcString> fcf{gtData.name[0], gtData.value[0], gtData.primary[0], gtData.secondary[0], gtData.tertiary[0]};
-                csv.writeRow(fcf);
-
-                fcf = {gtData.name[1], gtData.value[1], gtData.primary[1], gtData.secondary[1], gtData.tertiary[1]};
-                csv.writeRow(fcf);
-            }
+        [](AcDbObjectId objId)
+        {
+            Block::updateSerialNumberBlock(objId, 2);
         },
         L"test",
         UniversalPicker::SelectMode::Immediate
@@ -159,6 +129,7 @@ void Interface::cmdiRemoveSurroundingCharsForDimension()
     }
     else
     {
+        acutPrintf(L"\n取消操作");
         return;
     }
 
@@ -304,7 +275,7 @@ void Interface::cmdInsertSerialNumberBlockWithStartNumber()
 void Interface::cmdPrintClassHierarchy()
 {
     const ACHAR* prompt = L"\n功能：打印类层级关系\n";
-    UniversalPicker::run(nullptr, Common::printClassHierarchy, prompt, UniversalPicker::SelectMode::Immediate);
+    UniversalPicker::run(nullptr, Common::printClassHierarchy, prompt, UniversalPicker::SelectMode::Immediate, true);
 }
 
 void Interface::cmdExtractAnnotations()
@@ -424,5 +395,53 @@ void Interface::cmdExtractAnnotations()
         },
         prompt,
         UniversalPicker::SelectMode::Immediate
+    );
+}
+
+void Interface::cmdUpdateSerialNumberBlock()
+{
+    acutPrintf(L"\n功能：更新序号块，并自动递增序号\n");
+
+    CAcModuleResourceOverride resOverride;
+    GenericPairEditDlg dlg(L"设置序号块起始序号", L"起始序号：", L"序号字高：", true, true);
+
+    CString edit1Result;
+    if (dlg.DoModal() == IDOK)
+    {
+        edit1Result = dlg.getEdit1Result();
+    }
+    else
+    {
+        acutPrintf(L"\n取消操作");
+        return;
+    }
+
+    if (edit1Result.IsEmpty())
+    {
+        AfxMessageBox(L"必须输入起始序号", MB_OK | MB_ICONERROR);
+        return;
+    }
+
+    if (edit1Result.SpanIncluding(L"0123456789") != edit1Result)
+    {
+        AfxMessageBox(L"起始序号必须为非 0 整数", MB_OK | MB_ICONERROR);
+        return;
+    }
+    int startNum = _wtoi(edit1Result);
+
+    acutPrintf(L"\n选中的序号快将被设置为：%d", startNum);
+    UniversalPicker::run(
+        nullptr,
+        [&startNum](const AcDbObjectId& id)
+        {
+            if (Block::updateSerialNumberBlock(id, startNum))
+            {
+                ++startNum;
+                acutPrintf(L"\n选中的序号快将被设置为：%d", startNum);
+            }
+        },
+        nullptr,
+        UniversalPicker::SelectMode::Immediate,
+        true
     );
 }

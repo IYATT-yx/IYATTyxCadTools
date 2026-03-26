@@ -12,8 +12,8 @@
 * yxSetByLayer 或 yxSBL：设置选中实体的颜色、线型、线宽为 ByLayer
 * yxDimensionFix 或 yxDF：固定标注
 * yxDimensionResume 或 yxDR：恢复关联标注
-* yxAddSurroundingCharsForDimension 或 yxASCFD：在标注前后添加指定符号（各自指定）
-* yxRemoveSurroundingCharsForDimension 或 yxRSCFD：在标注前后移除指定符号（各自指定），可以只移除前或后，不移除的不填。  
+* yxAddSurroundingCharsForDimension 或 yxASCFD：在标注前后添加指定符号  
+* yxRemoveSurroundingCharsForDimension 或 yxRSCFD：在标注前后移除指定符号   
 ![alt text](doc/image.png)  
 ![alt text](doc/image1.png)
 * yxSetBasicBox 或 yxSBB：为标注设置理论尺寸框
@@ -23,6 +23,9 @@
 * yxInsertSerialNumberBlockWithStartNumber 或 yxISNSBN：从指定序号开始插入序号块
 ![alt text](doc/image2.png)  
 ![alt text](doc/image3.png)  
+* yxUpdateSerialNumberBlock 或 yxUSNB：更新序号块。指定开始序号值，点击已插入的序号块更新序号值，序号值会自动递增。  
+![alt text](doc/image7.png)  
+![alt text](doc/image8.png)  
 * yxExtractAnnotations 或 yxEA：提取指定标注和形位公差到 csv 文件。
 ![alt text](doc/image4.png)  
 ![alt text](doc/image5.png)  
