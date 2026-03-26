@@ -40,8 +40,8 @@ BEGIN_MESSAGE_MAP(GenericPairEditDlg, CAcUiDialog)
 END_MESSAGE_MAP()
 
 //-----------------------------------------------------------------------------
-GenericPairEditDlg::GenericPairEditDlg (CString title, CString label1, CString label2, bool singleMode, bool disableGdt, CWnd *pParent /*=NULL*/, HINSTANCE hInstance /*=NULL*/) : CAcUiDialog (GenericPairEditDlg::IDD, pParent, hInstance)
-, title(title), label1(label1), label2(label2), singleMode(singleMode), disableGdt(disableGdt)
+GenericPairEditDlg::GenericPairEditDlg (CString title, CString label1, CString label2, bool singleMode, bool disableGdt, bool trim, CWnd *pParent /*=NULL*/, HINSTANCE hInstance /*=NULL*/) : CAcUiDialog (GenericPairEditDlg::IDD, pParent, hInstance)
+, title(title), label1(label1), label2(label2), singleMode(singleMode), disableGdt(disableGdt), bTrim(trim)
 {
 
 }
@@ -137,7 +137,10 @@ BOOL GenericPairEditDlg::OnInitDialog()
 void GenericPairEditDlg::OnBnClickedOk()
 {
 	this->editControl1.GetWindowTextW(this->edit1Result);
-	this->edit1Result.Trim();
+	if (this->bTrim)
+	{
+		this->edit1Result.Trim();
+	}
 
 	if (this->singleMode)
 	{
@@ -146,7 +149,11 @@ void GenericPairEditDlg::OnBnClickedOk()
 	else
 	{
         this->editControl2.GetWindowTextW(this->edit2Result);
-		this->edit2Result.Trim();
+
+		if (this->bTrim)
+		{
+			this->edit2Result.Trim();
+		}
 	}
 
 	this->GdtCheckedStatus[0] = IsDlgButtonChecked(IDC_CHECK1);

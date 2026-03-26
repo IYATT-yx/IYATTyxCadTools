@@ -33,7 +33,7 @@ class GenericPairEditDlg : public CAcUiDialog {
 	DECLARE_DYNAMIC (GenericPairEditDlg)
 
 public:
-	GenericPairEditDlg (CString title = L"通用双编辑对话框", CString label1 = L"编辑框1：", CString label2 = L"编辑框2：", bool singleMode = false, bool disableGdt = false, CWnd* pParent = NULL, HINSTANCE hInstance = NULL);
+	GenericPairEditDlg (CString title = L"通用双编辑对话框", CString label1 = L"编辑框1：", CString label2 = L"编辑框2：", bool singleMode = false, bool disableGdt = false, bool trim = false, CWnd* pParent = NULL, HINSTANCE hInstance = NULL);
 
 	enum { IDD = IDD_GENERICPAIREDITDLG} ;
 
@@ -50,6 +50,7 @@ private:
     CString label2;
 	bool singleMode;
 	bool disableGdt;
+	bool bTrim;
 
 	CStatic staticText1; // 标签1变量
 	CStatic staticText2; // 标签2变量

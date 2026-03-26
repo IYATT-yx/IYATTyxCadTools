@@ -215,7 +215,7 @@ void Interface::cmdInsertSerialNumberBlockWithStartNumber()
     acutPrintf(L"\n功能：插入序号块，并自动递增序号\n");
 
     CAcModuleResourceOverride resOverride;
-    GenericPairEditDlg dlg(L"设置序号块起始序号", L"起始序号：", L"序号字高：", false, true);
+    GenericPairEditDlg dlg(L"设置序号块起始序号", L"起始序号：", L"序号字高：", false, true, true);
     // 设置默认字高
     CString csTextHeight;
     csTextHeight.Format(L"%f", Common::SerialNumberCircleBlock::defaultTextHeight);
@@ -403,7 +403,7 @@ void Interface::cmdUpdateSerialNumberBlock()
     acutPrintf(L"\n功能：更新序号块，并自动递增序号\n");
 
     CAcModuleResourceOverride resOverride;
-    GenericPairEditDlg dlg(L"设置序号块起始序号", L"起始序号：", L"序号字高：", true, true);
+    GenericPairEditDlg dlg(L"设置序号块起始序号", L"起始序号：", L"序号字高：", true, true, true);
 
     CString edit1Result;
     if (dlg.DoModal() == IDOK)
