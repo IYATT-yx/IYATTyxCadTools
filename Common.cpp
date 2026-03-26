@@ -187,9 +187,9 @@ namespace Common
 	}
 }
 
-CString Common::ShowSaveFileDialog(const CString& title, const CString& defExt, const CString& filter)
+CString Common::ShowSaveFileDialog(const CString& title, const CString& defaultName, const CString& defExt, const CString& filter)
 {
-	CFileDialog dlg(TRUE, defExt, nullptr, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, filter, AfxGetMainWnd());
+	CFileDialog dlg(FALSE, defExt, defaultName, OFN_HIDEREADONLY, filter, AfxGetMainWnd());
 	dlg.m_ofn.lpstrTitle = title;
 
 	if (dlg.DoModal() == IDOK)

@@ -89,7 +89,7 @@ export namespace Common
 	 * @param filter 文件类型过滤器，格式示例: "CSV Files (*.csv)|*.csv|All Files (*.*)|*.*||"
 	 * @return 用户选择的完整文件路径，如果取消返回空字符串
 	 */
-	CString ShowSaveFileDialog(const CString& title = L"保存文件", const CString& defExt = L"csv", const CString& filter = L"CSV Files (*.csv)|*.csv|All Files (*.*)|*.*||");
+	CString ShowSaveFileDialog(const CString& title = L"保存文件", const CString& defaultName = L"标注数据.csv", const CString& defExt = L"csv", const CString& filter = L"CSV Files (*.csv)|*.csv|All Files (*.*)|*.*||");
 }
 
 // 常量
