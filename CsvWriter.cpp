@@ -20,7 +20,18 @@ CsvWriter::~CsvWriter()
 void CsvWriter::open(const CString& filePath)
 {
     // 追加模式打开
-    mOfs.open(std::wstring(filePath.GetString()), std::ios::binary | std::ios::app);
+    this->mOfs.open(std::wstring(filePath.GetString()), std::ios::binary | std::ios::app);
+
+    // 如果是新建的文件，写入 BOM
+    if (this->mOfs.is_open())
+    {
+        this->mOfs.seekp(0, std::ios::end);
+        if (this->mOfs.tellp() == 0)
+        {
+            const unsigned char bom[] = {0xEF, 0xBB, 0xBF};
+            this->mOfs.write(reinterpret_cast<const char*>(bom), sizeof(bom));
+        }
+    }
 }
 
 void CsvWriter::writeRow(const std::vector<AcString>& fields)
