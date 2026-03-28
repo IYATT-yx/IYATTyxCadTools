@@ -56,7 +56,7 @@ namespace Block
         // 获取块参照的变换矩阵
         AcGeMatrix3d mat = this->mpBlockReference->blockTransform();
 
-        // 强制所有属性跟随快定义的相对位置变换
+        // 更新属性显示（仅位置，不改文字）
         AcDbObjectIterator* pAttIt = this->mpBlockReference->attributeIterator();
         if (pAttIt)
         {
@@ -65,18 +65,14 @@ namespace Block
                 AcDbAttribute* pAtt = AcDbAttribute::cast(pAttIt->entity());
                 if (pAtt)
                 {
+                    // 仅把属性放到块定义原点经过块变换的位置
                     AcGePoint3d basePt = AcGePoint3d::kOrigin;
                     pAtt->setPosition(basePt.transformBy(mat));
-
-                    if (pAtt->isDefaultAlignment() == Adesk::kFalse)
-                    {
-                        pAtt->setAlignmentPoint(basePt.transformBy(mat));
-                    }
                 }
             }
             delete pAttIt;
-            pAttIt = nullptr;
         }
+
         return Adesk::kTrue;
     }
 
@@ -153,6 +149,7 @@ namespace Block
 			pAttDef->setVerticalMode(AcDb::kTextVertMid);
 			pAttDef->setAlignmentPoint(AcGePoint3d::kOrigin);
             pAttDef->setColorIndex(3);
+            pAttDef->setLockPositionInBlock(true); //锁定属性位置
 
 			pNewBTR->appendAcDbEntity(pAttDef);
 			pAttDef->close();
