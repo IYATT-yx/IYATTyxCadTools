@@ -2,9 +2,10 @@ module;
 #include "StdAfx.h"
 #include <regex>
 
-module MText;
+module TextUtil;
+import Common;
 
-namespace MText
+namespace TextUtil
 {
 	void parseDimensionTolerance(const AcString& dimText, double& tolUpper, double& tolLower)
 	{
@@ -38,6 +39,42 @@ namespace MText
 			tolLower = -tol;
 			return;
 		}
+	}
 
+	bool readMText(AcDbObjectId& id, AcString& text, bool isRawContents)
+	{
+		AcDbMText* pMText = Common::getObject<AcDbMText>(id, AcDb::kForRead);
+		if (pMText == nullptr)
+		{
+			return false;
+		}
+
+		if (isRawContents)
+		{
+			pMText->contents(text);
+		}
+		else
+		{
+			pMText->text(text);
+		}
+		return true;
+	}
+
+	bool readDText(AcDbObjectId& id, AcString& text, bool isRawContents)
+	{
+        AcDbText* pText = Common::getObject<AcDbText>(id, AcDb::kForRead);
+		if (pText == nullptr)
+		{
+			return false;
+		}
+
+		pText->textString(text);
+		if (!isRawContents)
+		{
+			AcDbMText mtext;
+			mtext.setContents(text);
+			mtext.text(text);
+		}
+        return true;
 	}
 }

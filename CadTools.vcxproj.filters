@@ -78,10 +78,10 @@
     <ClCompile Include="GeometricTolerance.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="MText.ixx">
+    <ClCompile Include="TextUtil.ixx">
       <Filter>头文件</Filter>
     </ClCompile>
-    <ClCompile Include="MText.cpp">
+    <ClCompile Include="TextUtil.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="CsvWriter.cpp">
