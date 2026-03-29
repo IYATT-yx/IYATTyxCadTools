@@ -4,7 +4,7 @@
 module Dimension;
 
 import Common;
-import MText;
+import TextUtil;
 
 namespace Dimension
 {
@@ -210,7 +210,7 @@ namespace Dimension
 
 		pDim->measurement(data.measuredValue);
         pDim->dimensionText(data.dimText);
-		MText::parseDimensionTolerance(data.dimText, data.tolUpper, data.tolLower);
+		TextUtil::parseDimensionTolerance(data.dimText, data.tolUpper, data.tolLower);
 
 		if (pDim->isKindOf(AcDb2LineAngularDimension::desc())) // 角度精度
 		{
