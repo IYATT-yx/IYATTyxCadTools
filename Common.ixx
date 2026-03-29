@@ -4,6 +4,8 @@
 export module Common;
 export import :Inline;
 
+import UniversalPicker;
+
 // 定义在 Common-Inline.ixx
 export namespace Common
 {
@@ -167,4 +169,19 @@ export namespace Common
 		constexpr double defaultCircleRadius = 2.5;
 		constexpr double defaultTextHeight = 2.5;
 	}
+
+	// 标注类型的子类
+	UniversalPicker::AcRxClassVector DimensionSubClasses =
+	{
+		AcDbDimension::desc(),
+		AcDb2LineAngularDimension::desc(),
+		AcDb3PointAngularDimension::desc(),
+		AcDbAlignedDimension::desc(),
+		AcDbArcDimension::desc(),
+		AcDbDiametricDimension::desc(),
+		AcDbOrdinateDimension::desc(),
+		AcDbRadialDimension::desc(),
+		AcDbRadialDimensionLarge::desc(),
+		AcDbRotatedDimension::desc()
+	};
 }
