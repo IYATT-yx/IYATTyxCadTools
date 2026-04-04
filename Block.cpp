@@ -1,13 +1,15 @@
 module;
 #include "StdAfx.h"
+#include "dbAnnotativeObjectPE.h"
 #include <stdexcept>
 
 module Block;
 import Common;
+import Annotative;
 
 namespace Block
 {
-    BalloonNumberJig::BalloonNumberJig(unsigned int num, double dScale) : mNum(num), mdScale(dScale)
+    BalloonNumberJig::BalloonNumberJig(unsigned int num) : mNum(num)
     {
         this->mCurPt = AcGePoint3d::kOrigin;
 
@@ -29,7 +31,10 @@ namespace Block
         this->mpBlockReference = new AcDbBlockReference();
         this->mpBlockReference->setBlockTableRecord(this->mBlockDefineId);
         this->mpBlockReference->setPosition(this->mCurPt);
-        this->mpBlockReference->setScaleFactors(AcGeScale3d(this->mdScale));
+        //this->mpBlockReference->setScaleFactors(AcGeScale3d(1.0)); // 缩放比例
+
+        Annotative::applyCurrentAnnotativeScale(this->mpBlockReference); // 应用当前注释性比例
+        Block::syncAttributesFromDefinition(this->mpBlockReference, num); // 同步属性值
 
         this->setupAttributes();
     }
@@ -88,34 +93,33 @@ namespace Block
 
     void BalloonNumberJig::setupAttributes()
     {
-        AcDbBlockTableRecord* pBlockDefinition = nullptr;
-        if (acdbOpenObject(pBlockDefinition, this->mBlockDefineId, AcDb::kForRead) == Acad::eOk)
+        AcDbBlockTableRecord* pBlockDefinition = Common::getObject<AcDbBlockTableRecord>(this->mBlockDefineId);
+        if (pBlockDefinition == nullptr)
         {
-            AcDbBlockTableRecordIterator* pIt = nullptr;
-            pBlockDefinition->newIterator(pIt);
-            for (pIt->start(); !pIt->done(); pIt->step())
-            {
-                AcDbEntity* pEnt = nullptr;
-                if (pIt->getEntity(pEnt, AcDb::kForRead) == Acad::eOk)
-                {
-                    AcDbAttributeDefinition* pAttDef = AcDbAttributeDefinition::cast(pEnt);
-                    if (pAttDef && !pAttDef->isConstant() && AcString(pAttDef->tag()) == Common::BalloonNumberBlock::AttTag)
-                    {
-                        AcDbAttribute* pAtt = new AcDbAttribute();
-                        pAtt->setPropertiesFrom(pAttDef);
-                        pAtt->setAttributeFromBlock(pAttDef, this->mpBlockReference->blockTransform());
-                        pAtt->setTextString(std::to_wstring(this->mNum).c_str());
-                        this->mpBlockReference->appendAttribute(pAtt);
-                        pAtt->close();
-                    }
-                    pEnt->close();
-                }
-            }
-            delete pIt;
-            pIt = nullptr;
-            pBlockDefinition->close();
-            pBlockDefinition = nullptr;
+            return;
         }
+        AcDbBlockTableRecordIterator* pIt = nullptr;
+        pBlockDefinition->newIterator(pIt);
+        for (pIt->start(); !pIt->done(); pIt->step())
+        {
+            AcDbEntity* pEnt = nullptr;
+            if (pIt->getEntity(pEnt, AcDb::kForRead) == Acad::eOk)
+            {
+                AcDbAttributeDefinition* pAttDef = AcDbAttributeDefinition::cast(pEnt);
+                if (pAttDef && !pAttDef->isConstant() && AcString(pAttDef->tag()) == Common::BalloonNumberBlock::AttTag)
+                {
+                    AcDbAttribute* pAtt = new AcDbAttribute();
+                    pAtt->setPropertiesFrom(pAttDef);
+                    pAtt->setAttributeFromBlock(pAttDef, this->mpBlockReference->blockTransform());
+                    pAtt->setTextString(std::to_wstring(this->mNum).c_str());
+                    this->mpBlockReference->appendAttribute(pAtt);
+                    pAtt->close();
+                }
+                pEnt->close();
+            }
+        }
+        delete pIt;
+        pIt = nullptr;
     }
 }
 
@@ -133,6 +137,11 @@ namespace Block
 			AcDbBlockTableRecord* pNewBTR = new AcDbBlockTableRecord();
 			pNewBTR->setName(Common::BalloonNumberBlock::blockName);
 			pNewBTR->setOrigin(AcGePoint3d::kOrigin);
+            if (Annotative::setObjAnnotative(pNewBTR) != Acad::eOk)
+            {
+                AfxMessageBox(L"设置注释性失败！", MB_OK | MB_ICONERROR);
+                return;
+            }
 
 			// 创建圆
 			AcDbCircle* pCircle = new AcDbCircle(AcGePoint3d::kOrigin, AcGeVector3d::kZAxis, Common::BalloonNumberBlock::defaultCircleRadius);
@@ -159,11 +168,8 @@ namespace Block
 		pBlockTable->close();
 	}
 
-    void insertBalloonNumber(AcGePoint3d insPt, unsigned int num, double dScale)
+    void insertBalloonNumber(AcGePoint3d insPt, unsigned int num)
     {
-        std::wstring wsNumber = std::to_wstring(num);
-        const ACHAR* numStr = wsNumber.c_str();
-
         AcDbDatabase* pDb = acdbHostApplicationServices()->workingDatabase();
 
         AcDbObjectId blockDefineId;
@@ -184,38 +190,11 @@ namespace Block
         }
         pBlockTable->close();
 
-        // 创建块参照
         AcDbBlockReference* pBlkRef = new AcDbBlockReference(insPt, blockDefineId);
-        // 修改比例
-        pBlkRef->setScaleFactors(AcGeScale3d(dScale));
+        //pBlkRef->setScaleFactors(AcGeScale3d(1.0)); // 缩放比例
 
-        AcDbBlockTableRecord* pBlockDef = nullptr;
-        if (acdbOpenObject(pBlockDef, blockDefineId, AcDb::kForRead) == Acad::eOk)
-        {
-            AcDbBlockTableRecordIterator* pIt = nullptr;
-            pBlockDef->newIterator(pIt);
-            for (pIt->start(); !pIt->done(); pIt->step())
-            {
-                AcDbEntity* pEnt = nullptr;
-                if (pIt->getEntity(pEnt, AcDb::kForRead) == Acad::eOk)
-                {
-                    AcDbAttributeDefinition* pAttDef = AcDbAttributeDefinition::cast(pEnt);
-                    if (pAttDef && !pAttDef->isConstant() && AcString(pAttDef->tag()) == Common::BalloonNumberBlock::AttTag)
-                    {
-                        AcDbAttribute* pAtt = new AcDbAttribute();
-                        pAtt->setPropertiesFrom(pAttDef);
-                        pAtt->setAttributeFromBlock(pAttDef, pBlkRef->blockTransform());
-                        pAtt->setTextString(numStr);
-
-                        pBlkRef->appendAttribute(pAtt);
-                        pAtt->close();
-                    }
-                    pEnt->close();
-                }
-            }
-            delete pIt;
-            pBlockDef->close();
-        }
+        Annotative::applyCurrentAnnotativeScale(pBlkRef); // 应用当前注释性比例
+        Block::syncAttributesFromDefinition(pBlkRef, num);
 
         // 块参照提交到模型空间
         AcDbBlockTable* pBT = nullptr;
@@ -231,7 +210,7 @@ namespace Block
         pBlkRef->close();
     }
 
-    void insertBalloonNumberBlockWithStartNumber(int num, double dScale)
+    void insertBalloonNumberBlockWithStartNumber(int num)
     {
         if (num < 0)
         {
@@ -239,23 +218,16 @@ namespace Block
             return;
         }
 
-        if (dScale <= 0)
-        {
-            AfxMessageBox(L"比例必须大于 0", MB_OK | MB_ICONERROR);
-            return;
-        }
-
         AcString asPrompt;
-
         while (true)
         {
-            Block::BalloonNumberJig jig(static_cast<unsigned int>(num), dScale);
+            Block::BalloonNumberJig jig(static_cast<unsigned int>(num));
             asPrompt.format(L"\n指定序号 %d 的插入点[退出(Esc)]：\n", num);
             jig.setDispPrompt(asPrompt);
 
             if (jig.drag() == AcEdJig::kNormal)
             {
-                Block::insertBalloonNumber(jig.getPoint(), static_cast<unsigned int>(num), dScale);
+                Block::insertBalloonNumber(jig.getPoint(), static_cast<unsigned int>(num));
                 ++num;
             }
             else
@@ -267,37 +239,76 @@ namespace Block
 
     bool updateBalloonNumberBlock(AcDbObjectId blockRefId, unsigned int newNum)
     {
-        AcDbBlockReference* pBlkRef = nullptr;
-        bool bSuccess = false;
-
         // 以写模式打开块参照
-        if (acdbOpenObject(pBlkRef, blockRefId, AcDb::kForWrite) == Acad::eOk)
+        AcDbBlockReference* pBlkRef = Common::getObject<AcDbBlockReference>(blockRefId, AcDb::kForWrite);
+        if (pBlkRef == nullptr)
         {
-            // 遍历块参照携带的属性
-            AcDbObjectIterator* pAttIt = pBlkRef->attributeIterator();
-            for (pAttIt->start(); !pAttIt->done(); pAttIt->step())
+            return false;
+        }
+        // 遍历块参照携带的属性
+        AcDbObjectIterator* pAttIt = pBlkRef->attributeIterator();
+        for (pAttIt->start(); !pAttIt->done(); pAttIt->step())
+        {
+            AcDbObjectId attId = pAttIt->objectId();
+            AcDbAttribute* pAtt = Common::getObject<AcDbAttribute>(attId, AcDb::kForWrite);
+            if (pAtt == nullptr)
             {
-                AcDbObjectId attId = pAttIt->objectId();
-                AcDbAttribute* pAtt = nullptr;
+                continue;
+            }
+            // 检查标签是否匹配
+            if (AcString(pAtt->tag()) == Common::BalloonNumberBlock::AttTag)
+            {
+                // 修改文本内容
+                pAtt->setTextString(std::to_wstring(newNum).c_str());
+                pAtt->adjustAlignment(pBlkRef->database()); // 重新计算对齐位置
+                actrTransactionManager->queueForGraphicsFlush(); // 强制刷新图形缓冲区
+                break;
+            }
+        }
+        delete pAttIt;
 
-                if (acdbOpenObject(pAtt, attId, AcDb::kForWrite) == Acad::eOk)
+        // 如果修改了位置或比例，建议调用记录更新
+        //pBlkRef->recordGraphicsModified();
+
+        return true;
+    }
+
+    void syncAttributesFromDefinition(AcDbBlockReference* pBlkRef, unsigned int num)
+    {
+        if (!pBlkRef)
+        {
+            return;
+        }
+
+        AcDbObjectId blockDefineId = pBlkRef->blockTableRecord();
+        AcDbBlockTableRecord* pBlockDef = Common::getObject<AcDbBlockTableRecord>(blockDefineId);
+        if (pBlockDef == nullptr)
+        {
+            return;
+        }
+
+        AcDbBlockTableRecordIterator* pIt = nullptr;
+        pBlockDef->newIterator(pIt);
+        for (pIt->start(); !pIt->done(); pIt->step())
+        {
+            AcDbEntity* pEnt = nullptr;
+            if (pIt->getEntity(pEnt, AcDb::kForRead) == Acad::eOk)
+            {
+                AcDbAttributeDefinition* pAttDef = AcDbAttributeDefinition::cast(pEnt);
+                if (pAttDef && !pAttDef->isConstant() && AcString(pAttDef->tag()) == Common::BalloonNumberBlock::AttTag)
                 {
-                    // 检查标签是否匹配
-                    if (AcString(pAtt->tag()) == Common::BalloonNumberBlock::AttTag)
-                    {
-                        // 修改文本内容
-                        pAtt->setTextString(std::to_wstring(newNum).c_str());
-                        bSuccess = true;
-                    }
+                    AcDbAttribute* pAtt = new AcDbAttribute();
+                    pAtt->setPropertiesFrom(pAttDef);
+                    // 重要：此步会自动处理注释性比例带来的位置偏移
+                    pAtt->setAttributeFromBlock(pAttDef, pBlkRef->blockTransform());
+                    pAtt->setTextString(std::to_wstring(num).c_str());
+
+                    pBlkRef->appendAttribute(pAtt);
                     pAtt->close();
                 }
+                pEnt->close();
             }
-            delete pAttIt;
-
-            // 如果修改了位置或比例，建议调用记录更新
-            //pBlkRef->recordGraphicsModified();
-            pBlkRef->close();
         }
-        return bSuccess;
+        delete pIt;
     }
 }

@@ -16,9 +16,8 @@ export namespace Block
 		/**
 		 * @brief 构造函数，初始化序号块
 		 * @param num 序号
-		 * @param dScale 比例
 		 */
-		BalloonNumberJig(unsigned int num, double dScale = 1.0);
+		BalloonNumberJig(unsigned int num);
 
 		/**
 		 * @brief 析构函数,释放分配的块参照对象
@@ -57,7 +56,6 @@ export namespace Block
 		AcDbObjectId mBlockDefineId; // 块定义 ID
 		AcGePoint3d mCurPt; // 当前鼠标点
 		unsigned int mNum; // 当前序列号
-		double mdScale; // 比例
 	};
 }
 
@@ -72,16 +70,14 @@ export namespace Block
 	 * @brief 插入序列号块
 	 * @param insPt 插入点
 	 * @param numStr 序列号
-	 * @param dScale 比例
 	 */
-	void insertBalloonNumber(AcGePoint3d insPt, unsigned int num, double dScale = 1.0);
+	void insertBalloonNumber(AcGePoint3d insPt, unsigned int num);
 
 	/**
 	 * @brief 从指定序号开始插入
 	 * @param num 开始序号
-	 * @param dScale 比例
 	 */
-	void insertBalloonNumberBlockWithStartNumber(int num, double dScale);
+	void insertBalloonNumberBlockWithStartNumber(int num);
 
 	/**
 	 * @brief 更新块参照的序列号
@@ -90,4 +86,11 @@ export namespace Block
 	 * @return true 表示更新成功; false 表示更新失败
 	 */
 	bool updateBalloonNumberBlock(AcDbObjectId blockRefId, unsigned int newNum);
+
+	/**
+	 * @brief 更新气泡号块参照的属性
+	 * @param pBlkRef 块参照对象指针
+	 * @param num 序号
+	 */
+	void syncAttributesFromDefinition(AcDbBlockReference* pBlkRef, unsigned int num);
 }
