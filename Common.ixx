@@ -10,7 +10,7 @@ import UniversalPicker;
 export namespace Common
 {
 	/**
-	 * @brief 通过对象ID获取对象指针
+	 * @brief 通过对象ID获取对象指针。对象指针自动释放，不能调用close。
 	 * @tparam T 目标对象类型
 	 * @param objId 对象ID
 	 * @param mode 打开模式，默认为只读
