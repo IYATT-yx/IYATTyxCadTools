@@ -90,6 +90,12 @@
     <ClCompile Include="CsvWriter.ixx">
       <Filter>头文件</Filter>
     </ClCompile>
+    <ClCompile Include="Annotative.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Annotative.ixx">
+      <Filter>头文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StdAfx.h">
