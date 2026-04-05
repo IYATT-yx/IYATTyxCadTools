@@ -66,7 +66,7 @@ resbuf* UniversalPicker::buildFilter(UniversalPicker::AcRxClassVectorPtr arcv)
     return head;
 }
 
-void UniversalPicker::batchSelect(UniversalPicker::AcRxClassVectorPtr arcv, UniversalPicker::EntityProcessor processor)
+void UniversalPicker::batchSelect(UniversalPicker::AcRxClassVectorPtr arcv, UniversalPicker::EntityProcessor processor, SortMode defaultSortMode, bool isLocked, double sortTol)
 {
     ads_name ss;
     resbuf* filterRb = buildFilter(arcv);
@@ -77,17 +77,83 @@ void UniversalPicker::batchSelect(UniversalPicker::AcRxClassVectorPtr arcv, Univ
         return;
     }
 
-    // 使用事务管理器开始
-    AcDbTransactionManager* pTransMgr = acdbHostApplicationServices()->workingDatabase()->transactionManager();
-    AcTransaction* pTrans = pTransMgr->startTransaction();
-    // 记录处理过的 ID，用于后续批量刷新图形
-    std::vector<AcDbObjectId> processedIds;
-
-    try 
+    Adesk::Int32 len = 0;
+    acedSSLength(ss, &len);
+    if (len <= 0)
     {
-        Adesk::Int32 len = 0;
-        acedSSLength(ss, &len);
+        acedSSFree(ss);
+        UniversalPicker::freeFilter(filterRb);
+        return;
+    }
 
+    // 确定排序模式（提前获取模式以决定后续路径）
+    SortMode finalMode = defaultSortMode;
+    if (!isLocked)
+    {
+        acedInitGet(0, L"RD RU LD LU DR DL UR UL None");
+        wchar_t kword[20];
+        int stat = acedGetKword(L"\n排序模式 [右下(RD)/右上(RU)/左下(LD)/左上(LU)/下右(DR)/下左(DL)/上右(UR)/上左(UL)/无(None)] <RD>: ", kword);
+
+        if (stat == Acad::eNormal)
+        {
+            if (_wcsicmp(kword, L"RD") == 0)
+            {
+                finalMode = SortMode::RD;
+            }
+            else if (_wcsicmp(kword, L"RU") == 0)
+            {
+                finalMode = SortMode::RU;
+            }
+            else if (_wcsicmp(kword, L"LD") == 0)
+            {
+                finalMode = SortMode::LD;
+            }
+            else if (_wcsicmp(kword, L"LU") == 0)
+            {
+                finalMode = SortMode::LU;
+            }
+            else if (_wcsicmp(kword, L"DR") == 0)
+            {
+                finalMode = SortMode::DR;
+            }
+            else if (_wcsicmp(kword, L"DL") == 0)
+            {
+                finalMode = SortMode::DL;
+            }
+            else if (_wcsicmp(kword, L"UR") == 0)
+            {
+                finalMode = SortMode::UR;
+            }
+            else if (_wcsicmp(kword, L"UL") == 0)
+            {
+                finalMode = SortMode::UL;
+            }
+            else if (_wcsicmp(kword, L"None") == 0)
+            {
+                finalMode = SortMode::None;
+            }
+        }
+        else if (stat == Acad::eNone)
+        {
+            finalMode = defaultSortMode;
+        }
+        else
+        {
+            acedSSFree(ss);
+            UniversalPicker::freeFilter(filterRb);
+            return;
+        }
+    }
+
+    // 根据模式进入不同处理逻辑
+    std::vector<EntityInfo> entities;
+    std::vector<AcDbObjectId> processedIds;
+    AcDbDatabase* pDb = acdbHostApplicationServices()->workingDatabase();
+    AcDbTransactionManager* pTransMgr = pDb->transactionManager();
+    AcTransaction* pTrans = pTransMgr->startTransaction();
+
+    try
+    {
         for (Adesk::Int32 i = 0; i < len; ++i)
         {
             ads_name ent;
@@ -98,35 +164,81 @@ void UniversalPicker::batchSelect(UniversalPicker::AcRxClassVectorPtr arcv, Univ
                 continue;
             }
 
-            processor(id);
-            processedIds.push_back(id);
+            if (finalMode == SortMode::None)
+            {
+                // 不排序，直接执行
+                processor(id);
+                processedIds.push_back(id);
+            }
+            else
+            {
+                // 排序路径：采集坐标信息
+                AcGePoint3d pt = AcGePoint3d::kOrigin;
+                AcDbEntityPointer pEnt(id, AcDb::kForRead);
+                if (pEnt.openStatus() == Acad::eOk)
+                {
+                    AcDbBlockReference* pBlk = AcDbBlockReference::cast(pEnt);
+                    if (pBlk)
+                    {
+                        pt = pBlk->position();
+                    }
+                    else
+                    {
+                        AcDbExtents ext;
+                        if (pEnt->getGeomExtents(ext) == Acad::eOk)
+                        {
+                            pt = ext.minPoint() + (ext.maxPoint() - ext.minPoint()) * 0.5;
+                        }
+                    }
+                    entities.push_back({ id, pt });
+                }
+            }
         }
-        if (pTrans) // 提交修改
+
+        // 如果需要排序，则在此执行排序和处理
+        if (finalMode != SortMode::None)
+        {
+            std::sort(entities.begin(), entities.end(), [finalMode, sortTol](const EntityInfo& a, const EntityInfo& b)
+                {
+                    return UniversalPicker::compareEntities(a, b, finalMode, sortTol);
+                });
+
+            for (const auto& item : entities)
+            {
+                processor(item.id);
+                processedIds.push_back(item.id);
+            }
+        }
+
+        if (pTrans)
         {
             pTransMgr->endTransaction();
         }
 
-        // --- 批量强制刷新逻辑 ---
+        // 统一刷新图形
         for (const auto& id : processedIds)
         {
-            AcDbDimension* pDim = nullptr;
-            // 以写模式打开，强制触发标注块重绘
-            if (acdbOpenObject(pDim, id, AcDb::kForWrite) == Acad::eOk)
+            AcDbObjectPointer<AcDbEntity> pEnt(id, AcDb::kForWrite);
+            if (pEnt.openStatus() == Acad::eOk)
             {
-                pDim->recomputeDimBlock();      // 重新生成带方框的匿名块
-                pDim->recordGraphicsModified(); // 标记图形已更新
-                pDim->draw();                   // 显式推送至渲染管线
-                pDim->close();
+                AcDbDimension* pDim = AcDbDimension::cast(pEnt);
+                if (pDim)
+                {
+                    pDim->recomputeDimBlock();
+                }
+                pEnt->recordGraphicsModified();
+                pEnt->draw();
             }
         }
-
-        // 刷新屏幕缓冲区并更新显示
         actrTransactionManager->flushGraphics();
         acedUpdateDisplay();
     }
     catch (...)
     {
-        if (pTrans) pTransMgr->abortTransaction(); // 出错回滚
+        if (pTrans)
+        {
+            pTransMgr->abortTransaction();
+        }
     }
 
     acedSSFree(ss);
@@ -199,7 +311,7 @@ void UniversalPicker::immediateSelect(UniversalPicker::AcRxClassVectorPtr arcv, 
 }
 
 
-void UniversalPicker::run(UniversalPicker::AcRxClassVectorPtr arcv, UniversalPicker::EntityProcessor processor, const ACHAR* prompt, UniversalPicker::SelectMode defaultSelectMode, bool lockSelectMode)
+void UniversalPicker::run(UniversalPicker::AcRxClassVectorPtr arcv, UniversalPicker::EntityProcessor processor, const ACHAR* prompt, UniversalPicker::SelectMode defaultSelectMode, bool lockSelectMode, SortMode defaultSortMode, bool lockSortMode, double sortTol)
 {
     if (prompt != nullptr)
     {
@@ -249,7 +361,7 @@ void UniversalPicker::run(UniversalPicker::AcRxClassVectorPtr arcv, UniversalPic
 
     if (inputMode == UniversalPicker::SelectMode::Batch)
     {
-        UniversalPicker::batchSelect(arcv, processor);
+        UniversalPicker::batchSelect(arcv, processor, defaultSortMode, lockSortMode, sortTol);
     }
     else
     {
@@ -263,5 +375,88 @@ void UniversalPicker::freeFilter(resbuf* filterRb)
     {
         acutRelRb(filterRb);
         filterRb = nullptr;
+    }
+}
+
+bool UniversalPicker::compareEntities(const UniversalPicker::EntityInfo& a, const UniversalPicker::EntityInfo& b, UniversalPicker::SortMode mode, double sortTol)
+{
+    switch (mode)
+    {
+        case UniversalPicker::SortMode::RD:
+        {
+            if (fabs(a.pos.y - b.pos.y) > sortTol)
+            {
+                return a.pos.y > b.pos.y;
+            }
+            return a.pos.x < b.pos.x;
+        }
+
+        case UniversalPicker::SortMode::RU:
+        {
+            if (fabs(a.pos.y - b.pos.y) > sortTol)
+            {
+                return a.pos.y < b.pos.y;
+            }
+            return a.pos.x < b.pos.x;
+        }
+
+        case UniversalPicker::SortMode::LD:
+        {
+            if (fabs(a.pos.y - b.pos.y) > sortTol)
+            {
+                return a.pos.y > b.pos.y;
+            }
+            return a.pos.x > b.pos.x;
+        }
+
+        case UniversalPicker::SortMode::LU:
+        {
+            if (fabs(a.pos.y - b.pos.y) > sortTol)
+            {
+                return a.pos.y < b.pos.y;
+            }
+            return a.pos.x > b.pos.x;
+        }
+
+        case UniversalPicker::SortMode::DR:
+        {
+            if (fabs(a.pos.x - b.pos.x) > sortTol)
+            {
+                return a.pos.x < b.pos.x;
+            }
+            return a.pos.y > b.pos.y;
+        }
+
+        case UniversalPicker::SortMode::DL:
+        {
+            if (fabs(a.pos.x - b.pos.x) > sortTol)
+            {
+                return a.pos.x > b.pos.x;
+            }
+            return a.pos.y > b.pos.y;
+        }
+
+        case UniversalPicker::SortMode::UR:
+        {
+            if (fabs(a.pos.x - b.pos.x) > sortTol)
+            {
+                return a.pos.x < b.pos.x;
+            }
+            return a.pos.y < b.pos.y;
+        }
+
+        case UniversalPicker::SortMode::UL:
+        {
+            if (fabs(a.pos.x - b.pos.x) > sortTol)
+            {
+                return a.pos.x > b.pos.x;
+            }
+            return a.pos.y < b.pos.y;
+        }
+
+        default:
+        {
+            return false;
+        }
     }
 }
