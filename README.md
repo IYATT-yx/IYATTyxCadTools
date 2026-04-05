@@ -31,6 +31,9 @@
 ![alt text](doc/image5.png)  
 在 Excel 中，切换到`数据`选项卡，打开`从文本/CSV`，在里面导入 csv 文件  
 ![alt text](doc/image6.png)  
+* yxImeAutoSwitch 或 yxIAS：设置自动切换输入法到英语，方便输入命令。自启动设置为 1 时，加载插件后就会自动监控输入法状态，实现自动切换语言。周期为检查的频率，不能低于 200。  
+![alt text](doc/image9.png)
+![alt text](doc/image10.png)  
 
 ## 测试环境
 
