@@ -24,5 +24,6 @@ private:
 	static void test();
 	static void cmdExtractAnnotations();
 	static void cmdUpdateBalloonNumberBlock();
+	static void cmdImeAutoSwitch();
 };
 

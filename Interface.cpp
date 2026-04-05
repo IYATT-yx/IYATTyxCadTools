@@ -13,6 +13,7 @@ import Block;
 import CsvWriter;
 import GeometricTolerance;
 import TextUtil;
+import ImeAutoSwitcher;
 
 void Interface::init()
 {
@@ -33,11 +34,23 @@ void Interface::init()
     Common::registerYxCmd(L"yxPrintClassHierarchy", baseFlags, Interface::cmdPrintClassHierarchy);
     Common::registerYxCmd(L"yxExtractAnnotations", baseFlags, Interface::cmdExtractAnnotations);
     Common::registerYxCmd(L"yxUpdateBalloonNumberBlock", baseFlags, Interface::cmdUpdateBalloonNumberBlock);
+    Common::registerYxCmd(L"yxImeAutoSwitch", baseFlags, Interface::cmdImeAutoSwitch);
+
+    // 输入法状态监控自启动处理
+    bool bAutoStart = false;
+    int nAutoMonitorInterval = 200;
+    ImeAutoSwitcher::loadSettings(bAutoStart, nAutoMonitorInterval);
+    if (bAutoStart)
+    {
+        ImeAutoSwitcher::start(nAutoMonitorInterval);
+    }
 }
 
 // 测试使用
 void Interface::test()
 {
+    acutPrintf(L"\n%s", acdbHostApplicationServices()->getMachineRegistryProductRootKey());
+    return;
     static unsigned int currentNum = 1;
     double bubbleScale = 1.0;
     double offsetDistance = 7.0; // 气泡距离文字中心的偏移
@@ -536,3 +549,60 @@ void Interface::cmdUpdateBalloonNumberBlock()
         false
     );
 }
+
+void Interface::cmdImeAutoSwitch()
+{
+    CAcModuleResourceOverride resOverride;
+    GenericPairEditDlg dlg(L"设置输入法语言自动切换", L"自启动：", L"检查间隔(ms)：", false, true, true);
+
+    CString edit1Result, edit2Result;
+    bool bAutoStart;
+    int nInterval;
+    ImeAutoSwitcher::loadSettings(bAutoStart, nInterval);
+    edit1Result.Format(L"%d", bAutoStart);
+    edit2Result.Format(L"%d", nInterval);
+    dlg.modifyEditControl(edit1Result, edit2Result);
+    if (dlg.DoModal() == IDOK)
+    {
+        edit1Result = dlg.getEdit1Result();
+        edit2Result = dlg.getEdit2Result();
+    }
+    else
+    {
+        acutPrintf(L"\n取消操作");
+        return;
+    }
+
+    if (edit1Result.IsEmpty() || edit2Result.IsEmpty())
+    {
+        AfxMessageBox(L"必须输入自启动状态和检查间隔", MB_OK | MB_ICONERROR);
+    }
+
+    if (edit1Result.SpanIncluding(L"01") != edit1Result)
+    {
+        AfxMessageBox(L"自启动状态必须为 0 或 1，1表示自启动，0 表示不自启动", MB_OK | MB_ICONERROR);
+        return;
+    }
+
+    if (edit2Result.SpanIncluding(L"0123456789") != edit2Result)
+    {
+        AfxMessageBox(L"检查间隔必须为非负整数，且不小于 200", MB_OK | MB_ICONERROR);
+    }
+
+    bAutoStart = edit1Result == L"1";
+    nInterval = _wtoi(edit2Result);
+
+    if (nInterval < 200)
+    {
+        AfxMessageBox(L"检查间隔必须不小于 200", MB_OK | MB_ICONERROR);
+        return;
+    }
+
+    ImeAutoSwitcher::stop();
+    if (bAutoStart)
+    {
+        ImeAutoSwitcher::start(nInterval);
+    }
+    ImeAutoSwitcher::saveSettings(bAutoStart, nInterval);
+}
+
