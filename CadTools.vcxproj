@@ -36,6 +36,8 @@
     <ClCompile Include="GenericPairEditDlg.cpp" />
     <ClCompile Include="GeometricTolerance.cpp" />
     <ClCompile Include="GeometricTolerance.ixx" />
+    <ClCompile Include="ImeAutoSwitcher.cpp" />
+    <ClCompile Include="ImeAutoSwitcher.ixx" />
     <ClCompile Include="Interface.cpp" />
     <ClCompile Include="Interface.ixx" />
     <ClCompile Include="TextUtil.cpp" />

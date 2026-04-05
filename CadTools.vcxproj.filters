@@ -96,6 +96,12 @@
     <ClCompile Include="Annotative.ixx">
       <Filter>头文件</Filter>
     </ClCompile>
+    <ClCompile Include="ImeAutoSwitcher.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ImeAutoSwitcher.ixx">
+      <Filter>头文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StdAfx.h">
