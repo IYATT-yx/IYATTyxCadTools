@@ -1,6 +1,5 @@
 module;
 #include "StdAfx.h"
-#include "dbAnnotativeObjectPE.h"
 #include <stdexcept>
 
 module Block;
