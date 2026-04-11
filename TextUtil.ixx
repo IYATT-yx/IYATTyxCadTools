@@ -30,4 +30,10 @@ export namespace TextUtil
 	 * @return true 成功；false 失败
 	 */
 	bool readDText(AcDbObjectId& id, AcString& text, bool isRawContents = false);
+
+	/**
+	 * @brief 解析控制字符得到纯文本
+	 * @param text 传带控制字符的文本，传出纯文本
+	 */
+	void resolveControlCodes(AcString& text);
 }

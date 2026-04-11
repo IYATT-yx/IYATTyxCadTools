@@ -71,10 +71,15 @@ namespace TextUtil
 		pText->textString(text);
 		if (!isRawContents)
 		{
-			AcDbMText mtext;
-			mtext.setContents(text);
-			mtext.text(text);
+			TextUtil::resolveControlCodes(text);
 		}
         return true;
+	}
+
+	void resolveControlCodes(AcString& text)
+	{
+		AcDbMText mtext;
+		mtext.setContents(text);
+		mtext.text(text);
 	}
 }

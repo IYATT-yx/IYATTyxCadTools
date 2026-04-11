@@ -15,6 +15,7 @@ import GeometricTolerance;
 import TextUtil;
 import ImeAutoSwitcher;
 
+
 void Interface::init()
 {
     int baseFlags = ACRX_CMD_MODAL;
@@ -36,7 +37,7 @@ void Interface::init()
     Common::registerYxCmd(L"yxUpdateBalloonNumberBlock", baseFlags, Interface::cmdUpdateBalloonNumberBlock);
     Common::registerYxCmd(L"yxImeAutoSwitch", baseFlags, Interface::cmdImeAutoSwitch);
 
-    // 输入法状态监控自启动处理
+    // 输入法自动切换自启动 
     bool bAutoStart = false;
     int nAutoMonitorInterval = 200;
     ImeAutoSwitcher::loadSettings(bAutoStart, nAutoMonitorInterval);
@@ -49,121 +50,6 @@ void Interface::init()
 // 测试使用
 void Interface::test()
 {
-    acutPrintf(L"\n%s", acdbHostApplicationServices()->getMachineRegistryProductRootKey());
-    return;
-    static unsigned int currentNum = 1;
-    double bubbleScale = 1.0;
-    double offsetDistance = 7.0; // 气泡距离文字中心的偏移
-
-    UniversalPicker::run(
-        nullptr,
-        [=](AcDbObjectId objId) mutable
-        {
-            AcDbDimension* pDim = Common::getObject<AcDbDimension>(objId, AcDb::kForRead);
-            if (pDim == nullptr)
-            {
-                return;
-            }
-
-            // 1. 获取文字中心和旋转角度（万能法：优先取 textRotation，特殊类型手动纠偏）
-            AcGePoint3d textPt = pDim->textPosition();
-            double finalRotation = pDim->textRotation();
-            AcGeVector3d dirVec;
-
-            // 处理不同类型的基准角度
-            if (pDim->isKindOf(AcDbRotatedDimension::desc()))
-            {
-                finalRotation += AcDbRotatedDimension::cast(pDim)->rotation();
-            }
-            else if (pDim->isKindOf(AcDbAlignedDimension::desc()))
-            {
-                auto pAli = AcDbAlignedDimension::cast(pDim);
-                finalRotation += (pAli->xLine2Point() - pAli->xLine1Point()).angleOnPlane(AcGePlane::kXYPlane);
-            }
-            else if (pDim->isKindOf(AcDbRadialDimension::desc()) || pDim->isKindOf(AcDbDiametricDimension::desc()))
-            {
-                // 径向标注：文字通常沿引线方向，若 textRotation 为 0，方向即为中心到文字点
-                AcGePoint3d center = AcGePoint3d::kOrigin;
-                if (auto pR = AcDbRadialDimension::cast(pDim)) center = pR->center();
-                else if (auto pD = AcDbDiametricDimension::cast(pDim)) center = pD->chordPoint();
-
-                AcGeVector3d radialDir = textPt - center;
-                if (!radialDir.isZeroLength())
-                {
-                    finalRotation += radialDir.angleOnPlane(AcGePlane::kXYPlane);
-                }
-            }
-
-            // 构造指向文字方向的矢量
-            dirVec.set(cos(finalRotation), sin(finalRotation), 0.0);
-
-            // 2. 计算插入点：在文字方向的反方向（左侧）
-            AcGePoint3d insPt = textPt - (dirVec * offsetDistance);
-
-            // 3. 插入块参照并填充属性
-            Block::createBalloonNumberBlock();
-            AcDbDatabase* pDb = pDim->database();
-            AcDbBlockTable* pBT = nullptr;
-
-            if (pDb->getBlockTable(pBT, AcDb::kForRead) == Acad::eOk)
-            {
-                AcDbObjectId blockDefId;
-                if (pBT->getAt(Common::BalloonNumberBlock::blockName, blockDefId) == Acad::eOk)
-                {
-                    AcDbBlockReference* pBlkRef = new AcDbBlockReference(insPt, blockDefId);
-                    pBlkRef->setScaleFactors(AcGeScale3d(bubbleScale));
-                    pBlkRef->setRotation(finalRotation);
-
-                    // --- 完整的属性填充逻辑 ---
-                    AcDbBlockTableRecord* pBTR = nullptr;
-                    if (acdbOpenObject(pBTR, blockDefId, AcDb::kForRead) == Acad::eOk)
-                    {
-                        AcDbBlockTableRecordIterator* pIt = nullptr;
-                        pBTR->newIterator(pIt);
-                        for (pIt->start(); !pIt->done(); pIt->step())
-                        {
-                            AcDbEntity* pEnt = nullptr;
-                            if (pIt->getEntity(pEnt, AcDb::kForRead) == Acad::eOk)
-                            {
-                                AcDbAttributeDefinition* pAttDef = AcDbAttributeDefinition::cast(pEnt);
-                                if (pAttDef && !pAttDef->isConstant() &&
-                                    AcString(pAttDef->tag()) == Common::BalloonNumberBlock::AttTag)
-                                {
-                                    AcDbAttribute* pAtt = new AcDbAttribute();
-                                    pAtt->setPropertiesFrom(pAttDef);
-                                    // 必须基于块参照的变换矩阵设置属性位置
-                                    pAtt->setAttributeFromBlock(pAttDef, pBlkRef->blockTransform());
-                                    pAtt->setTextString(std::to_wstring(currentNum).c_str());
-
-                                    pBlkRef->appendAttribute(pAtt);
-                                    pAtt->close();
-                                }
-                                pEnt->close();
-                            }
-                        }
-                        delete pIt;
-                        pBTR->close();
-                    }
-
-                    // 提交到模型空间
-                    AcDbBlockTableRecord* pMs = nullptr;
-                    if (pBT->getAt(ACDB_MODEL_SPACE, pMs, AcDb::kForWrite) == Acad::eOk)
-                    {
-                        pMs->appendAcDbEntity(pBlkRef);
-                        pMs->close();
-                    }
-                    pBlkRef->close();
-
-                    currentNum++; // 仅在成功插入后递增
-                }
-                pBT->close();
-            }
-            pDim->close();
-        },
-        L"\n功能：全类型标注适配气泡\n",
-        UniversalPicker::SelectMode::Immediate,
-        true
-    );
 }
 
 void Interface::unload()
@@ -442,40 +328,24 @@ void Interface::cmdExtractAnnotations()
             }
             else if (gtData.status) // 形位公差
             {
-                AcString name = gtData.name[0];
-                AcString value = gtData.value[0];
-                AcString primary = gtData.primary[0];
-                AcString secondary = gtData.secondary[0];
-                AcString tertiary = gtData.tertiary[0];
-                AcString row = name + value + primary + secondary + tertiary;
-                acutPrintf(L"\n形位公差：%s", row.kACharPtr());
-                std::vector<AcString> rows = { row, name, value, primary, secondary, tertiary };
-                csv.writeRow(rows);
-
-                if (gtData.gdtSymbolType[1] != Acm::kNoType)
+                for (int i = 0; i < GeometricTolerance::GeometricToleranceDataLen; ++i)
                 {
-                    name = gtData.name[1];
-                    value = gtData.value[1];
-                    primary = gtData.primary[1];
-                    secondary = gtData.secondary[1];
-                    tertiary = gtData.tertiary[1];
-                    row = name + value + primary + secondary + tertiary;
-                    acutPrintf(L"\n形位公差：%s", row.kACharPtr());
-                    rows = { row, name, value, primary, secondary, tertiary };
-                    csv.writeRow( rows );
-
-                    if (gtData.gdtSymbolType[2] != Acm::kNoType)
+                    GeometricTolerance::GeometricToleranceRow row = gtData.rows[i];
+                    if (row.gdtSymbolType != Acm::kNoType)
                     {
-                        name = gtData.name[2];
-                        value = gtData.value[2];
-                        primary = gtData.primary[2];
-                        secondary = gtData.secondary[2];
-                        tertiary = gtData.tertiary[2];
-                        row = name + value + primary + secondary + tertiary;
-                        rows = { name, value, primary, secondary, tertiary };
+                        AcString name = row.name;
+                        AcString value = row.value;
+                        AcString primary = row.primary;
+                        AcString secondary = row.secondary;
+                        AcString tertiary = row.tertiary;
+                        AcString row = name + " " + value + " " + primary + " " + secondary + " " + tertiary;
                         acutPrintf(L"\n形位公差：%s", row.kACharPtr());
-                        rows = { row, name, value, primary, secondary, tertiary };
-                        csv.writeRow( rows );
+                        std::vector<AcString> asvRow = { row, name, value, primary, secondary, tertiary };
+                        csv.writeRow(asvRow);
+                    }
+                    else
+                    {
+                        break;
                     }
                 }
             }

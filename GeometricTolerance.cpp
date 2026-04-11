@@ -1,8 +1,9 @@
-module;
+ï»¿module;
 #include "StdAfx.h"
 
 module GeometricTolerance;
 import Common;
+import TextUtil;
 
 namespace GeometricTolerance
 {
@@ -15,43 +16,68 @@ namespace GeometricTolerance
 			return;
 		}
 
-		// ¾ä±ú
+		// å¥æŸ„
 		AcDbHandle handle = nullptr;
 		pFcf->getAcDbHandle(handle);
 		data.u64handle = handle;
 
-		// µÚ 1 ¸ö
-		data.gdtSymbolType[0] = pFcf->symbol();
-		data.name[0] = GeometricTolerance::gdtNameMap[data.gdtSymbolType[0]];
-		data.gdtSymbol[0] = GeometricTolerance::gdtSymbolMap[data.gdtSymbolType[0]];
-		data.value[0] = pFcf->value(Acm::FCFTolerance);
-		data.primary[0] = pFcf->value(Acm::FCFDatumPrimary);
-        data.secondary[0] = pFcf->value(Acm::FCFDatumSecondary);
-        data.tertiary[0] = pFcf->value(Acm::FCFDatumTertiary);
+		// ç¬¬ 1 ä¸ª
+		GeometricTolerance::GeometricToleranceRow& row0 = data.rows[0];
+		row0.gdtSymbolType = pFcf->symbol();
+		row0.name = GeometricTolerance::gdtNameMap[row0.gdtSymbolType];
+		row0.gdtSymbol = GeometricTolerance::gdtSymbolMap[row0.gdtSymbolType];
+		row0.value = pFcf->value(Acm::FCFTolerance);
+		row0.primary = pFcf->value(Acm::FCFDatumPrimary);
+        row0.secondary = pFcf->value(Acm::FCFDatumSecondary);
+        row0.tertiary = pFcf->value(Acm::FCFDatumTertiary);
 
-		// µÚ 2 ¸ö
-		data.gdtSymbolType[1] = pFcf->symbol2();
-		if (data.gdtSymbolType[1] != Acm::kNoType)
+		// ç¬¬ 2 ä¸ª
+		GeometricTolerance::GeometricToleranceRow& row1 = data.rows[1];
+		row1.gdtSymbolType = pFcf->symbol2();
+		if (row1.gdtSymbolType != Acm::kNoType)
 		{
-            data.name[1] = GeometricTolerance::gdtNameMap[data.gdtSymbolType[1]];
-            data.gdtSymbol[1] = GeometricTolerance::gdtSymbolMap[data.gdtSymbolType[1]];
-			data.value[1] = pFcf->value(Acm::FCFTolerance2);
-            data.primary[1] = pFcf->value(Acm::FCFDatumPrimary2);
-            data.secondary[1] = pFcf->value(Acm::FCFDatumSecondary2);
-            data.tertiary[1] = pFcf->value(Acm::FCFDatumTertiary2);
+            row1.name = GeometricTolerance::gdtNameMap[row1.gdtSymbolType];
+            row1.gdtSymbol = GeometricTolerance::gdtSymbolMap[row1.gdtSymbolType];
+			row1.value = pFcf->value(Acm::FCFTolerance2);
+            row1.primary = pFcf->value(Acm::FCFDatumPrimary2);
+            row1.secondary = pFcf->value(Acm::FCFDatumSecondary2);
+            row1.tertiary = pFcf->value(Acm::FCFDatumTertiary2);
 
-			// µÚ 3 ¸ö
-			data.gdtSymbolType[2] = pFcf->symbol3();
-			if (data.gdtSymbolType[2] != Acm::kNoType)
+			// ç¬¬ 3 ä¸ª
+			GeometricTolerance::GeometricToleranceRow& row2 = data.rows[2];
+			row2.gdtSymbolType = pFcf->symbol3();
+			if (row2.gdtSymbolType != Acm::kNoType)
 			{
-                data.name[2] = GeometricTolerance::gdtNameMap[data.gdtSymbolType[2]];
-                data.gdtSymbol[2] = GeometricTolerance::gdtSymbolMap[data.gdtSymbolType[2]];
-                data.value[2] = pFcf->value(Acm::FCFTolerance3);
-                data.primary[2] = pFcf->value(Acm::FCFDatumPrimary3);
-                data.secondary[2] = pFcf->value(Acm::FCFDatumSecondary3);
-                data.tertiary[2] = pFcf->value(Acm::FCFDatumTertiary3);
+                row2.name = GeometricTolerance::gdtNameMap[row2.gdtSymbolType];
+                row2.gdtSymbol = GeometricTolerance::gdtSymbolMap[row2.gdtSymbolType];
+                row2.value = pFcf->value(Acm::FCFTolerance3);
+                row2.primary = pFcf->value(Acm::FCFDatumPrimary3);
+                row2.secondary = pFcf->value(Acm::FCFDatumSecondary3);
+                row2.tertiary = pFcf->value(Acm::FCFDatumTertiary3);
 			}
 		}
+
+		GeometricTolerance::resolveData(data);
+
         data.status = true;
+	}
+
+	void resolveData(GeometricTolerance::GeometricToleranceData& data)
+	{
+		for (int i = 0; i < GeometricTolerance::GeometricToleranceDataLen; ++i)
+		{
+			GeometricTolerance::GeometricToleranceRow& row = data.rows[i];
+			if (row.gdtSymbolType != Acm::kNoType)
+			{
+				TextUtil::resolveControlCodes(row.value);
+				TextUtil::resolveControlCodes(row.primary);
+                TextUtil::resolveControlCodes(row.secondary);
+				TextUtil::resolveControlCodes(row.tertiary);
+			}
+			else
+			{
+				break;
+			}
+		}
 	}
 }

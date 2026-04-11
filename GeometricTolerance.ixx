@@ -6,18 +6,26 @@ export module GeometricTolerance;
 
 export namespace GeometricTolerance
 {
-	// 形位公差数据存储结构
+	constexpr int GeometricToleranceDataLen = 3; // AutoCAD 最多允许3个
+
+	// 形位公差行数据
+	struct GeometricToleranceRow
+	{
+		AcString name; // 名称
+		Acm::GdtSymbolType gdtSymbolType; // 符号类型枚举值
+		AcString gdtSymbol; // GDT 符号
+		AcString value; // 值
+        AcString primary; // 基准1
+        AcString secondary; // 基准2
+        AcString tertiary; // 基准3
+	};
+
+	// 形位公差数据
 	struct GeometricToleranceData
 	{
 		bool status = false;
 		Adesk::UInt64 u64handle; // 在文件中的唯一句柄
-		AcString name[3]; // 名称
-		Acm::GdtSymbolType gdtSymbolType[3]; // 符号类型枚举值
-		AcString gdtSymbol[3]; // 符号
-		AcString value[3]; // 值
-		AcString primary[3]; // 基准1
-		AcString secondary[3]; // 基准2
-		AcString tertiary[3]; // 基准3
+		GeometricTolerance::GeometricToleranceRow rows[GeometricTolerance::GeometricToleranceDataLen]; // 形位公差数据
 
 		// 句柄转字符串
 		AcString handleAsString() const
@@ -77,4 +85,10 @@ export namespace GeometricTolerance
 	 * @param data 传出形位公差数据
 	 */
 	void readFcf(AcDbObjectId id, GeometricToleranceData& data);
+
+	/**
+	 * @brief 解析形位公差数据得到纯文本数据
+	 * @param data 传入传出数据结构
+	 */
+	void resolveData(GeometricTolerance::GeometricToleranceData& data);
 }
