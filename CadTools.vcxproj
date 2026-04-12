@@ -18,6 +18,8 @@
     <ClCompile Include="Block.ixx" />
     <ClCompile Include="BuildingTime.ixx" />
     <ClCompile Include="CadTools.cpp" />
+    <ClCompile Include="Commands.cpp" />
+    <ClCompile Include="Commands.ixx" />
     <ClCompile Include="Common-Inline.ixx" />
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="Common.ixx" />
@@ -40,6 +42,8 @@
     <ClCompile Include="ImeAutoSwitcher.ixx" />
     <ClCompile Include="Interface.cpp" />
     <ClCompile Include="Interface.ixx" />
+    <ClCompile Include="MainBar.cpp" />
+    <ClCompile Include="MainBarChildDlg.cpp" />
     <ClCompile Include="TextUtil.cpp" />
     <ClCompile Include="TextUtil.ixx" />
     <ClCompile Include="StdAfx.cpp">
@@ -52,6 +56,8 @@
   <ItemGroup>
     <ClInclude Include="DocData.h" />
     <ClInclude Include="GenericPairEditDlg.hpp" />
+    <ClInclude Include="MainBar.hpp" />
+    <ClInclude Include="MainBarChildDlg.hpp" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="StdAfx.h" />
   </ItemGroup>

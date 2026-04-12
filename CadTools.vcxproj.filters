@@ -102,6 +102,18 @@
     <ClCompile Include="ImeAutoSwitcher.ixx">
       <Filter>头文件</Filter>
     </ClCompile>
+    <ClCompile Include="MainBarChildDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MainBar.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Commands.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Commands.ixx">
+      <Filter>头文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StdAfx.h">
@@ -114,6 +126,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="GenericPairEditDlg.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MainBarChildDlg.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MainBar.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
