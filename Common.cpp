@@ -100,37 +100,6 @@ namespace Common
 		return result;
 	}
 
-	AcString getShortCommandName(const ACHAR* cmdName)
-	{
-		AcString shortName = L"yx";
-
-		if (cmdName == nullptr)
-		{
-			return shortName;
-		}
-
-		const ACHAR* pChar = cmdName;
-		while (*pChar != L'\0')
-		{
-			if (iswupper(*pChar))
-			{
-                shortName += *pChar;
-			}
-			++pChar;
-		}
-		return shortName;
-	}
-
-	void registerYxCmd(const ACHAR* cmdName, int flags, AcRxFunctionPtr proc)
-	{
-		acedRegCmds->addCommand(Common::commandGroup, cmdName, cmdName, flags, proc);
-		AcString shortCmdName = Common::getShortCommandName(cmdName);
-		if (shortCmdName.compare(cmdName) != 0)
-		{
-			acedRegCmds->addCommand(Common::commandGroup, shortCmdName, shortCmdName, flags, proc);
-		}
-	}
-
 	void printClassHierarchy(AcDbObjectId objId)
 	{
 		if (objId.isNull())

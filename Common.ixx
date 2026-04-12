@@ -64,21 +64,6 @@ export namespace Common
 	AcString wrapWithGdtFont(const ACHAR* input);
 
 	/**
-	 * @brief 获取命令的简名
-	 * @param cmdName 命令全名
-	 * @return 命令简名。yx 开头，加命令全名中的大写字母拼接。
-	 */
-	AcString getShortCommandName(const ACHAR* cmdName);
-
-	/**
-	 * @brief 注册命令
-	 * @param cmdName 命令全名
-	 * @param flags 命令标志
-	 * @param proc 命令处理函数
-	 */
-	void registerYxCmd(const ACHAR* cmdName, int flags, AcRxFunctionPtr proc);
-
-	/**
 	 * @brief 打印指定对象ID的类层次结构
 	 * @param objId 对象ID
 	 */
@@ -97,9 +82,6 @@ export namespace Common
 // 常量
 export namespace Common
 {
-	// 命令组
-	constexpr const ACHAR* commandGroup = L"IYATTyxCadTools";
-
 	// 符号代码
 	namespace SymbolCodes
 	{
