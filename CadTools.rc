@@ -103,6 +103,13 @@ BEGIN
     PUSHBUTTON      "字符映射表",IDC_BUTTON1,600,17,50,41
 END
 
+IDD_MAINBAR DIALOGEX 0, 0, 184, 93
+STYLE DS_SETFONT | WS_CHILD | WS_VISIBLE
+FONT 8, "Tahoma", 0, 0, 0x0
+BEGIN
+    CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,0,0,183,92
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -119,6 +126,10 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 88
     END
+
+    IDD_MAINBAR, DIALOG
+    BEGIN
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -133,6 +144,11 @@ BEGIN
     0
 END
 
+IDD_MAINBAR AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -142,6 +158,11 @@ END
 STRINGTABLE
 BEGIN
     IDS_PROJNAME            "CadTools"
+    IDS_ShortCommandName    "精简命令名"
+    IDS_CommandName         "命令名"
+    IDS_CommandDescription  "命令描述"
+    IDS_CommandGroup        "IYATTyxCadTools"
+    IDS_ChineseProjectName  "IYATT-yx AutoCAD Mechanical 工具箱"
 END
 
 #endif    // 中文(简体，中国) resources
