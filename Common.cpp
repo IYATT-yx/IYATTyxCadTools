@@ -154,17 +154,24 @@ namespace Common
 
 		acutPrintf(L"\n----------------------------\n");
 	}
-}
 
-CString Common::ShowSaveFileDialog(const CString& title, const CString& defaultName, const CString& defExt, const CString& filter)
-{
-	CFileDialog dlg(FALSE, defExt, defaultName, OFN_HIDEREADONLY, filter, AfxGetMainWnd());
-	dlg.m_ofn.lpstrTitle = title;
-
-	if (dlg.DoModal() == IDOK)
+	CString ShowSaveFileDialog(const CString& title, const CString& defaultName, const CString& defExt, const CString& filter)
 	{
-		return dlg.GetPathName();
+		CFileDialog dlg(FALSE, defExt, defaultName, OFN_HIDEREADONLY, filter, AfxGetMainWnd());
+		dlg.m_ofn.lpstrTitle = title;
+
+		if (dlg.DoModal() == IDOK)
+		{
+			return dlg.GetPathName();
+		}
+
+		return L"";
 	}
 
-	return L"";
+	CString loadString(UINT nID)
+	{
+		CString tmp;
+		tmp.LoadStringW(nID);
+		return tmp;
+	}
 }

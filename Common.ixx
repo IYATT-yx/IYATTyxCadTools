@@ -77,6 +77,13 @@ export namespace Common
 	 * @return 用户选择的完整文件路径，如果取消返回空字符串
 	 */
 	CString ShowSaveFileDialog(const CString& title = L"保存文件", const CString& defaultName = L"标注数据.csv", const CString& defExt = L"csv", const CString& filter = L"CSV Files (*.csv)|*.csv|All Files (*.*)|*.*||");
+
+	/**
+	 * @brief 读取 String Table 中的字符串
+	 * @param nID String Table 中的字符串 ID
+	 * @return 字符串
+	 */
+	CString loadString(UINT nID);
 }
 
 // 常量
