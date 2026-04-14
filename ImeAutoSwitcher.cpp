@@ -1,9 +1,11 @@
 module;
 #include "stdafx.h"
+#include "resource.h"
 #include <imm.h>
 #pragma comment(lib, "imm32.lib")
 
 module ImeAutoSwitcher;
+import Common;
 
 namespace ImeAutoSwitcher
 {
@@ -44,7 +46,8 @@ namespace ImeAutoSwitcher
 
                     SendInput(2, inputs, sizeof(INPUT));
 
-                    acutPrintf(L"\n发送 Shift 切换语言。\n");
+                    CAcModuleResourceOverride resOverride;
+                    acutPrintf(L"\n%s\n", Common::loadString(IDS_ImeAutoSwitchPrompt));
                 }
             }
             ImmReleaseContext(hWnd, hIMC);
@@ -97,7 +100,8 @@ namespace ImeAutoSwitcher
             g_hKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, lowLevelKeyboardProc, GetModuleHandle(nullptr), 0);
             if (g_hKeyboardHook)
             {
-                acutPrintf(L"\n启动输入法自动切换，切换间隔：%dms", g_intervalMs);
+                CAcModuleResourceOverride resOverride;
+                acutPrintf(Common::loadString(IDS_ImeAutoSwitchStartPrompt_FMT), g_intervalMs);
             }
         }
     }
@@ -108,7 +112,8 @@ namespace ImeAutoSwitcher
         {
             UnhookWindowsHookEx(g_hKeyboardHook);
             g_hKeyboardHook = nullptr;
-            acutPrintf(L"\n停止输入法自动切换");
+            CAcModuleResourceOverride resOverride;
+            acutPrintf(L"\n%s", Common::loadString(IDS_ImeAutoSwitchStopPrompt));
         }
     }
 
