@@ -127,9 +127,9 @@ void MainBarChildDlg::insertCommands(Commands::CommandInfoList& commandInfoList)
 	for (Commands::CommandInfo ci : commandInfoList)
 	{
 		AcString shortCommandName = ci.getShortCommandName();
-		this->commandListControl.InsertItem(idx, shortCommandName.kACharPtr());
-        this->commandListControl.SetItemText(idx, 1, ci.commandName.kACharPtr());
-		this->commandListControl.SetItemText(idx, 2, ci.commandDescription.kACharPtr());
+		this->commandListControl.InsertItem(idx, shortCommandName.constPtr());
+        this->commandListControl.SetItemText(idx, 1, ci.commandName.constPtr());
+		this->commandListControl.SetItemText(idx, 2, ci.commandDescription.constPtr());
 		++idx;
 	}
 }
@@ -146,8 +146,8 @@ void MainBarChildDlg::OnNMDblclkList1(NMHDR* pNMHDR, LRESULT* pResult)
 		if (!strFullCmd.IsEmpty())
 		{
 			AcString acCmd;
-			acCmd.format(L"._%s\n", (const ACHAR*)strFullCmd);
-			acDocManager->sendStringToExecute(curDoc(), acCmd, false, true, true);
+			acCmd.format(L"._%s\n", (const wchar_t*)strFullCmd);
+			acDocManager->sendStringToExecute(curDoc(), acCmd.constPtr(), false, true, true);
 		}
 	}
 	*pResult = 0;

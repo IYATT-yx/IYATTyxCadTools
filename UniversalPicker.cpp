@@ -40,7 +40,7 @@ resbuf* UniversalPicker::buildFilter(UniversalPicker::AcRxClassVectorPtr arcv)
             continue;
         }
 
-        const ACHAR* dxfName = cls->dxfName();
+        const wchar_t* dxfName = cls->dxfName();
         if (!dxfName || !*dxfName)
         {
             continue;
@@ -93,10 +93,10 @@ void UniversalPicker::batchSelect(UniversalPicker::AcRxClassVectorPtr arcv, Univ
         acedInitGet(0, L"RD RU LD LU DR DL UR UL None");
         wchar_t kword[20];
         AcString asKword;
-        const ACHAR* prefix = L"\n排序模式 [右下(RD)/右上(RU)/左下(LD)/左上(LU)/下右(DR)/下左(DL)/上右(UR)/上左(UL)/无(None)] <";
-        const ACHAR* suffix = L">: ";
+        const wchar_t* prefix = L"\n排序模式 [右下(RD)/右上(RU)/左下(LD)/左上(LU)/下右(DR)/下左(DL)/上右(UR)/上左(UL)/无(None)] <";
+        const wchar_t* suffix = L">: ";
         asKword.format(L"%s%s%s", prefix, UniversalPicker::SortModeToString(finalMode), suffix);
-        int stat = acedGetKword(asKword.kACharPtr(), kword);
+        int stat = acedGetKword(asKword.constPtr(), kword);
 
         if (stat == Acad::eNormal)
         {
@@ -355,7 +355,7 @@ void UniversalPicker::immediateSelect(UniversalPicker::AcRxClassVectorPtr arcv, 
 }
 
 
-void UniversalPicker::run(UniversalPicker::AcRxClassVectorPtr arcv, UniversalPicker::EntityProcessor processor, const ACHAR* prompt, UniversalPicker::SelectMode defaultSelectMode, bool lockSelectMode, SortMode defaultSortMode, bool lockSortMode, double sortTol)
+void UniversalPicker::run(UniversalPicker::AcRxClassVectorPtr arcv, UniversalPicker::EntityProcessor processor, const wchar_t* prompt, UniversalPicker::SelectMode defaultSelectMode, bool lockSelectMode, SortMode defaultSortMode, bool lockSortMode, double sortTol)
 {
     if (prompt != nullptr)
     {
@@ -363,12 +363,12 @@ void UniversalPicker::run(UniversalPicker::AcRxClassVectorPtr arcv, UniversalPic
     }
 
     // 模式选择提示
-    const ACHAR* modePrompt = (defaultSelectMode == UniversalPicker::SelectMode::Batch) ?
+    const wchar_t* modePrompt = (defaultSelectMode == UniversalPicker::SelectMode::Batch) ?
         L"\n选择模式 [批量(B)/立即(I)]<B>：" :
         L"\n选择模式 [批量(B)/立即(I)]<I>：";
 
     UniversalPicker::SelectMode inputMode = defaultSelectMode;
-    ACHAR keyword[2] = { 0 };
+    wchar_t keyword[2] = { 0 };
     bool validInput = false;
 
     if (!lockSelectMode)
@@ -505,7 +505,7 @@ bool UniversalPicker::compareEntities(const UniversalPicker::EntityInfo& a, cons
     }
 }
 
-const ACHAR* UniversalPicker::SortModeToString(UniversalPicker::SortMode mode)
+const wchar_t* UniversalPicker::SortModeToString(UniversalPicker::SortMode mode)
 {
     switch (mode)
     {

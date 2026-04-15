@@ -5,10 +5,10 @@ export module ImeAutoSwitcher;
 
 namespace ImeAutoSwitcher
 {
-    constexpr const ACHAR* cmdActive = L"CMDACTIVE";
-    constexpr const ACHAR* regAutoStartKey = L"ImeAutoSwitcherAutoStart";
-    constexpr const ACHAR* regIntervalKey = L"ImeAutoSwitcherIntervalMs";
-    constexpr const ACHAR* regSettingsPath = L"\\Applications\\IYATTyxCadTools\\Settings";
+    constexpr const wchar_t* cmdActive = L"CMDACTIVE";
+    constexpr const wchar_t* regAutoStartKey = L"ImeAutoSwitcherAutoStart";
+    constexpr const wchar_t* regIntervalKey = L"ImeAutoSwitcherIntervalMs";
+    constexpr const wchar_t* regSettingsPath = L"\\Applications\\IYATTyxCadTools\\Settings";
 };
 
 export namespace ImeAutoSwitcher

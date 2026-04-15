@@ -37,7 +37,7 @@ export namespace GeometricTolerance
 	};
 
 	// 符号类型与名称的映射
-	std::map<Acm::GdtSymbolType, const ACHAR*> gdtNameMap =
+	std::map<Acm::GdtSymbolType, const wchar_t*> gdtNameMap =
 	{
 		{Acm::kStraightness, L"直线度"},
 		{Acm::kFlatness, L"平面度"},
@@ -57,7 +57,7 @@ export namespace GeometricTolerance
 	};
 
 	// 符号类型与 GDT 符号的映射
-	std::map<Acm::GdtSymbolType, const ACHAR*> gdtSymbolMap =
+	std::map<Acm::GdtSymbolType, const wchar_t*> gdtSymbolMap =
 	{
 		{Acm::kStraightness, L"u"},
 		{Acm::kFlatness, L"c"},

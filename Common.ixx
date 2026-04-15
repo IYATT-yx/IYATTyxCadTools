@@ -61,7 +61,7 @@ export namespace Common
 	 * @param input 要包裹的字符串
 	 * @return 包裹后的字符串
 	 */
-	AcString wrapWithGdtFont(const ACHAR* input);
+	AcString wrapWithGdtFont(const wchar_t* input);
 
 	/**
 	 * @brief 打印指定对象ID的类层次结构
@@ -92,19 +92,19 @@ export namespace Common
 	// 符号代码
 	namespace SymbolCodes
 	{
-		constexpr const ACHAR* Diameter = L"%%c";
-		constexpr const ACHAR* PlusMinus = L"%%p";
-		constexpr const ACHAR* Degree = L"%%d";
-		constexpr const ACHAR* Radius = L"R";
+		constexpr const wchar_t* Diameter = L"%%c";
+		constexpr const wchar_t* PlusMinus = L"%%p";
+		constexpr const wchar_t* Degree = L"%%d";
+		constexpr const wchar_t* Radius = L"R";
 	}
 
 	// 符号
 	namespace Symbols
 	{
-		constexpr const ACHAR* Diameter = L"⌀";
-		constexpr const ACHAR* PlusMinus = L"±";
-		constexpr const ACHAR* Degree = L"°";
-		constexpr const ACHAR* Radius = L"R";
+		constexpr const wchar_t* Diameter = L"⌀";
+		constexpr const wchar_t* PlusMinus = L"±";
+		constexpr const wchar_t* Degree = L"°";
+		constexpr const wchar_t* Radius = L"R";
 	}
 
 	// 控制代码
@@ -138,7 +138,7 @@ export namespace Common
 	};
 
 	// 标注的默认尺寸文本占位符
-	constexpr const ACHAR* ACDB_DIM_TEXT_DEFAULT = L"<>";
+	constexpr const wchar_t* ACDB_DIM_TEXT_DEFAULT = L"<>";
 
 	// 启动 charmap 字符映射表使用的常量
 	namespace CharMap
@@ -152,9 +152,9 @@ export namespace Common
 	// 序号圆
 	namespace BalloonNumberBlock
 	{
-		constexpr const ACHAR* blockName = L"气泡号块";
-		constexpr const ACHAR* AttTag = L"序号";
-		constexpr const ACHAR* AttPrompt = L"输入序号：";
+		constexpr const wchar_t* blockName = L"气泡号块";
+		constexpr const wchar_t* AttTag = L"序号";
+		constexpr const wchar_t* AttPrompt = L"输入序号：";
 		constexpr double defaultCircleRadius = 2.5;
 		constexpr double defaultTextHeight = 2.5;
 	}

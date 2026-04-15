@@ -52,8 +52,8 @@ namespace Dimension
 			}
 			else
 			{
-				dimData.dimText.replace(Common::ACDB_DIM_TEXT_DEFAULT, measurementValueText.kACharPtr());
-                pDim->setDimensionText(dimData.dimText.kACharPtr());
+				dimData.dimText.replace(Common::ACDB_DIM_TEXT_DEFAULT, measurementValueText.constPtr());
+                pDim->setDimensionText(dimData.dimText.constPtr());
 			}
 		}
 	}
@@ -68,7 +68,7 @@ namespace Dimension
 		pDim->setDimensionText(L"");
 	}
 
-	void addSurroundingCharsForDimension(AcDbObjectId objId, const ACHAR* left, const ACHAR* right, bool isLGdt, bool isRGdt)
+	void addSurroundingCharsForDimension(AcDbObjectId objId, const wchar_t* left, const wchar_t* right, bool isLGdt, bool isRGdt)
 	{
         AcDbDimension* pDim = Common::getObject<AcDbDimension>(objId, AcDb::kForWrite);
 		if (pDim == nullptr)
@@ -80,9 +80,9 @@ namespace Dimension
 
 		// 处理 GDT 字体包裹
 		AcString leftWrapedString = isLGdt ? Common::wrapWithGdtFont(left) : AcString(left);
-		const ACHAR* leftNew = leftWrapedString.kACharPtr();
+		const wchar_t* leftNew = leftWrapedString.constPtr();
 		AcString rightWrapedString = isRGdt ? Common::wrapWithGdtFont(right) : AcString(right);
-        const ACHAR* rightNew = rightWrapedString.kACharPtr();
+        const wchar_t* rightNew = rightWrapedString.constPtr();
 
 		AcString dimensionNewText;
 		if (dimensionText.empty())
@@ -91,12 +91,12 @@ namespace Dimension
 		}
 		else
 		{
-			dimensionNewText.format(L"%s%s%s", leftNew, dimensionText.kACharPtr(), rightNew);
+			dimensionNewText.format(L"%s%s%s", leftNew, dimensionText.constPtr(), rightNew);
 		}
-        pDim->setDimensionText(dimensionNewText.kACharPtr());
+        pDim->setDimensionText(dimensionNewText.constPtr());
 	}
 
-	void removeSurroundingCharsForDimension(AcDbObjectId objId, const ACHAR* left, const ACHAR* right, bool isLGdt, bool isRGdt)
+	void removeSurroundingCharsForDimension(AcDbObjectId objId, const wchar_t* left, const wchar_t* right, bool isLGdt, bool isRGdt)
 	{
 		AcDbDimension* pDim = Common::getObject<AcDbDimension>(objId, AcDb::kForWrite);
 		if (pDim == nullptr)
@@ -114,9 +114,9 @@ namespace Dimension
 
 		// 处理 GDT 字体包裹
 		AcString leftWrapedString = isLGdt ? Common::wrapWithGdtFont(left) : AcString(left);
-		const ACHAR* leftNew = leftWrapedString.kACharPtr();
+		const wchar_t* leftNew = leftWrapedString.constPtr();
 		AcString rightWrapedString = isRGdt ? Common::wrapWithGdtFont(right) : AcString(right);
-		const ACHAR* rightNew = rightWrapedString.kACharPtr();
+		const wchar_t* rightNew = rightWrapedString.constPtr();
 
 		// 使用 static_cast 明确转换类型，消除编译器关于类型缩减的警告
 		int nTextLen = static_cast<int>(text.length());
@@ -160,7 +160,7 @@ namespace Dimension
 				}
 				else
 				{
-					pDim->setDimensionText(newText.kACharPtr());
+					pDim->setDimensionText(newText.constPtr());
 				}
 			}
 		}
@@ -187,8 +187,8 @@ namespace Dimension
 
 	void setAndUnsetRefDim(AcDbObjectId objId, bool isSet)
 	{
-		const ACHAR* left = L"(";
-        const ACHAR* right = L")";
+		const wchar_t* left = L"(";
+        const wchar_t* right = L")";
 		if (isSet)
 		{
 			Dimension::addSurroundingCharsForDimension(objId, left, right);

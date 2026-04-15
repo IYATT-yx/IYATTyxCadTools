@@ -63,6 +63,18 @@ void Interface::init()
 // 测试使用
 void Interface::test()
 {
+    UniversalPicker::run(
+        nullptr,
+        [](const AcDbObjectId& id)
+        {
+            AcString strTmp;
+            BalloonNumber::getBalloonAttributeValue(id, strTmp);
+            acutPrintf(L"\n读取到：%s", strTmp.constPtr());
+        },
+        L"测试",
+        UniversalPicker::SelectMode::Immediate,
+        true
+    );
 }
 
 void Interface::unload()
@@ -81,7 +93,7 @@ void Interface::unload()
 
 void Interface::cmdUnloadApp()
 {
-    const ACHAR* appName = acedGetAppName();
+    const wchar_t* appName = acedGetAppName();
     AcString acCmd;
     acCmd.format(L"._ARX\nU\n%s\n", appName);
     acDocManager->sendStringToExecute(curDoc(), acCmd, false, true, true);
@@ -133,8 +145,8 @@ void Interface::cmdAddSurroundingCharsForDimension()
         return;
     }
 
-    const ACHAR* left = edit1Result.GetString();
-    const ACHAR* right = edit2Result.GetString();
+    const wchar_t* left = edit1Result.GetString();
+    const wchar_t* right = edit2Result.GetString();
     bool isLGdt = dlg.getGdtCheckStatus(0);
     bool isRGdt = dlg.getGdtCheckStatus(1);
 
@@ -168,8 +180,8 @@ void Interface::cmdRemoveSurroundingCharsForDimension()
         return;
     }
 
-    const ACHAR* left = edit1Result.GetString();
-    const ACHAR* right = edit2Result.GetString();
+    const wchar_t* left = edit1Result.GetString();
+    const wchar_t* right = edit2Result.GetString();
     bool isLGdt = dlg.getGdtCheckStatus(0);
     bool isRGdt = dlg.getGdtCheckStatus(1);
     UniversalPicker::run(
@@ -324,7 +336,7 @@ void Interface::cmdExtractAnnotations()
                 }
                 Common::double2AcString(dMeasuredValue, asMeasuredValue, dimData.measuredValuePrecision);
                 
-                //acutPrintf(L"\n调试：%s %s %f %f ", dimData.prefix.kACharPtr(), dimData.suffix.kACharPtr(), dimData.tolUpper, dimData.tolLower);
+                //acutPrintf(L"\n调试：%s %s %f %f ", dimData.prefix.constPtr(), dimData.suffix.constPtr(), dimData.tolUpper, dimData.tolLower);
                 // 公差
                 AcString asTol,asTolUpper, asTolLower;
                 if (dimData.tolUpper == 0 && dimData.tolLower == 0) // 无公差
@@ -347,7 +359,7 @@ void Interface::cmdExtractAnnotations()
                         
                         Common::double2AcString(dimData.tolUpper, asTolUpper, dimData.tolPrecision);
                         Common::double2AcString(dimData.tolLower, asTolLower, dimData.tolPrecision);
-                        asTol.format(L"+%s/%s", asTolUpper.kACharPtr(), asTolLower.kACharPtr());
+                        asTol.format(L"+%s/%s", asTolUpper.constPtr(), asTolLower.constPtr());
                         asTolUpper.format(L"%.*g", dimData.tolPrecision, dimData.tolUpper);
                         asTolLower.format(L"%.*g", dimData.tolPrecision, dimData.tolLower);
                     }
@@ -355,7 +367,7 @@ void Interface::cmdExtractAnnotations()
                 AcString asPrefix = Common::getSymbol(dimData.prefix);
                 AcString asSuffix = Common::getSymbol(dimData.suffix);
                 AcString asDimText = asPrefix + asMeasuredValue + asTol + asSuffix;
-                acutPrintf(L"\n%s：%s", Common::loadString(IDS_Dimension), asDimText.kACharPtr());
+                acutPrintf(L"\n%s：%s", Common::loadString(IDS_Dimension), asDimText.constPtr());
                 std::vector<AcString> row = { asDimText, asMeasuredValue, asTolUpper, asTolLower }; // 完整尺寸文本、名义值、上极限偏差、下极限偏差
                 csv.writeRow(row);
             }
@@ -372,7 +384,7 @@ void Interface::cmdExtractAnnotations()
                         AcString secondary = row.secondary;
                         AcString tertiary = row.tertiary;
                         AcString row = name + " " + value + " " + primary + " " + secondary + " " + tertiary;
-                        acutPrintf(L"\n%s：%s", Common::loadString(IDS_GDT), row.kACharPtr());
+                        acutPrintf(L"\n%s：%s", Common::loadString(IDS_GDT), row.constPtr());
                         std::vector<AcString> asvRow = { row, name, value, primary, secondary, tertiary };
                         csv.writeRow(asvRow);
                     }
@@ -384,13 +396,13 @@ void Interface::cmdExtractAnnotations()
             }
             else if (TextUtil::readMText(objId, asMText))
             {
-                acutPrintf(L"\n%s：%s", Common::loadString(IDS_MText), asMText.kACharPtr());
+                acutPrintf(L"\n%s：%s", Common::loadString(IDS_MText), asMText.constPtr());
                 std::vector<AcString> rows = { asMText };
                 csv.writeRow(rows);
             }
             else if (TextUtil::readDText(objId, asDText))
             {
-                acutPrintf(L"\n%s：%s", Common::loadString(IDS_DText), asDText.kACharPtr());
+                acutPrintf(L"\n%s：%s", Common::loadString(IDS_DText), asDText.constPtr());
                 std::vector<AcString> rows = { asDText };
                 csv.writeRow(rows);
             }
@@ -526,7 +538,7 @@ void Interface::cmdCloneText()
         acutPrintf(L"\n%s", Common::loadString(IDS_CancelOperation));
         return;
     }
-    acutPrintf(L"\n读取到：%s\n", asSrcTextContent.kACharPtr());
+    acutPrintf(L"\n读取到：%s\n", asSrcTextContent.constPtr());
 
     acutPrintf(L"\n%s", Common::loadString(IDS_Msg_PasteDstTextPrompt));
     UniversalPicker::run(

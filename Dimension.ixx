@@ -59,7 +59,7 @@ export namespace Dimension
 	 * @param isLGdt 左字符是否为 GDT
 	 * @param isRGdt 右字符是否为 GDT
 	 */
-	void addSurroundingCharsForDimension(AcDbObjectId objId, const ACHAR* left, const ACHAR* right, bool isLGdt = false, bool isRGdt = false);
+	void addSurroundingCharsForDimension(AcDbObjectId objId, const wchar_t* left, const wchar_t* right, bool isLGdt = false, bool isRGdt = false);
 	/**
 	 * @brief 删除标注前后字符
 	 * @param objId 标注对象ID
@@ -68,7 +68,7 @@ export namespace Dimension
 	 * @param isLGdt 左字符是否为 GDT
 	 * @param isRGdt 右字符是否为 GDT
 	 */
-	void removeSurroundingCharsForDimension(AcDbObjectId objId, const ACHAR* left, const ACHAR* right, bool isLGdt = false, bool isRGdt = false);
+	void removeSurroundingCharsForDimension(AcDbObjectId objId, const wchar_t* left, const wchar_t* right, bool isLGdt = false, bool isRGdt = false);
 	/**
 	 * @brief 设置或取消标注的理论尺寸框
 	 * @param objId 标注对象ID

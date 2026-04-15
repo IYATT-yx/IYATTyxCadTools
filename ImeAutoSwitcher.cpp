@@ -120,7 +120,7 @@ namespace ImeAutoSwitcher
     bool saveSettings(bool bAutoStart, int nIntervalMS)
     {
         HKEY hKey;
-        const ACHAR* pProductRoot = acdbHostApplicationServices()->getMachineRegistryProductRootKey();
+        const wchar_t* pProductRoot = acdbHostApplicationServices()->getMachineRegistryProductRootKey();
 
         if (pProductRoot == nullptr)
         {
@@ -160,7 +160,7 @@ namespace ImeAutoSwitcher
     bool loadSettings(bool& bAutoStart, int& nIntervalMS)
     {
         HKEY hKey;
-        const ACHAR* pProductRoot = acdbHostApplicationServices()->getMachineRegistryProductRootKey();
+        const wchar_t* pProductRoot = acdbHostApplicationServices()->getMachineRegistryProductRootKey();
 
         if (pProductRoot == nullptr)
         {

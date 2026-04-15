@@ -86,7 +86,7 @@ private:
 	 * @param mode 排序模式 
 	 * @return 字符串
 	 */
-	static const ACHAR* SortModeToString(UniversalPicker::SortMode mode);
+	static const wchar_t* SortModeToString(UniversalPicker::SortMode mode);
 
 public:
 	/**
@@ -100,7 +100,7 @@ public:
 	 * @param lockSortMode 是否锁定排序模式，默认锁定
 	 * @param sortTol 坐标容差，默认为 3.5。坐标超过容差认为是不同行或不同列。
 	 */
-	static void run(UniversalPicker::AcRxClassVectorPtr arcv, UniversalPicker::EntityProcessor processor, const ACHAR* prompt, UniversalPicker::SelectMode defaultSelectMode = UniversalPicker::SelectMode::Batch, bool lockSelectMode = false, SortMode defaultSortMode = UniversalPicker::SortMode::None, bool lockSortMode = true, double sortTol = 3.5);
+	static void run(UniversalPicker::AcRxClassVectorPtr arcv, UniversalPicker::EntityProcessor processor, const wchar_t* prompt, UniversalPicker::SelectMode defaultSelectMode = UniversalPicker::SelectMode::Batch, bool lockSelectMode = false, SortMode defaultSortMode = UniversalPicker::SortMode::None, bool lockSortMode = true, double sortTol = 3.5);
 
 	/**
 	 * @brief 构建过滤器

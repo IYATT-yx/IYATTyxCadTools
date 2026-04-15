@@ -121,7 +121,7 @@ std::wstring CsvWriter::escape(const std::wstring& field)
 
 std::wstring CsvWriter::toWString(const AcString& s) const
 {
-    return std::wstring(s.kACharPtr());
+    return std::wstring(s.constPtr());
 }
 
 

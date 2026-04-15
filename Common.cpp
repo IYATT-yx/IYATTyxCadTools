@@ -79,7 +79,7 @@ namespace Common
 		}
 	}
 
-	AcString wrapWithGdtFont(const ACHAR* input)
+	AcString wrapWithGdtFont(const wchar_t* input)
 	{
 		AcString result = L"";
 		if (input == nullptr)

@@ -13,7 +13,7 @@ namespace TextUtil
 		tolUpper = 0;
         tolLower = 0;
 		std::wsmatch match;
-		std::wstring text(dimText.kACharPtr());
+		std::wstring text(dimText.constPtr());
 
 		// 优先解析 \s 格式的极限偏差
 		std::wregex re(LR"(\\S([+-]?[0-9]*\.?[0-9]+)°?\^([+-]?[0-9]*\.?[0-9]+)°?;)");

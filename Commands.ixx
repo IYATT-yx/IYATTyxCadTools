@@ -34,7 +34,7 @@ export namespace Commands
 			AcString shortCommandName;
 			for (size_t i = 0; i < this->commandName.length(); ++i)
 			{
-				ACHAR ch = this->commandName[i];
+				wchar_t ch = this->commandName[i];
 				if (iswupper(ch))
 				{
 					shortCommandName += ch;
