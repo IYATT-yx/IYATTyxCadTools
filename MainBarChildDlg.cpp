@@ -43,7 +43,7 @@ BEGIN_MESSAGE_MAP(MainBarChildDlg, CAcUiDialog)
 	//}}AFX_MSG_MAP
 
 	ON_WM_SIZE()
-	ON_NOTIFY(NM_DBLCLK, IDC_LIST1, &MainBarChildDlg::OnNMDblclkList1)
+	ON_NOTIFY(NM_CLICK, IDC_LIST1, &MainBarChildDlg::OnNMDblclkList1)
 END_MESSAGE_MAP()
 
 //-----------------------------------------------------------------------------
