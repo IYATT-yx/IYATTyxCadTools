@@ -218,7 +218,7 @@ BEGIN
     IDS_ImeAutoSwitchPrompt "已自动切换输入法"
     IDS_ImeAutoSwitchStartPrompt_FMT "\n启动输入法自动切换，切换间隔：%dms\n"
     IDS_ImeAutoSwitchStopPrompt "\n停止输入法自动切换\n"
-    IDS_yxUnloadCommandDescription "卸载本插件"
+    IDS_yxUnloadCommandDescription "关闭本插件"
     IDS_Msg_Unload_FMT      "\n已卸载 %s"
     IDS_yxCloneTextCommandDescription "将多行/单行文本内容复制给其它多行/单行文本"
     IDS_Msg_CopySrcTextPrompt "请选择要复制的源文本对象"
