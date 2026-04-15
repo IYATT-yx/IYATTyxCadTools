@@ -25,5 +25,7 @@ private:
 	static void cmdExtractAnnotations();
 	static void cmdUpdateBalloonNumberBlock();
 	static void cmdImeAutoSwitch();
+	static void cmdUnloadApp();
+	static void cmdCloneText();
 };
 

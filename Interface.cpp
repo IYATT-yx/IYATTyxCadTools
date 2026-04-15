@@ -27,6 +27,7 @@ void Interface::init()
     {
         {L"yx", Common::loadString(IDS_yxCommandDescription), Commands::CommandFlags::Base, Interface::cmdHelp},
         {L"yxTest", Common::loadString(IDS_yxTestCommandDescription), Commands::CommandFlags::Base, Interface::test},
+        {L"yxUnload", Common::loadString(IDS_yxUnloadCommandDescription), Commands::CommandFlags::Base, Interface::cmdUnloadApp},
         {L"yxSetByLayer", Common::loadString(IDS_yxSetByLayerCommandDescription), Commands::CommandFlags::Pick, Interface::cmdSetByLayer},
         {L"yxDimensionFix", Common::loadString(IDS_yxDimensionFixCommandDescription), Commands::CommandFlags::Pick, Interface::cmdDimensionFix},
         {L"yxDimensionResume", Common::loadString(IDS_yxDimensionResumeCommandDescription), Commands::CommandFlags::Pick, Interface::cmdDimensionResume},
@@ -40,7 +41,8 @@ void Interface::init()
         {L"yxPrintClassHierarchy", Common::loadString(IDS_yxPrintClassHierarchyCommandDescription), Commands::CommandFlags::Base, Interface::cmdPrintClassHierarchy},
         {L"yxExtractAnnotations", Common::loadString(IDS_yxExtractAnnotationsCommandDescription), Commands::CommandFlags::Base, Interface::cmdExtractAnnotations},
         {L"yxUpdateBalloonNumberBlock", Common::loadString(IDS_yxUpdateBalloonNumberBlockCommandDescription), Commands::CommandFlags::Base, Interface::cmdUpdateBalloonNumberBlock},
-        {L"yxImeAutoSwitch", Common::loadString(IDS_yxImeAutoSwitchCommandDescription), Commands::CommandFlags::Base, Interface::cmdImeAutoSwitch}
+        {L"yxImeAutoSwitch", Common::loadString(IDS_yxImeAutoSwitchCommandDescription), Commands::CommandFlags::Base, Interface::cmdImeAutoSwitch},
+        {L"yxCloneText", Common::loadString(IDS_yxCloneTextCommandDescription), Commands::CommandFlags::Base, Interface::cmdCloneText}
     };
 
     // ◊¢≤·√¸¡Ó
@@ -61,8 +63,6 @@ void Interface::init()
 // ≤‚ ‘ π”√
 void Interface::test()
 {
-    
-    
 }
 
 void Interface::unload()
@@ -76,6 +76,15 @@ void Interface::unload()
     CString cmdGroup;
     cmdGroup.LoadStringW(IDS_CommandGroup);
 	acedRegCmds->removeGroup(cmdGroup);
+    acutPrintf(Common::loadString(IDS_Msg_Unload_FMT), Common::loadString(IDS_LocaleProjectName));
+}
+
+void Interface::cmdUnloadApp()
+{
+    const ACHAR* appName = acedGetAppName();
+    AcString acCmd;
+    acCmd.format(L"._ARX\nU\n%s\n", appName);
+    acDocManager->sendStringToExecute(curDoc(), acCmd, false, true, true);
 }
 
 void Interface::cmdHelp()
@@ -504,3 +513,29 @@ void Interface::cmdImeAutoSwitch()
     ImeAutoSwitcher::saveSettings(bAutoStart, nInterval);
 }
 
+void Interface::cmdCloneText()
+{
+    CAcModuleResourceOverride resOverride;
+    AcString asSrcTextContent;
+    acutPrintf(L"\n%s", Common::loadString(IDS_Msg_CopySrcTextPrompt));
+    if (!TextUtil::getSelectedTextRawContent(asSrcTextContent) || asSrcTextContent.isEmpty())
+    {
+        acutPrintf(L"\n%s", Common::loadString(IDS_CancelOperation));
+        return;
+    }
+    acutPrintf(L"\n∂¡»°µΩ£∫%s\n", asSrcTextContent.kACharPtr());
+
+    acutPrintf(L"\n%s", Common::loadString(IDS_Msg_PasteDstTextPrompt));
+    UniversalPicker::run(
+        &TextUtil::textClassList,
+        [&asSrcTextContent](const AcDbObjectId& id)
+        {
+            TextUtil::updateTextEntityContent(id, asSrcTextContent);
+        },
+        Common::loadString(IDS_yxCloneTextCommandDescription),
+        UniversalPicker::SelectMode::Immediate,
+        false,
+        UniversalPicker::SortMode::None,
+        true
+    );
+}
