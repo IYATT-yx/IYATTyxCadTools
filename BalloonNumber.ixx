@@ -67,13 +67,6 @@ export namespace BalloonNumber
 	void createBalloonNumberBlock();
 
 	/**
-	 * @brief 插入序列号块
-	 * @param insPt 插入点
-	 * @param numStr 序列号
-	 */
-	void insertBalloonNumber(AcGePoint3d insPt, unsigned int num);
-
-	/**
 	 * @brief 从指定序号开始插入
 	 * @param num 开始序号
 	 */
@@ -86,6 +79,16 @@ export namespace BalloonNumber
 	 * @return true 表示更新成功; false 表示更新失败
 	 */
 	bool updateBalloonNumberBlock(AcDbObjectId blockRefId, unsigned int newNum);
+}
+
+namespace BalloonNumber
+{
+	/**
+	 * @brief 插入序列号块
+	 * @param insPt 插入点
+	 * @param numStr 序列号
+	 */
+	void insertBalloonNumber(AcGePoint3d insPt, unsigned int num);
 
 	/**
 	 * @brief 更新气泡号块参照的属性
