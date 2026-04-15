@@ -435,9 +435,11 @@ void Interface::cmdUpdateBalloonNumberBlock()
     }
     int startNum = _wtoi(edit1Result);
 
+    UniversalPicker::AcRxClassVector arcv = { AcDbBlockReference::desc() };
+
     acutPrintf(Common::loadString(IDS_BalloonNextNumber_FMT), startNum);
     UniversalPicker::run(
-        nullptr,
+        &arcv,
         [&startNum](const AcDbObjectId& id)
         {
             if (Block::updateBalloonNumberBlock(id, startNum))
