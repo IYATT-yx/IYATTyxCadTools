@@ -8,7 +8,8 @@ export namespace Commands
 	enum CommandFlags : int
 	{
 		Base = ACRX_CMD_MODAL, // 模态命令
-		Pick = ACRX_CMD_MODAL | ACRX_CMD_USEPICKSET // 模态命令，支持预选（先选实体后执行命令）
+		//Pick = ACRX_CMD_MODAL | ACRX_CMD_USEPICKSET, // 模态命令，支持预选（先选实体后执行命令）
+		PickRedraw = ACRX_CMD_MODAL | ACRX_CMD_USEPICKSET | ACRX_CMD_REDRAW // 模态命令，支持预选，支持重绘
 	};
 
 	struct CommandInfo
@@ -45,8 +46,9 @@ export namespace Commands
 	};
 
 	using CommandInfoList = std::vector<Commands::CommandInfo>;
-
 	CommandInfoList commandInfoList;
+
+	using CommandList = std::vector<const wchar_t*>;
 };
 
 export namespace Commands
@@ -56,4 +58,11 @@ export namespace Commands
 	 * @param cil 命令列表
 	 */
 	void registerYxCmds(Commands::CommandInfoList& cil);
+
+	/**
+	 * @brief 执行命令，命令列表第一个元素自动加上“._” 开头
+	 * @param cmdList 命令列表
+	 * @param pDoc 文档指针
+	 */
+	void executeCommand(const Commands::CommandList& cmdList, AcApDocument* pDoc = nullptr);
 };
