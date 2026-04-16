@@ -95,9 +95,13 @@ void Interface::unload()
 void Interface::cmdUnloadApp()
 {
     const wchar_t* appName = acedGetAppName();
-    AcString acCmd;
-    acCmd.format(L"._ARX\nU\n%s\n", appName);
-    acDocManager->sendStringToExecute(curDoc(), acCmd, false, true, true);
+    AcString strCmd;
+    strCmd.format(L"._ARX\nU\n%s\n", appName);
+    AcApDocument* pDoc = curDoc();
+    if (pDoc != nullptr)
+    {
+        acDocManager->sendStringToExecute(pDoc, strCmd.constPtr(), false, true, true);
+    }
 }
 
 void Interface::cmdHelp()
@@ -558,6 +562,10 @@ void Interface::cmdCloneText()
 
 void Interface::cmdIntersect()
 {
-    AcString strCmd = L"._FILLET\nM\nR\n0\n";
-    acDocManager->sendStringToExecute(curDoc(), strCmd, false, true, true);
+    static const AcString strCmd = L"._FILLET\nM\nR\n0\n";
+    AcApDocument* pDoc = curDoc();
+    if (pDoc != nullptr)
+    {
+        acDocManager->sendStringToExecute(pDoc, strCmd.constPtr(), false, true, true);
+    }
 }

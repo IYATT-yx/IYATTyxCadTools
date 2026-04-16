@@ -145,9 +145,13 @@ void MainBarChildDlg::OnNMDblclkList1(NMHDR* pNMHDR, LRESULT* pResult)
 
 		if (!strFullCmd.IsEmpty())
 		{
-			AcString acCmd;
-			acCmd.format(L"._%s\n", (const wchar_t*)strFullCmd);
-			acDocManager->sendStringToExecute(curDoc(), acCmd.constPtr(), false, true, true);
+			AcString strCmd;
+			strCmd.format(L"._%s\n", (const wchar_t*)strFullCmd);
+			AcApDocument* pDoc = curDoc();
+			if (pDoc != nullptr)
+			{
+				acDocManager->sendStringToExecute(pDoc, strCmd.constPtr(), false, true, true);
+			}
 		}
 	}
 	*pResult = 0;
