@@ -45,6 +45,7 @@ AutoCAD Mechanical SDK 环境配置参考：https://blog.iyatt.com/?p=23776
 【0】紧跟最新版本的原则。  
 本插件的定位是个人效率提升工具，当新版本 AutoCAD Mechanical 及 SDK 发布后，我将切换最新版进行测试。由于个人精力有限，不再针对旧版本进行维护。  
 【1】优先使用基于 `wchar_t` 的宽字符及宽字符串。字符串类优先使用 `AcString`，在与 MFC 交互时使用 `CString`。`AcString` 转字符串常量使用 `constPtr()` 方法。字面值常量统一使用 `L` 前缀，如 `L"这是一个字面值"`。  
+【2】涉及提示的字符串全部存储到 String Table 中，便于翻译以支持其它语言使用。  
 
 ## 许可证
 
