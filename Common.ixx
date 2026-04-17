@@ -89,6 +89,8 @@ export namespace Common
 // 常量
 export namespace Common
 {
+	constexpr double defaultTextHeight = 3.5; // 全局默认文本高度
+
 	// 符号代码
 	namespace SymbolCodes
 	{
@@ -155,8 +157,8 @@ export namespace Common
 		constexpr const wchar_t* blockName = L"气泡号块";
 		constexpr const wchar_t* AttTag = L"序号";
 		constexpr const wchar_t* AttPrompt = L"输入序号：";
-		constexpr double defaultCircleRadius = 2.5;
-		constexpr double defaultTextHeight = 2.5;
+		constexpr double defaultCircleRadius = Common::defaultTextHeight;
+		constexpr double defaultTextHeight = Common::defaultTextHeight;
 	}
 
 	// 标注类型的子类
