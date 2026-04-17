@@ -4,6 +4,7 @@ module;
 #include "dbObjectContextCollection.h"
 #include "dbObjectContextManager.h"
 #include "dbObjectContextInterface.h"
+#include "dbAnnotationScale.h"
 
 module Annotative;
 
@@ -58,5 +59,40 @@ namespace Annotative
         }
 
         return Acad::eNotApplicable;
+    }
+
+    double getCurrentScaleValue()
+    {
+        double scaleValue = -1;
+        AcDbDatabase* pDb = acdbHostApplicationServices()->workingDatabase();
+        if (!pDb)
+        {
+            return scaleValue;
+        }
+
+        AcDbObjectContextManager* pContextMgr = pDb->objectContextManager();
+        if (pContextMgr)
+        {
+            AcDbObjectContextCollection* pCollection = pContextMgr->contextCollection(ACDB_ANNOTATIONSCALES_COLLECTION);
+            if (pCollection)
+            {
+                AcDbObjectContext* pContext = pCollection->currentContext(nullptr);
+                AcDbAnnotationScale* pAnnoScale = AcDbAnnotationScale::cast(pContext);
+                if (pAnnoScale)
+                {
+                    double dDrawingUnits = 1.0;
+                    double dPaperUnits = 1.0;
+
+                    if (pAnnoScale->getDrawingUnits(dDrawingUnits) == Acad::eOk && pAnnoScale->getPaperUnits(dPaperUnits) == Acad::eOk)
+                    {
+                        if (abs(dPaperUnits) > 1e-8)
+                        {
+                            scaleValue = dDrawingUnits / dPaperUnits;
+                        }
+                    }
+                }
+            }
+        }
+        return scaleValue;
     }
 };

@@ -18,4 +18,10 @@ export namespace Annotative
 	 * @return Acad::ErrorStatus 返回操作状态
 	 */
 	Acad::ErrorStatus setObjAnnotative(AcDbObject* pObj, bool bAnnotative = true);
+
+	/**
+	 * @brief 获取当前数据库的注释比例缩放值
+	 * @return double 缩放系数。例如 1:100 返回 100.0；1:1 返回 1.0。返回负数代表失败。
+	 */
+	double getCurrentScaleValue();
 };
