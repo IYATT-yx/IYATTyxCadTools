@@ -133,7 +133,7 @@ bool CsvWriter::isValid() const
 
 namespace CsvModule
 {
-    bool readCsvToAcStringMatrix(const CString& strFilePath, std::vector<std::vector<AcString>>& matrixData, char delimiter)
+    bool readCsvToAcStringMatrix(const CString& strFilePath, AcStringMatrix& matrixData, char delimiter)
     {
         matrixData.clear();
 

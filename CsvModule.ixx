@@ -87,6 +87,8 @@ private:
 
 export namespace CsvModule
 {
+    using AcStringMatrix = std::vector<std::vector<AcString>>;
+
     /**
      * @brief 从 CSV 文件读取数据并解析为 AcString 矩阵。
      * * @details 该函数支持 UTF-8 编码（含/不含 BOM），并能处理 CSV 标准中的双引号转义逻辑。
@@ -96,5 +98,5 @@ export namespace CsvModule
      * @param delimiter 输入参数，指定 CSV 的字段分隔符，默认为英文逗号。
      * @return 如果文件成功打开并解析则返回 true，否则返回 false。
      */
-    bool readCsvToAcStringMatrix(const CString& strFilePath, std::vector<std::vector<AcString>>& matrixData, char delimiter = ',');
+    bool readCsvToAcStringMatrix(const CString& strFilePath, AcStringMatrix& matrixData, char delimiter = ',');
 };
