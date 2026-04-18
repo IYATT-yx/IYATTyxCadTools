@@ -35,6 +35,8 @@
     <ClCompile Include="EntityStyle.ixx">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="FileDialog.cpp" />
+    <ClCompile Include="FileDialog.ixx" />
     <ClCompile Include="GenericPairEditDlg.cpp" />
     <ClCompile Include="GeometricTolerance.cpp" />
     <ClCompile Include="GeometricTolerance.ixx" />

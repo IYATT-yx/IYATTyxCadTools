@@ -17,6 +17,7 @@ import GeometricTolerance;
 import TextUtil;
 import ImeAutoSwitcher;
 import Commands;
+import FileDialog;
 
 void Interface::init()
 {
@@ -293,7 +294,7 @@ void Interface::cmdPrintClassHierarchy()
 void Interface::cmdExtractAnnotations()
 {
     CAcModuleResourceOverride resOverride;
-    CString filePath = Common::ShowSaveFileDialog(Common::loadString(IDS_SaveCsvTitle));
+    CString filePath = FileDialog::ShowSaveFileDialog(Common::loadString(IDS_SaveCsvTitle));
     if (filePath.IsEmpty())
     {
         acutPrintf(L"\n%s", Common::loadString(IDS_CancelOperation));
