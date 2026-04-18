@@ -294,7 +294,9 @@ void Interface::cmdPrintClassHierarchy()
 void Interface::cmdExtractAnnotations()
 {
     CAcModuleResourceOverride resOverride;
-    CString filePath = FileDialog::ShowSaveFileDialog(Common::loadString(IDS_SaveCsvTitle));
+    FileDialog::FileDialogFilterBuilder fileFilterBuilder;
+    CString strFileFilter = fileFilterBuilder.addFilter(Common::loadString(IDS_CsvFiles), { L"*.csv" }).build();
+    CString filePath = FileDialog::ShowSaveFileDialog(Common::loadString(IDS_SaveCsvTitle), Common::loadString(IDS_DefaultSaveDataCsvFilename), L"csv", strFileFilter);
     if (filePath.IsEmpty())
     {
         acutPrintf(L"\n%s", Common::loadString(IDS_CancelOperation));
