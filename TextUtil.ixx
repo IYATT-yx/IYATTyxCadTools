@@ -65,11 +65,11 @@ export namespace TextUtil
 	/**
 	 * @brief 创建注释性多行文本矩阵（表格排布）。图纸文字高度为 3.5，实际显示模型文字高度= 3.5 * 注释比例缩放值。
 	 * @param colWidth     矩阵列宽，即单个多行文本的长度。实际显示长度= 列宽 * 注释比例缩放值
-	 * @param colSpacing   多行文本列距离（非间距，小于“矩阵列宽 * 注释比例缩放值”时会重叠）
-	 * @param rowSpacing   多行文本行距离（非间隔距离，小于 “3.5 * 注释比例缩放值”时会重叠）
+	 * @param colStep	   列步长（小于“矩阵列宽 * 注释比例缩放值”时会重叠）
+	 * @param rowStep      行步长（小于 “3.5 * 注释比例缩放值”时会重叠）
 	 * @param matrixData   矩阵文本数据 (vector<vector<AcString>>)
 	 * @param topLeftPt    左上角起始基准点
 	 * @param dLineSpacingFactor 行距比例。默认值 1，不可小于 0.25，不可大于 4.0。实际行间距 = 文字高度 x 1.6667 x 行距比例。
 	 */
-	void createMTextMatrix(double colWidth, double colSpacing, double rowSpacing, const std::vector<std::vector<AcString>>& matrixData, AcGePoint3d topLeftPt, double dLineSpacingFactor = 1.0);
+	void createMTextMatrix(double colWidth, double colStep, double rowStep, const std::vector<std::vector<AcString>>& matrixData, AcGePoint3d topLeftPt, double dLineSpacingFactor = 1.0);
 }

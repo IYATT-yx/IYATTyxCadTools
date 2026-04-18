@@ -119,7 +119,7 @@ namespace TextUtil
 		}
 	}
 
-	void createMTextMatrix(double colWidth, double colSpacing, double rowSpacing, const std::vector<std::vector<AcString>>& matrixData, AcGePoint3d topLeftPt, double dLineSpacingFactor)
+	void createMTextMatrix(double colWidth, double colStep, double rowStep, const std::vector<std::vector<AcString>>& matrixData, AcGePoint3d topLeftPt, double dLineSpacingFactor)
 	{
 		if (dLineSpacingFactor < 0.25 || dLineSpacingFactor > 4.0)
 		{
@@ -161,8 +161,8 @@ namespace TextUtil
 					pMText->setLineSpacingFactor(dLineSpacingFactor);
 
 					AcGePoint3d currentPt;
-					currentPt.x = topLeftPt.x + (col * colSpacing);
-					currentPt.y = topLeftPt.y - (row * rowSpacing);
+					currentPt.x = topLeftPt.x + (col * colStep);
+					currentPt.y = topLeftPt.y - (row * rowStep);
 					currentPt.z = topLeftPt.z;
 					pMText->setLocation(currentPt);
 
