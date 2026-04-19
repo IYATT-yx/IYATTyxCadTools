@@ -1,5 +1,7 @@
 // Microsoft Visual C++ generated resource script.
 //
+#pragma code_page(65001)
+
 #include "resource.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
@@ -13,11 +15,10 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// ÖĞÎÄ(¼òÌå£¬ÖĞ¹ú) resources
+// ä¸­æ–‡(ç®€ä½“ï¼Œä¸­å›½) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
-#pragma code_page(936)
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -50,8 +51,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
+ FILEVERSION 0,0,0,0
+ PRODUCTVERSION 0,0,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -64,20 +65,19 @@ VS_VERSION_INFO VERSIONINFO
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "040904B0"
+        BLOCK "000404b0"
         BEGIN
             VALUE "FileDescription", "CadTools ObjectARX application"
-            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "FileVersion", "0.0.0.0"
             VALUE "InternalName", "CadTools"
-            VALUE "LegalCopyright", "Copyright ?2012"
+            VALUE "LegalCopyright", "Copyright (c) 2026 IYATT-yx"
             VALUE "OriginalFilename", "IYATTyxCadTools.arx"
-            VALUE "ProductName", "CadTools Application"
-            VALUE "ProductVersion", "1, 0, 0, 1"
+            VALUE "ProductName", "AutoCAD Mechanical æ€èƒ½å·¥å…·ç®±"
         END
     END
     BLOCK "VarFileInfo"
     BEGIN
-        VALUE "Translation", 0x409, 1200
+        VALUE "Translation", 0x4, 1200
     END
 END
 
@@ -92,15 +92,15 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "ObjectARX Dialog"
 FONT 8, "Tahoma", 0, 0, 0x0
 BEGIN
-    DEFPUSHBUTTON   "È·¶¨",IDOK,527,72,50,16
-    PUSHBUTTON      "È¡Ïû",IDCANCEL,600,72,50,16
+    DEFPUSHBUTTON   "ç¡®å®š",IDOK,527,72,50,16
+    PUSHBUTTON      "å–æ¶ˆ",IDCANCEL,600,72,50,16
     LTEXT           "Static",IDC_LABEL2,7,47,57,17
     EDITTEXT        IDC_EDIT2,74,47,468,21,ES_AUTOHSCROLL
     EDITTEXT        IDC_EDIT1,74,17,466,21,ES_AUTOHSCROLL
     LTEXT           "Static",IDC_LABEL1,7,17,60,15
-    CONTROL         "GDT ×ÖÌå",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,547,17,47,10
-    CONTROL         "GDT ×ÖÌå",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,547,47,47,10
-    PUSHBUTTON      "×Ö·ûÓ³Éä±í",IDC_BUTTON1,600,17,50,41
+    CONTROL         "GDT å­—ä½“",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,547,17,47,10
+    CONTROL         "GDT å­—ä½“",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,547,47,47,10
+    PUSHBUTTON      "å­—ç¬¦æ˜ å°„è¡¨",IDC_BUTTON1,600,17,50,41
 END
 
 IDD_MAINBAR DIALOGEX 0, 0, 184, 93
@@ -158,113 +158,113 @@ END
 STRINGTABLE
 BEGIN
     IDS_PROJNAME            "CadTools"
-    IDS_ShortCommandName    "¾«¼òÃüÁîÃû"
-    IDS_CommandName         "ÃüÁîÃû"
-    IDS_CommandDescription  "ÃüÁîÃèÊö"
+    IDS_ShortCommandName    "ç²¾ç®€å‘½ä»¤å"
+    IDS_CommandName         "å‘½ä»¤å"
+    IDS_CommandDescription  "å‘½ä»¤æè¿°"
     IDS_CommandGroup        "IYATTyxCadTools"
-    IDS_LocaleProjectName   "AutoCAD Mechanical 2026 Ë¼ÄÜ¹¤¾ßÏä"
-    IDS_PrefixSymbol        "Ç°×º·ûºÅ"
-    IDS_yxCommandDescription "ÏÔÊ¾»òÒş²ØÃüÁî²Ëµ¥"
-    IDS_yxTestCommandDescription "¿ª·¢ÓÃ²âÊÔÃüÁî"
-    IDS_yxSetByLayerCommandDescription "ÉèÖÃÊµÌåÑùÊ½Îªµ±Ç°²ãÑùÊ½"
-    IDS_yxDimensionFixCommandDescription "¹Ì¶¨±ê×¢³ß´ç"
-    IDS_yxDimensionResumeCommandDescription "»Ö¸´ÊµÌåÇı¶¯µÄ±ê×¢³ß´ç"
+    IDS_LocaleProjectName   "AutoCAD Mechanical 2026 æ€èƒ½å·¥å…·ç®±"
+    IDS_PrefixSymbol        "å‰ç¼€ç¬¦å·"
+    IDS_yxCommandDescription "æ˜¾ç¤ºæˆ–éšè—å‘½ä»¤èœå•"
+    IDS_yxTestCommandDescription "å¼€å‘ç”¨æµ‹è¯•å‘½ä»¤"
+    IDS_yxSetByLayerCommandDescription "è®¾ç½®å®ä½“æ ·å¼ä¸ºå½“å‰å±‚æ ·å¼"
+    IDS_yxDimensionFixCommandDescription "å›ºå®šæ ‡æ³¨å°ºå¯¸"
+    IDS_yxDimensionResumeCommandDescription "æ¢å¤å®ä½“é©±åŠ¨çš„æ ‡æ³¨å°ºå¯¸"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_yxAddSurroundingCharsForDimensionCommandDescription "Îª±ê×¢Ìí¼ÓÇ°ºó×º"
-    IDS_yxRemoveSurroundingCharsForDimensionCommandDescription "Îª±ê×¢ÒÆ³ıÇ°ºó×º"
-    IDS_yxSetBasicBoxCommandDescription "ÉèÖÃÀíÂÛ³ß´ç¿ò"
-    IDS_yxUnsetBasicBoxCommandDescription "È¡ÏûÀíÂÛ³ß´ç¿ò"
-    IDS_yxSetRefDimCommandDescription "ÉèÖÃ²Î¿¼³ß´çÀ¨ºÅ"
-    IDS_yxUnsetRefDimCommandDescription "È¡Ïû²Î¿¼³ß´çÀ¨ºÅ"
+    IDS_yxAddSurroundingCharsForDimensionCommandDescription "ä¸ºæ ‡æ³¨æ·»åŠ å‰åç¼€"
+    IDS_yxRemoveSurroundingCharsForDimensionCommandDescription "ä¸ºæ ‡æ³¨ç§»é™¤å‰åç¼€"
+    IDS_yxSetBasicBoxCommandDescription "è®¾ç½®ç†è®ºå°ºå¯¸æ¡†"
+    IDS_yxUnsetBasicBoxCommandDescription "å–æ¶ˆç†è®ºå°ºå¯¸æ¡†"
+    IDS_yxSetRefDimCommandDescription "è®¾ç½®å‚è€ƒå°ºå¯¸æ‹¬å·"
+    IDS_yxUnsetRefDimCommandDescription "å–æ¶ˆå‚è€ƒå°ºå¯¸æ‹¬å·"
     IDS_yxInsertBalloonNumberBlockWithStartNumberCommandDescription 
-                            "²åÈë´øÆğÊ¼±àºÅµÄÆøÅİºÅ"
-    IDS_yxPrintClassHierarchyCommandDescription "´òÓ¡Àà²ã´Î½á¹¹"
-    IDS_yxExtractAnnotationsCommandDescription "ÌáÈ¡±ê×¢µ½CSVÎÄ¼ş"
-    IDS_yxUpdateBalloonNumberBlockCommandDescription "¸üĞÂÆøÅİºÅ"
-    IDS_yxImeAutoSwitchCommandDescription "ÉèÖÃÊäÈë·¨×Ô¶¯ÇĞ»»"
-    IDS_Author              "×÷Õß"
-    IDS_ProjectUrl          "ÏîÄ¿µØÖ·"
-    IDS_SuffixSymbol        "ºó×º·ûºÅ"
-    IDS_CancelOperation     "È¡Ïû²Ù×÷"
-    IDS_StartNumber         "¿ªÊ¼ĞòºÅ"
+                            "æ’å…¥å¸¦èµ·å§‹ç¼–å·çš„æ°”æ³¡å·"
+    IDS_yxPrintClassHierarchyCommandDescription "æ‰“å°ç±»å±‚æ¬¡ç»“æ„"
+    IDS_yxExtractAnnotationsCommandDescription "æå–æ ‡æ³¨åˆ°CSVæ–‡ä»¶"
+    IDS_yxUpdateBalloonNumberBlockCommandDescription "æ›´æ–°æ°”æ³¡å·"
+    IDS_yxImeAutoSwitchCommandDescription "è®¾ç½®è¾“å…¥æ³•è‡ªåŠ¨åˆ‡æ¢"
+    IDS_Author              "ä½œè€…"
+    IDS_ProjectUrl          "é¡¹ç›®åœ°å€"
+    IDS_SuffixSymbol        "åç¼€ç¬¦å·"
+    IDS_CancelOperation     "å–æ¶ˆæ“ä½œ"
+    IDS_StartNumber         "å¼€å§‹åºå·"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_Prompt              "ÌáÊ¾"
-    IDS_Msg_BalloonTips_FMT "Ä¬ÈÏĞòºÅ×ÖÌå¸ß¶È£¨Ô²È¦°ë¾¶£©£º%g£¬ÆøÅİËõ·Å±ÈÀıÓÉ×¢ÊÍĞÔ±ÈÀı¿ØÖÆ"
-    IDS_Err_EmptyStartNumber "±ØĞëÊäÈë¿ªÊ¼ĞòºÅ"
-    IDS_Err_InvalidStartNumber "¿ªÊ¼ĞòºÅ±ØĞëÎª·Ç 0 ÕûÊı"
-    IDS_SaveCsvTitle        "½«ÌáÈ¡µÄ±ê×¢ÄÚÈİ±£´æµ½"
-    IDS_Err_FileOpenFailed  "ÎÄ¼şÂ·¾¶´ò¿ªÊ§°Ü£¬Çë¼ì²éÊÇ·ñ±»Õ¼ÓÃ»òÂ·¾¶ÎŞĞ§"
-    IDS_GDT                 "¼¸ºÎ¹«²î"
-    IDS_MText               "¶àĞĞÎÄ±¾"
-    IDS_DText               "µ¥ĞĞÎÄ±¾"
-    IDS_BalloonNumberHeight "ÆøÅİĞòºÅ×Ö¸ß"
-    IDS_Dimension           "³ß´ç"
-    IDS_BalloonNextNumber_FMT "\nÑ¡ÖĞµÄÆøÅİºÅ½«±»ÉèÖÃÎª£º%d"
-    IDS_AutoStart           "×ÔÆô¶¯(1/0)"
-    IDS_Interval            "¼ä¸ô(ms)"
-    IDS_Err_ImeAutoSwitchEmptySetting "±ØĞëÊäÈë×ÔÆô¶¯×´Ì¬ºÍÇĞ»»¼ä¸ôÊ±¼ä"
-    IDS_Err_InvalidAutoStart "×ÔÆô¶¯×´Ì¬±ØĞëÎª 0 »ò 1£¬1±íÊ¾×ÔÆô¶¯£¬0 ±íÊ¾²»×ÔÆô¶¯"
+    IDS_Prompt              "æç¤º"
+    IDS_Msg_BalloonTips_FMT "é»˜è®¤åºå·å­—ä½“é«˜åº¦ï¼ˆåœ†åœˆåŠå¾„ï¼‰ï¼š%gï¼Œæ°”æ³¡ç¼©æ”¾æ¯”ä¾‹ç”±æ³¨é‡Šæ€§æ¯”ä¾‹æ§åˆ¶"
+    IDS_Err_EmptyStartNumber "å¿…é¡»è¾“å…¥å¼€å§‹åºå·"
+    IDS_Err_InvalidStartNumber "å¼€å§‹åºå·å¿…é¡»ä¸ºé 0 æ•´æ•°"
+    IDS_SaveCsvTitle        "å°†æå–çš„æ ‡æ³¨å†…å®¹ä¿å­˜åˆ°"
+    IDS_Err_FileOpenFailed  "æ–‡ä»¶è·¯å¾„æ‰“å¼€å¤±è´¥ï¼Œè¯·æ£€æŸ¥æ˜¯å¦è¢«å ç”¨æˆ–è·¯å¾„æ— æ•ˆ"
+    IDS_GDT                 "å‡ ä½•å…¬å·®"
+    IDS_MText               "å¤šè¡Œæ–‡æœ¬"
+    IDS_DText               "å•è¡Œæ–‡æœ¬"
+    IDS_BalloonNumberHeight "æ°”æ³¡åºå·å­—é«˜"
+    IDS_Dimension           "å°ºå¯¸"
+    IDS_BalloonNextNumber_FMT "\né€‰ä¸­çš„æ°”æ³¡å·å°†è¢«è®¾ç½®ä¸ºï¼š%d"
+    IDS_AutoStart           "è‡ªå¯åŠ¨(1/0)"
+    IDS_Interval            "é—´éš”(ms)"
+    IDS_Err_ImeAutoSwitchEmptySetting "å¿…é¡»è¾“å…¥è‡ªå¯åŠ¨çŠ¶æ€å’Œåˆ‡æ¢é—´éš”æ—¶é—´"
+    IDS_Err_InvalidAutoStart "è‡ªå¯åŠ¨çŠ¶æ€å¿…é¡»ä¸º 0 æˆ– 1ï¼Œ1è¡¨ç¤ºè‡ªå¯åŠ¨ï¼Œ0 è¡¨ç¤ºä¸è‡ªå¯åŠ¨"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_Err_InvalidInterval_FMT "ÇĞ»»¼ä¸ô±ØĞëÎª²»Ğ¡ÓÚ %d µÄÕûÊı"
-    IDS_ImeAutoSwitchPrompt "ÒÑ×Ô¶¯ÇĞ»»ÊäÈë·¨"
-    IDS_ImeAutoSwitchStartPrompt_FMT "\nÆô¶¯ÊäÈë·¨×Ô¶¯ÇĞ»»£¬ÇĞ»»¼ä¸ô£º%dms\n"
-    IDS_ImeAutoSwitchStopPrompt "\nÍ£Ö¹ÊäÈë·¨×Ô¶¯ÇĞ»»\n"
-    IDS_yxUnloadCommandDescription "¹Ø±Õ±¾²å¼ş"
-    IDS_Msg_Unload_FMT      "\nÒÑĞ¶ÔØ %s"
-    IDS_yxCloneTextCommandDescription "½«¶àĞĞ/µ¥ĞĞÎÄ±¾ÄÚÈİ¸´ÖÆ¸øÆäËü¶àĞĞ/µ¥ĞĞÎÄ±¾"
-    IDS_Msg_CopySrcTextPrompt "ÇëÑ¡ÔñÒª¸´ÖÆµÄÔ´ÎÄ±¾¶ÔÏó"
-    IDS_Msg_PasteDstTextPrompt "ÇëÑ¡ÔñÒªÕ³Ìùµ½µÄÎÄ±¾¶ÔÏó"
-    IDS_Version             "°æ±¾"
-    IDS_yxIntersect         "½«Á½ÌõÖ±ÏßÑÓÉì»òĞŞ¼ôÖÁÆä½»µã"
-    IDS_yxBalloonNumberOffsetCommandDescription "ÆøÅİºÅ±àºÅÆ«ÖÃ"
-    IDS_BalloonNumberOffsetLabel "Æ«ÖÃÖµ"
-    IDS_OffsetResultInfo_FMT "\n¶ÁÈ¡µ½ÆøÅİºÅ±àºÅ£º%s"
-    IDS_OffsetLessZero      "Æ«ÖÃºóÆøÅİºÅ±àºÅĞ¡ÓÚ 0£¬ÒÑÖØÖÃÎª 0"
-    IDS_OffsetTargetInfo_FMT "\nÆ«ÖÃºóÆøÅİºÅ±àºÅ£º%d"
+    IDS_Err_InvalidInterval_FMT "åˆ‡æ¢é—´éš”å¿…é¡»ä¸ºä¸å°äº %d çš„æ•´æ•°"
+    IDS_ImeAutoSwitchPrompt "å·²è‡ªåŠ¨åˆ‡æ¢è¾“å…¥æ³•"
+    IDS_ImeAutoSwitchStartPrompt_FMT "\nå¯åŠ¨è¾“å…¥æ³•è‡ªåŠ¨åˆ‡æ¢ï¼Œåˆ‡æ¢é—´éš”ï¼š%dms\n"
+    IDS_ImeAutoSwitchStopPrompt "\nåœæ­¢è¾“å…¥æ³•è‡ªåŠ¨åˆ‡æ¢\n"
+    IDS_yxUnloadCommandDescription "å…³é—­æœ¬æ’ä»¶"
+    IDS_Msg_Unload_FMT      "\nå·²å¸è½½ %s"
+    IDS_yxCloneTextCommandDescription "å°†å¤šè¡Œ/å•è¡Œæ–‡æœ¬å†…å®¹å¤åˆ¶ç»™å…¶å®ƒå¤šè¡Œ/å•è¡Œæ–‡æœ¬"
+    IDS_Msg_CopySrcTextPrompt "è¯·é€‰æ‹©è¦å¤åˆ¶çš„æºæ–‡æœ¬å¯¹è±¡"
+    IDS_Msg_PasteDstTextPrompt "è¯·é€‰æ‹©è¦ç²˜è´´åˆ°çš„æ–‡æœ¬å¯¹è±¡"
+    IDS_Version             "ç‰ˆæœ¬"
+    IDS_yxIntersect         "å°†ä¸¤æ¡ç›´çº¿å»¶ä¼¸æˆ–ä¿®å‰ªè‡³å…¶äº¤ç‚¹"
+    IDS_yxBalloonNumberOffsetCommandDescription "æ°”æ³¡å·ç¼–å·åç½®"
+    IDS_BalloonNumberOffsetLabel "åç½®å€¼"
+    IDS_OffsetResultInfo_FMT "\nè¯»å–åˆ°æ°”æ³¡å·ç¼–å·ï¼š%s"
+    IDS_OffsetLessZero      "åç½®åæ°”æ³¡å·ç¼–å·å°äº 0ï¼Œå·²é‡ç½®ä¸º 0"
+    IDS_OffsetTargetInfo_FMT "\nåç½®åæ°”æ³¡å·ç¼–å·ï¼š%d"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_Err_BalloonNumberOffsetFail "Æ«ÖÃÆøÅİºÅÊ§°Ü£¬ÆøÅİºÅÖµ¿ÉÄÜ²»ÊÇÊı×Ö"
-    IDS_Err_EmptyBalloonNumberOffset "Æ«ÖÃÖµ²»¿ÉÎª¿Õ"
-    IDS_Err_InvalidInteger  "Æ«ÖÃÖµ±ØĞëÎªÕûÊı"
-    IDS_BalloonNumberOffsetPromptInfo "ĞÂ±àºÅ=¾É±àºÅ+Æ«ÖÃÖµ£¬Èô¼ÆËã³öĞÂ±àºÅ<0£¬ÔòĞÂ±àºÅ=0"
-    IDS_yxBalloonNumberFilterCommandDescription "ÆøÅİºÅÉ¸Ñ¡"
+    IDS_Err_BalloonNumberOffsetFail "åç½®æ°”æ³¡å·å¤±è´¥ï¼Œæ°”æ³¡å·å€¼å¯èƒ½ä¸æ˜¯æ•°å­—"
+    IDS_Err_EmptyBalloonNumberOffset "åç½®å€¼ä¸å¯ä¸ºç©º"
+    IDS_Err_InvalidInteger  "åç½®å€¼å¿…é¡»ä¸ºæ•´æ•°"
+    IDS_BalloonNumberOffsetPromptInfo "æ–°ç¼–å·=æ—§ç¼–å·+åç½®å€¼ï¼Œè‹¥è®¡ç®—å‡ºæ–°ç¼–å·<0ï¼Œåˆ™æ–°ç¼–å·=0"
+    IDS_yxBalloonNumberFilterCommandDescription "æ°”æ³¡å·ç­›é€‰"
     IDS_BalloonNumberFilterPrompt 
-                            "¸ñÊ½£º·ûºÅ+Öµ£¬Èç£º>>10É¸Ñ¡´óÓÚ10¡£´óÓÚ£º>>»ò¡·¡·£¬Ğ¡ÓÚ£º<<»ò¡¶¡¶£¬µÈÓÚ£º==£¬²»µÈÓÚ£º<>»ò¡¶¡·£¬´óÓÚµÈÓÚ£º>=»ò¡·=£¬Ğ¡ÓÚµÈÓÚ£º<=»ò¡¶=¡£µÈÓÚºÍ²»µÈÓÚÅĞ¶ÏÔÊĞí·ÇÕûÊı¡£"
-    IDS_BalloonNumberFilterCondition "É¸Ñ¡Ìõ¼ş"
-    IDS_Err_BalloonNumberFilterEmptyCriteria "É¸Ñ¡Ìõ¼ş²»ÄÜÎª¿Õ¡£"
-    IDS_Err_BalloonNumberFilterInvalidOperatorType "ÊäÈëµÄ·ûºÅ²»ºÏ·¨¡£"
-    IDS_Err_BalloonNumberFilterNeedInterger "·ÇµÈÓÚ»ò²»µÈÓÚÅĞ¶¨Ê±£¬ÅĞ¶¨Öµ±ØĞëÎªÕûÊı¡£"
-    IDS_Msg_BalloonNumberFilterMatchCount_FMT "\nÉ¸Ñ¡Íê³É£º%d ¸öÆ¥ÅäÏî¡£"
-    IDS_Msg_BalloonNumberFilterNoMatch "\nÎ´·¢ÏÖ·ûºÏÌõ¼şµÄÆøÅİºÅ¡£"
-    IDS_Err_GetCurrentScaleValue_FMT "\n»ñÈ¡×¢ÊÍ±ÈÀıËõ·ÅÏµÊıÊ§°Ü£¬ÒÑÖØÖÃÎª£º%g"
-    IDS_Err_LineSpacingFactorOutOfRange "ĞĞ¾à±ÈÀı²»¿ÉĞ¡ÓÚ0.25£¬ÇÒ²»¿É´óÓÚ4.0¡£"
-    IDS_CsvFiles            "CSV ÎÄ¼ş"
-    IDS_AllFiles            "ËùÓĞÎÄ¼ş"
+                            "æ ¼å¼ï¼šç¬¦å·+å€¼ï¼Œå¦‚ï¼š>>10ç­›é€‰å¤§äº10ã€‚å¤§äºï¼š>>æˆ–ã€‹ã€‹ï¼Œå°äºï¼š<<æˆ–ã€Šã€Šï¼Œç­‰äºï¼š==ï¼Œä¸ç­‰äºï¼š<>æˆ–ã€Šã€‹ï¼Œå¤§äºç­‰äºï¼š>=æˆ–ã€‹=ï¼Œå°äºç­‰äºï¼š<=æˆ–ã€Š=ã€‚ç­‰äºå’Œä¸ç­‰äºåˆ¤æ–­å…è®¸éæ•´æ•°ã€‚"
+    IDS_BalloonNumberFilterCondition "ç­›é€‰æ¡ä»¶"
+    IDS_Err_BalloonNumberFilterEmptyCriteria "ç­›é€‰æ¡ä»¶ä¸èƒ½ä¸ºç©ºã€‚"
+    IDS_Err_BalloonNumberFilterInvalidOperatorType "è¾“å…¥çš„ç¬¦å·ä¸åˆæ³•ã€‚"
+    IDS_Err_BalloonNumberFilterNeedInterger "éç­‰äºæˆ–ä¸ç­‰äºåˆ¤å®šæ—¶ï¼Œåˆ¤å®šå€¼å¿…é¡»ä¸ºæ•´æ•°ã€‚"
+    IDS_Msg_BalloonNumberFilterMatchCount_FMT "\nç­›é€‰å®Œæˆï¼š%d ä¸ªåŒ¹é…é¡¹ã€‚"
+    IDS_Msg_BalloonNumberFilterNoMatch "\næœªå‘ç°ç¬¦åˆæ¡ä»¶çš„æ°”æ³¡å·ã€‚"
+    IDS_Err_GetCurrentScaleValue_FMT "\nè·å–æ³¨é‡Šæ¯”ä¾‹ç¼©æ”¾ç³»æ•°å¤±è´¥ï¼Œå·²é‡ç½®ä¸ºï¼š%g"
+    IDS_Err_LineSpacingFactorOutOfRange "è¡Œè·æ¯”ä¾‹ä¸å¯å°äº0.25ï¼Œä¸”ä¸å¯å¤§äº4.0ã€‚"
+    IDS_CsvFiles            "CSV æ–‡ä»¶"
+    IDS_AllFiles            "æ‰€æœ‰æ–‡ä»¶"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_DefaultSaveDataCsvFilename "Êı¾İÎÄ¼ş.csv"
-    IDS_yxImportCsvToMTextMatrixCommandDescription "´Ó CSV ÎÄ¼şµ¼ÈëÊı¾İÉú³É¶àĞĞÎÄ±¾¾ØÕó"
-    IDS_ImportCsvTitle      "Ñ¡ÔñÒªµ¼ÈëµÄÎÄ¼ş"
-    IDS_LBL_Parameter       "²ÎÊı"
-    IDS_MTextMatrixParameterPrompt "ÊäÈë3¸ö²»Ğ¡ÓÚ0µÄ¸¡µãÊı²ÎÊı£¬Ê¹ÓÃ¿Õ¸ñ·Ö¸ô£¬·Ö±ğÎª£ºÁĞ¿í¡¢ÁĞ²½³¤¡¢ĞĞ²½³¤¡£"
-    IDS_Err_EmptyMTextMatrixParameter "¶àĞĞÎÄ±¾¾ØÕó²ÎÊı²»ÄÜÎª¿Õ"
-    IDS_Msg_GetPoint        "ÇëÑ¡ÔñÎ»ÖÃ"
+    IDS_DefaultSaveDataCsvFilename "æ•°æ®æ–‡ä»¶.csv"
+    IDS_yxImportCsvToMTextMatrixCommandDescription "ä» CSV æ–‡ä»¶å¯¼å…¥æ•°æ®ç”Ÿæˆå¤šè¡Œæ–‡æœ¬çŸ©é˜µ"
+    IDS_ImportCsvTitle      "é€‰æ‹©è¦å¯¼å…¥çš„æ–‡ä»¶"
+    IDS_LBL_Parameter       "å‚æ•°"
+    IDS_MTextMatrixParameterPrompt "è¾“å…¥3ä¸ªä¸å°äº0çš„æµ®ç‚¹æ•°å‚æ•°ï¼Œä½¿ç”¨ç©ºæ ¼åˆ†éš”ï¼Œåˆ†åˆ«ä¸ºï¼šåˆ—å®½ã€åˆ—æ­¥é•¿ã€è¡Œæ­¥é•¿ã€‚"
+    IDS_Err_EmptyMTextMatrixParameter "å¤šè¡Œæ–‡æœ¬çŸ©é˜µå‚æ•°ä¸èƒ½ä¸ºç©º"
+    IDS_Msg_GetPoint        "è¯·é€‰æ‹©ä½ç½®"
 END
 
-#endif    // ÖĞÎÄ(¼òÌå£¬ÖĞ¹ú) resources
+#endif    // ä¸­æ–‡(ç®€ä½“ï¼Œä¸­å›½) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
