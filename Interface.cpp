@@ -131,27 +131,24 @@ void Interface::cmdAddSurroundingCharsForDimension()
     CString title = Common::loadString(IDS_yxAddSurroundingCharsForDimensionCommandDescription);
     GenericPairEditDlg dlg(title, Common::loadString(IDS_PrefixSymbol), Common::loadString(IDS_SuffixSymbol));
 
-    CString edit1Result;
-    CString edit2Result;
-    if (dlg.DoModal() == IDOK)
-    {
-        edit1Result = dlg.getEdit1Result();
-        edit2Result = dlg.getEdit2Result();
-    }
-    else
+    CString left, right;
+    dlg.setValidatorAndParser([&](const CString& value1, const CString& value2) -> CString
+        {
+            left = value1;
+            right= value2;
+            return GenericPairEditDlg::ValidatorOk;
+        });
+    if (dlg.DoModal() != IDOK)
     {
         acutPrintf(L"\n%s", Common::loadString(IDS_CancelOperation));
         return;
     }
 
-    const wchar_t* left = edit1Result.GetString();
-    const wchar_t* right = edit2Result.GetString();
     bool isLGdt = dlg.getGdtCheckStatus(0);
     bool isRGdt = dlg.getGdtCheckStatus(1);
-
     UniversalPicker::run(
         &Common::DimensionSubClasses,
-        [left, right, isLGdt, isRGdt](AcDbObjectId objId)
+        [&](AcDbObjectId objId)
         {
             Dimension::addSurroundingCharsForDimension(objId, left, right, isLGdt, isRGdt);
         },
@@ -166,26 +163,24 @@ void Interface::cmdRemoveSurroundingCharsForDimension()
     CString title = Common::loadString(IDS_yxRemoveSurroundingCharsForDimensionCommandDescription);
     GenericPairEditDlg dlg(title, Common::loadString(IDS_PrefixSymbol), Common::loadString(IDS_SuffixSymbol));
 
-    CString edit1Result;
-    CString edit2Result;
-    if (dlg.DoModal() == IDOK)
-    {
-        edit1Result = dlg.getEdit1Result();
-        edit2Result = dlg.getEdit2Result();
-    }
-    else
+    CString left, right;
+    dlg.setValidatorAndParser([&](const CString& value1, const CString& value2) -> CString
+        {
+            left = value1;
+            right = value2;
+            return GenericPairEditDlg::ValidatorOk;
+        });
+    if (dlg.DoModal() != IDOK)
     {
         acutPrintf(L"\n%s", Common::loadString(IDS_CancelOperation));
         return;
     }
 
-    const wchar_t* left = edit1Result.GetString();
-    const wchar_t* right = edit2Result.GetString();
     bool isLGdt = dlg.getGdtCheckStatus(0);
     bool isRGdt = dlg.getGdtCheckStatus(1);
     UniversalPicker::run(
         &Common::DimensionSubClasses,
-        [left, right, isLGdt, isRGdt](AcDbObjectId objId)
+        [&](AcDbObjectId objId)
         {
             Dimension::removeSurroundingCharsForDimension(objId, left, right, isLGdt, isRGdt);
         },
@@ -262,31 +257,37 @@ void Interface::cmdInsertBalloonNumberBlockWithStartNumber()
     csTips.Format(Common::loadString(IDS_Msg_BalloonTips_FMT), Common::BalloonNumberBlock::defaultTextHeight);
     dlg.modifyEditControl(L"", csTips);
 
-    CString edit1Result;
-    if (dlg.DoModal() == IDOK)
-    {
-        edit1Result = dlg.getEdit1Result();
-    }
-    else
+    int startNumber;
+    dlg.setValidatorAndParser([&](const CString& strVal, const CString& _) -> CString
+        {
+            try
+            {
+                size_t pos;
+                startNumber = std::stoi(strVal.GetString(), &pos);
+                if (pos != strVal.GetLength())
+                {
+                    throw std::exception();
+                }
+                if (startNumber < 0)
+                {
+                    throw std::exception();
+                }
+            }
+            catch (...)
+            {
+                return Common::loadString(IDS_Err_InvalidStartNumber);
+            }
+            return GenericPairEditDlg::ValidatorOk;
+        });
+
+    if (dlg.DoModal() != IDOK)
     {
         acutPrintf(L"\n%s", Common::loadString(IDS_CancelOperation));
         return;
     }
 
-    if (edit1Result.IsEmpty())
-    {
-        AfxMessageBox(Common::loadString(IDS_Err_EmptyStartNumber), MB_OK | MB_ICONERROR);
-        return;
-    }
-
-    if (edit1Result.SpanIncluding(L"0123456789") != edit1Result)
-    {
-        AfxMessageBox(Common::loadString(IDS_Err_InvalidStartNumber), MB_OK | MB_ICONERROR);
-        return;
-    }
-    int startNum = std::stoi(edit1Result.GetString());
     BalloonNumber::createBalloonNumberBlock();
-    BalloonNumber::insertBalloonNumberBlockWithStartNumber(startNum);
+    BalloonNumber::insertBalloonNumberBlockWithStartNumber(startNumber);
 }
 
 void Interface::cmdPrintClassHierarchy()
@@ -423,41 +424,46 @@ void Interface::cmdUpdateBalloonNumberBlock()
 
     GenericPairEditDlg dlg(title, Common::loadString(IDS_StartNumber), Common::loadString(IDS_BalloonNumberHeight), true, true, true);
 
-    CString edit1Result;
-    if (dlg.DoModal() == IDOK)
+    int startNumber;
+    dlg.setValidatorAndParser([&](const CString& strValue, const CString& _) -> CString
     {
-        edit1Result = dlg.getEdit1Result();
-    }
-    else
+            try
+            {
+                size_t pos;
+                startNumber = std::stoi(strValue.GetString(), &pos);
+                if (pos != strValue.GetLength())
+                {
+                    throw std::exception();
+                }
+                if (startNumber < 0)
+                {
+                    throw std::exception();
+                }
+            }
+            catch (...)
+            {
+                return Common::loadString(IDS_Err_InvalidStartNumber);
+            }
+            return GenericPairEditDlg::ValidatorOk;
+    });
+
+    if (dlg.DoModal() != IDOK)
     {
         acutPrintf(L"\n%s", Common::loadString(IDS_CancelOperation));
         return;
     }
 
-    if (edit1Result.IsEmpty())
-    {
-        AfxMessageBox(Common::loadString(IDS_Err_EmptyStartNumber), MB_OK | MB_ICONERROR);
-        return;
-    }
-
-    if (edit1Result.SpanIncluding(L"0123456789") != edit1Result)
-    {
-        AfxMessageBox(Common::loadString(IDS_Err_InvalidStartNumber), MB_OK | MB_ICONERROR);
-        return;
-    }
-    int startNum = std::stoi(edit1Result.GetString());
-
     UniversalPicker::AcRxClassVector arcv = { AcDbBlockReference::desc() };
 
-    acutPrintf(Common::loadString(IDS_BalloonNextNumber_FMT), startNum);
+    acutPrintf(Common::loadString(IDS_BalloonNextNumber_FMT), startNumber);
     UniversalPicker::run(
         &arcv,
-        [&startNum](const AcDbObjectId& id)
+        [&](const AcDbObjectId& id)
         {
-            if (BalloonNumber::updateBalloonNumberBlock(id, startNum))
+            if (BalloonNumber::updateBalloonNumberBlock(id, startNumber))
             {
-                ++startNum;
-                acutPrintf(Common::loadString(IDS_BalloonNextNumber_FMT), startNum);
+                ++startNumber;
+                acutPrintf(Common::loadString(IDS_BalloonNextNumber_FMT), startNumber);
             }
         },
         nullptr,
@@ -474,52 +480,55 @@ void Interface::cmdImeAutoSwitch()
     CString title = Common::loadString(IDS_yxImeAutoSwitchCommandDescription);
     GenericPairEditDlg dlg(title, Common::loadString(IDS_AutoStart), Common::loadString(IDS_Interval), false, true, true);
 
-    CString edit1Result, edit2Result;
+    CString edit1Result, edit2Result, csInvalidInterval;
     bool bAutoStart;
     int nInterval;
     ImeAutoSwitcher::loadSettings(bAutoStart, nInterval);
     edit1Result.Format(L"%d", bAutoStart);
     edit2Result.Format(L"%d", nInterval);
     dlg.modifyEditControl(edit1Result, edit2Result);
-    if (dlg.DoModal() == IDOK)
-    {
-        edit1Result = dlg.getEdit1Result();
-        edit2Result = dlg.getEdit2Result();
-    }
-    else
+
+    csInvalidInterval.Format(Common::loadString(IDS_Err_InvalidInterval_FMT), ImeAutoSwitcher::defaultIntervalMs);
+
+    dlg.setValidatorAndParser([&](const CString& value1, const CString& value2) -> CString
+        {
+            if (value1.IsEmpty() || value2.IsEmpty())
+            {
+                return Common::loadString(IDS_Err_ImeAutoSwitchEmptySetting);
+            }
+            if (value1.SpanIncluding(L"01") != value1)
+            {
+                return Common::loadString(IDS_Err_InvalidAutoStart);
+            }
+            try
+            {
+                size_t pos;
+                nInterval = std::stoi(value2.GetString(), &pos);
+                if (pos != value2.GetLength())
+                {
+                    throw std::exception();
+                }
+                if (nInterval < ImeAutoSwitcher::defaultIntervalMs)
+                {
+                    throw std::exception();
+                }
+            }
+            catch (...)
+            {
+                return csInvalidInterval;
+            }
+
+            edit1Result = value1;
+            return GenericPairEditDlg::ValidatorOk;
+        });
+
+    if (dlg.DoModal() != IDOK)
     {
         acutPrintf(L"\n%s", Common::loadString(IDS_CancelOperation));
         return;
     }
 
-    if (edit1Result.IsEmpty() || edit2Result.IsEmpty())
-    {
-        AfxMessageBox(Common::loadString(IDS_Err_ImeAutoSwitchEmptySetting), MB_OK | MB_ICONERROR);
-    }
-
-    if (edit1Result.SpanIncluding(L"01") != edit1Result)
-    {
-        AfxMessageBox(Common::loadString(IDS_Err_InvalidAutoStart), MB_OK | MB_ICONERROR);
-        return;
-    }
-
-    CString csInvalidInterval;
-    csInvalidInterval.Format(Common::loadString(IDS_Err_InvalidInterval_FMT), ImeAutoSwitcher::defaultIntervalMs);
-
-    if (edit2Result.SpanIncluding(L"0123456789") != edit2Result)
-    {
-        AfxMessageBox(csInvalidInterval, MB_OK | MB_ICONERROR);
-    }
-
     bAutoStart = edit1Result == L"1";
-    nInterval = std::stoi(edit2Result.GetString());
-
-    if (nInterval < ImeAutoSwitcher::defaultIntervalMs)
-    {
-        AfxMessageBox(csInvalidInterval, MB_OK | MB_ICONERROR);
-        return;
-    }
-
     ImeAutoSwitcher::stop();
     if (bAutoStart)
     {
@@ -574,36 +583,32 @@ void Interface::cmdBalloonNumberOffset()
     GenericPairEditDlg dlg(title, Common::loadString(IDS_BalloonNumberOffsetLabel), Common::loadString(IDS_Prompt), false, true, true);
     dlg.modifyEditControl(L"", Common::loadString(IDS_BalloonNumberOffsetPromptInfo));
 
-    CString edit1Result;
-    if (dlg.DoModal() == IDOK)
-    {
-        edit1Result = dlg.getEdit1Result();
-    }
-    else
+    int offset;
+    dlg.setValidatorAndParser([&](const CString& strValue, const CString& _) -> CString
+        {
+            if (strValue.IsEmpty())
+            {
+                return Common::loadString(IDS_Err_EmptyBalloonNumberOffset);
+            }
+            try
+            {
+                size_t pos = 0;
+                offset = std::stoi(strValue.GetString(), &pos);
+                if (pos != strValue.GetLength())
+                {
+                    throw std::exception();
+                }
+            }
+            catch (...)
+            {
+                return Common::loadString(IDS_Err_InvalidInteger);
+            }
+            return GenericPairEditDlg::ValidatorOk;
+        });
+
+    if (dlg.DoModal() != IDOK)
     {
         acutPrintf(L"\n%s", Common::loadString(IDS_CancelOperation));
-        return;
-    }
-
-    if (edit1Result.IsEmpty())
-    {
-        acutPrintf(L"\n%s", Common::loadString(IDS_Err_EmptyBalloonNumberOffset));
-        return;
-    }
-
-    int offset = 0;
-    try
-    {
-        size_t pos = 0;
-        offset = std::stoi(edit1Result.GetString(), &pos);
-        if (pos != edit1Result.GetLength())
-        {
-            throw std::exception();
-        }
-    }
-    catch (...)
-    {
-        AfxMessageBox(Common::loadString(IDS_Err_InvalidInteger), MB_OK | MB_ICONERROR);
         return;
     }
 
@@ -630,62 +635,60 @@ void Interface::cmdBalloonNumberFilter()
     dlg.modifyEditControl(L"", Common::loadString(IDS_BalloonNumberFilterPrompt));
 
     CString edit1Result;
-    if (dlg.DoModal() == IDOK)
-    {
-         edit1Result = dlg.getEdit1Result();
-    }
-    else
+    dlg.setValidatorAndParser([&](const CString& strValue, const CString& _) -> CString
+        {
+            if (strValue.GetLength() < 3)
+            {
+                return Common::loadString(IDS_Err_BalloonNumberFilterEmptyCriteria);
+            }
+
+            // 验证输入合法性
+            /////////////////////
+            // 无限制判定值的符号列表
+            std::vector<CString> opNoLimit = { BalloonNumber::OperatorType::equal, BalloonNumber::OperatorType::notEqual1, BalloonNumber::OperatorType::notEqual2 };
+            // 限制判定值为数字的列表
+            std::vector<CString> opNeedNumeric =
+            {
+                BalloonNumber::OperatorType::greater1, BalloonNumber::OperatorType::greater2,
+                BalloonNumber::OperatorType::less1, BalloonNumber::OperatorType::less2,
+                BalloonNumber::OperatorType::greaterEqual1, BalloonNumber::OperatorType::greaterEqual2,
+                BalloonNumber::OperatorType::lessEqual1, BalloonNumber::OperatorType::lessEqual2
+            };
+
+            CString strInputOpType = strValue.Left(2);
+            CString strInputOpValue = strValue.Mid(2);
+            auto it = std::find(opNoLimit.begin(), opNoLimit.end(), strInputOpType);
+            if (it == opNoLimit.end()) // 不在无限制判定值的符号列表中，则要求判定值必须为正数
+            {
+                // 进一步判断是否输入了非法符号
+                it = std::find(opNeedNumeric.begin(), opNeedNumeric.end(), strInputOpType);
+                if (it == opNeedNumeric.end())
+                {
+                    return Common::loadString(IDS_Err_BalloonNumberFilterInvalidOperatorType);
+                }
+
+                try
+                {
+                    size_t pos = 0;
+                    int iInputOpValue = std::stoi(strInputOpValue.GetString(), &pos);
+                    if (pos != strInputOpValue.GetLength())
+                    {
+                        throw std::exception();
+                    }
+                }
+                catch (...)
+                {
+                    return Common::loadString(IDS_Err_BalloonNumberFilterNeedInterger);
+                }
+            }
+            edit1Result = strValue;
+            return GenericPairEditDlg::ValidatorOk;
+        });
+
+    if (dlg.DoModal() != IDOK)
     {
         acutPrintf(L"\n%s", Common::loadString(IDS_CancelOperation));
         return;
-    }
-
-    if (edit1Result.GetLength() < 3)
-    {
-        AfxMessageBox(Common::loadString(IDS_Err_BalloonNumberFilterEmptyCriteria), MB_OK | MB_ICONERROR);
-        return;
-    }
-
-    // 验证输入合法性
-    /////////////////////
-    // 无限制判定值的符号列表
-    std::vector<CString> opNoLimit = { BalloonNumber::OperatorType::equal, BalloonNumber::OperatorType::notEqual1, BalloonNumber::OperatorType::notEqual2 };
-    // 限制判定值为数字的列表
-    std::vector<CString> opNeedNumeric =
-    {
-        BalloonNumber::OperatorType::greater1, BalloonNumber::OperatorType::greater2,
-        BalloonNumber::OperatorType::less1, BalloonNumber::OperatorType::less2,
-        BalloonNumber::OperatorType::greaterEqual1, BalloonNumber::OperatorType::greaterEqual2,
-        BalloonNumber::OperatorType::lessEqual1, BalloonNumber::OperatorType::lessEqual2
-    };
-
-    CString strInputOpType = edit1Result.Left(2);
-    CString strInputOpValue = edit1Result.Mid(2);
-    auto it = std::find(opNoLimit.begin(), opNoLimit.end(), strInputOpType);
-    if (it == opNoLimit.end()) // 不在无限制判定值的符号列表中，则要求判定值必须为证书
-    {
-        // 进一步判断是否输入了非法符号
-        it = std::find(opNeedNumeric.begin(), opNeedNumeric.end(), strInputOpType);
-        if (it == opNeedNumeric.end())
-        {
-            AfxMessageBox(Common::loadString(IDS_Err_BalloonNumberFilterInvalidOperatorType), MB_OK | MB_ICONERROR);
-            return;
-        }
-
-        try
-        {
-            size_t pos = 0;
-            int iInputOpValue = std::stoi(strInputOpValue.GetString(), &pos);
-            if (pos != strInputOpValue.GetLength())
-            {
-                throw std::exception();
-            }
-        }
-        catch (...)
-        {
-            AfxMessageBox(Common::loadString(IDS_Err_BalloonNumberFilterNeedInterger), MB_OK | MB_ICONERROR);
-            return;
-        }
     }
 
     AcDbObjectIdArray matchedIds;
@@ -740,24 +743,22 @@ void Interface::cmdImportCsvToMTextMatrix()
     GenericPairEditDlg dlg(Common::loadString(IDS_yxImportCsvToMTextMatrixCommandDescription), Common::loadString(IDS_LBL_Parameter), Common::loadString(IDS_Prompt), false, true, true);
     dlg.modifyEditControl(L"", Common::loadString(IDS_MTextMatrixParameterPrompt));
 
-    CString edit1Result;
-    if (dlg.DoModal() == IDOK)
-    {
-        edit1Result = dlg.getEdit1Result();
-    }
-    else
+    std::vector<double> params;
+    dlg.setValidatorAndParser([&](const CString& edit1, const CString& _) -> CString
+        {
+            const int paramsNumber = 3;
+            if (!Common::parse(edit1, paramsNumber, [](double v) { return v > 0; }, params))
+            {
+                return Common::loadString(IDS_MTextMatrixParameterPrompt);
+            }
+            return GenericPairEditDlg::ValidatorOk;
+        });
+
+    if (dlg.DoModal() != IDOK)
     {
         acutPrintf(L"\n%s", Common::loadString(IDS_CancelOperation));
         return;
     }
-
-    std::vector<double> params;
-    const int paramsNumber = 3;
-    if (!Common::parse(edit1Result, paramsNumber, [](double v) { return v > 0; }, params))
-    {
-        AfxMessageBox(Common::loadString(IDS_MTextMatrixParameterPrompt), MB_OK | MB_ICONERROR);
-        return;
-     }
 
     ads_point pt{};
     if (acedGetPoint(nullptr, Common::loadString(IDS_Msg_GetPoint), pt) != RTNORM)
@@ -769,90 +770,89 @@ void Interface::cmdImportCsvToMTextMatrix()
     TextUtil::createMTextMatrix(params[0], params[1], params[2], matrixData, asPnt3d(pt));
 }
 
-void Interface::cmdSpatialTableExplorer()
-{
-    CAcModuleResourceOverride resOverride;
-    CString title = Common::loadString(IDS_yxSpatialTableExplorerCommandDescription);
-    GenericPairEditDlg dlg(title, Common::loadString(IDS_LBL_Parameter), Common::loadString(IDS_Prompt), false, true, true);
-
-    // 默认列容差和行容差
-    // 字高默认 3.5，列容差默认按字高的 3 倍，行容差默认按字高的 1 倍（考虑注释比例缩放值）
-    CString strInitParameter;
-    double scale = Annotative::getCurrentScaleValue();
-    strInitParameter.Format(L"%g %g", Common::defaultTextHeight * scale * 3, Common::defaultTextHeight * scale * 1);
-    dlg.modifyEditControl(strInitParameter, Common::loadString(IDS_SpatialTableExplorerParameterPrompt));
-
-    CString edit1Result;
-    if (dlg.DoModal() == IDOK)
+    void Interface::cmdSpatialTableExplorer()
     {
-        edit1Result = dlg.getEdit1Result();
-    }
-    else
-    {
-        acutPrintf(L"\n%s", Common::loadString(IDS_CancelOperation));
-        return;
-    }
+        CAcModuleResourceOverride resOverride;
+        CString title = Common::loadString(IDS_yxSpatialTableExplorerCommandDescription);
+        GenericPairEditDlg dlg(title, Common::loadString(IDS_LBL_Parameter), Common::loadString(IDS_Prompt), false, true, true);
 
-    std::vector<double> params;
-    const int paramsNumber = 2;
-    if (!Common::parse(edit1Result, paramsNumber, [](double v) { return v > 0; }, params))
-    {
-        AfxMessageBox(Common::loadString(IDS_SpatialTableExplorerParameterPrompt), MB_OK | MB_ICONERROR);
-        return;
-    }
+        // 默认列容差和行容差
+        // 字高默认 3.5，列容差默认按字高的 3 倍，行容差默认按字高的 1 倍（考虑注释比例缩放值）
+        CString strInitParameter;
+        double scale = Annotative::getCurrentScaleValue();
+        strInitParameter.Format(L"%g %g", Common::defaultTextHeight * scale * 3, Common::defaultTextHeight * scale * 1);
+        dlg.modifyEditControl(strInitParameter, Common::loadString(IDS_SpatialTableExplorerParameterPrompt));
 
-    FileDialog::FileDialogFilterBuilder fileFilterBuilter;
-    CString strFileFilter = fileFilterBuilter.addFilter(Common::loadString(IDS_CsvFiles), { L"*.csv" }).build();
-    CString strFilePath = FileDialog::ShowSaveFileDialog(Common::loadString(IDS_SaveCsvTitle), Common::loadString(IDS_DefaultSaveDataCsvFilename), L"csv", strFileFilter);
-    if (strFilePath.IsEmpty())
-    {
-        acutPrintf(L"\n%s", Common::loadString(IDS_CancelOperation));
-        return;
-    }
-    CsvWriter writer(strFilePath);
-    if (!writer.isValid())
-    {
-        AfxMessageBox(Common::loadString(IDS_Err_FileOpenFailed), MB_OK | MB_ICONERROR);
-        return;
-    }
+        std::vector<double> params;
+        dlg.setValidatorAndParser([&](const CString& edit1, const CString& _) -> CString
+            {
+                const int paramsNumber = 2;
+                if (!Common::parse(edit1, paramsNumber, [](double v) { return v > 0; }, params))
+                {
+                    return Common::loadString(IDS_SpatialTableExplorerParameterPrompt);
+                }
+                return GenericPairEditDlg::ValidatorOk;
+            });
 
-    TextUtil::TextEntityDataList elements;
-    UniversalPicker::run(
-        &TextUtil::textClassList,
-        [&](const AcDbObjectId& id)
+    
+        if (dlg.DoModal() != IDOK)
         {
-            TextUtil::TextEntityData data;
-            data.id = id;
-            if (TextUtil::readMText(id, data.text, false, &data.pos))
-            {
-                acutPrintf(Common::loadString(IDS_MTextPos_FMT), data.pos.x, data.pos.y, data.pos.z, data.text.constPtr());
-            }
-            else if (TextUtil::readDText(id, data.text, false, &data.pos))
-            {
-                acutPrintf(Common::loadString(IDS_DTextPos_FMT), data.text.constPtr());
-            }
-            elements.push_back(data);
-        },
-        title,
-        UniversalPicker::SelectMode::Batch,
-        false,
-        UniversalPicker::SortMode::None,
-        true
-    );
+            acutPrintf(L"\n%s", Common::loadString(IDS_CancelOperation));
+            return;
+        }
 
-    CsvModule::AcStringMatrix matrixData;
-    TextUtil::structureTextToAcStringMatrix(elements, params[0], params[1], matrixData);
+        FileDialog::FileDialogFilterBuilder fileFilterBuilter;
+        CString strFileFilter = fileFilterBuilter.addFilter(Common::loadString(IDS_CsvFiles), { L"*.csv" }).build();
+        CString strFilePath = FileDialog::ShowSaveFileDialog(Common::loadString(IDS_SaveCsvTitle), Common::loadString(IDS_DefaultSaveDataCsvFilename), L"csv", strFileFilter);
+        if (strFilePath.IsEmpty())
+        {
+            acutPrintf(L"\n%s", Common::loadString(IDS_CancelOperation));
+            return;
+        }
+        CsvWriter writer(strFilePath);
+        if (!writer.isValid())
+        {
+            AfxMessageBox(Common::loadString(IDS_Err_FileOpenFailed), MB_OK | MB_ICONERROR);
+            return;
+        }
+
+        TextUtil::TextEntityDataList elements;
+        UniversalPicker::run(
+            &TextUtil::textClassList,
+            [&](const AcDbObjectId& id)
+            {
+                TextUtil::TextEntityData data;
+                data.id = id;
+                if (TextUtil::readMText(id, data.text, false, &data.pos))
+                {
+                    acutPrintf(Common::loadString(IDS_MTextPos_FMT), data.pos.x, data.pos.y, data.pos.z, data.text.constPtr());
+                }
+                else if (TextUtil::readDText(id, data.text, false, &data.pos))
+                {
+                    acutPrintf(Common::loadString(IDS_DTextPos_FMT), data.text.constPtr());
+                }
+                elements.push_back(data);
+            },
+            title,
+            UniversalPicker::SelectMode::Batch,
+            false,
+            UniversalPicker::SortMode::None,
+            true
+        );
+
+        CsvModule::AcStringMatrix matrixData;
+        TextUtil::structureTextToAcStringMatrix(elements, params[0], params[1], matrixData);
     
 
-    for (const auto& row : matrixData)
-    {
-        writer.writeRow(row);
-        acutPrintf(L"\n");
-        for (const auto& field : row)
+        for (const auto& row : matrixData)
         {
-            acutPrintf(L"%s\t", field.constPtr());
+            writer.writeRow(row);
+            acutPrintf(L"\n");
+            for (const auto& field : row)
+            {
+                acutPrintf(L"%s\t", field.constPtr());
+            }
         }
-    }
 
-    acutPrintf(Common::loadString(IDS_IDS_FileLocation_FMT), strFilePath);
-}
+        acutPrintf(Common::loadString(IDS_IDS_FileLocation_FMT), strFilePath);
+    }
