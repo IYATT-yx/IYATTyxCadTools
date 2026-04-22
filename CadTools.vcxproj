@@ -83,7 +83,7 @@
     <CLRSupport>false</CLRSupport>
     <UseOfMfc>Dynamic</UseOfMfc>
     <!-- <UseOfAtl>false</UseOfAtl> -->
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Debug'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
@@ -110,7 +110,7 @@
     <Import Project="Autodesk.mechanical-2026.props" />
   </ImportGroup>
   <PropertyGroup Label="Configuration">
-    <PlatformToolset Condition="'$(ArxSDKPlatform)'=='v143'">v143</PlatformToolset>
+    <PlatformToolset Condition="'$(ArxSDKPlatform)'=='v145'">v145</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
