@@ -51,9 +51,13 @@ AutoCAD Mechanical SDK 环境配置参考：https://blog.iyatt.com/?p=23776
 * 格式化字符串： _FMT 结尾
 * 错误消息：IDS_ERR_错误名称
 * 使用提示：IDS_TIP_提示名称
+* 警告消息：IDS_WARN_警告名称
 * 输出消息：IDS_MSG_消息名称
 * 属性值：IDS_VAL_属性名称
 * 操作提示：IDS_PROMPT_操作名称
+* 标题：IDS_TITLE_标题名称
+* 文件过滤器：IDS_FILTER_文件类型名
+* 文件名：IDS_FILE_文件名
 
 ## 许可证
 

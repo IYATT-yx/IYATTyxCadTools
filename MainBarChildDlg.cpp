@@ -28,6 +28,7 @@
 #include "MainBarChildDlg.hpp"
 
 import Commands;
+import Common;
 
 //-----------------------------------------------------------------------------
 #ifdef _DEBUG
@@ -109,11 +110,7 @@ BOOL MainBarChildDlg::OnInitDialog()
 	CAcModuleResourceOverride resOverride;
 
 	this->commandListControl.SetExtendedStyle(this->commandListControl.GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
-	CString shortCommandName, commandName, commandDescription;
-	shortCommandName.LoadStringW(IDS_ShortCommandName);
-	commandName.LoadStringW(IDS_CommandName);
-    commandDescription.LoadStringW(IDS_CommandDescription);
-	std::vector<CString> columnNames = {commandDescription, commandName, shortCommandName };
+	std::vector<CString> columnNames = {Common::loadString(IDS_LBL_CommandDescription), Common::loadString(IDS_LBL_CommandName), Common::loadString(IDS_LBL_ShortCommandName)};
 	for (auto columnName : columnNames)
 	{
         this->commandListControl.InsertColumn(0, columnName, LVCFMT_LEFT, 100);

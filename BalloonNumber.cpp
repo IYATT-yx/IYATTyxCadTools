@@ -379,7 +379,7 @@ namespace BalloonNumber
             return;
         }
 
-        acutPrintf(Common::loadString(IDS_OffsetResultInfo_FMT), currVal.constPtr());
+        acutPrintf(Common::loadString(IDS_MSG_OffsetResultInfo_FMT), currVal.constPtr());
         try
         {
             std::wstring wstr(currVal.constPtr());
@@ -394,9 +394,9 @@ namespace BalloonNumber
             if (newVal < 0)
             {
                 newVal = 0;
-                acutPrintf(L"\n%s", Common::loadString(IDS_OffsetLessZero));
+                acutPrintf(L"\n%s", Common::loadString(IDS_WARN_OffsetLessZero));
             }
-            acutPrintf(Common::loadString(IDS_OffsetTargetInfo_FMT), newVal);
+            acutPrintf(Common::loadString(IDS_MSG_OffsetTargetInfo_FMT), newVal);
             BalloonNumber::updateBalloonNumberBlock(id, newVal);
         }
         catch (...)
