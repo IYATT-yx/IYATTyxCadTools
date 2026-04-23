@@ -3,6 +3,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerCommandArguments>/nologo /b $(ProjectDir)debug.scr $(ProjectDir)test.dwg</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArgumentsHistory>/nologo /b C:\work\development\CadTools\debug.scr C:\work\development\CadTools\test.dwg|</LocalDebuggerCommandArgumentsHistory>
   </PropertyGroup>
   <PropertyGroup>
     <RESOURCE_FILE>CadTools.rc</RESOURCE_FILE>
@@ -10,5 +11,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LocalDebuggerCommandArguments>/nologo /b $(ProjectDir)release.scr $(ProjectDir)test.dwg</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArgumentsHistory>/nologo /b C:\work\development\CadTools\release.scr C:\work\development\CadTools\test.dwg|</LocalDebuggerCommandArgumentsHistory>
   </PropertyGroup>
 </Project>
