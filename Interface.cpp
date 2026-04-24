@@ -1,4 +1,4 @@
-module;
+ï»¿module;
 #include "stdafx.h"
 #include "GenericPairEditDlg.hpp"
 #include "MainBar.hpp"
@@ -19,11 +19,12 @@ import ImeAutoSwitcher;
 import Commands;
 import FileDialog;
 import Annotative;
+import Image;
 
 void Interface::init()
 {
     CAcModuleResourceOverride resOverride;
-    // ÃüÁîÁĞ±í
+    // å‘½ä»¤åˆ—è¡¨
     Commands::commandInfoList =
     {
         {L"yxSetByLayer", Common::loadString(IDS_CMD_yxSetByLayer), Commands::CommandFlags::PickRedraw, Interface::cmdSetByLayer},
@@ -45,6 +46,7 @@ void Interface::init()
         {L"yxIntersect", Common::loadString(IDS_CMD_yxIntersect), Commands::CommandFlags::Base, Interface::cmdIntersect},
         {L"yxImportCsvToMTextMatrix", Common::loadString(IDS_CMD_yxImportCsvToMTextMatrix), Commands::CommandFlags::PickRedraw, Interface::cmdImportCsvToMTextMatrix},
         {L"yxSpatialTableExplorer", Common::loadString(IDS_CMD_yxSpatialTableExplorer), Commands::CommandFlags::PickRedraw, Interface::cmdSpatialTableExplorer},
+        {L"yxPasteClipImage", Common::loadString(IDS_CMD_yxPasteClipImage), Commands::CommandFlags::PickRedraw, Interface::cmdPasteClipImage},
         {L"yxImeAutoSwitch", Common::loadString(IDS_CMD_yxImeAutoSwitch), Commands::CommandFlags::Base, Interface::cmdImeAutoSwitch},
         {L"yx", Common::loadString(IDS_CMD_yx), Commands::CommandFlags::Base, Interface::cmdYx},
         {L"yxTest", Common::loadString(IDS_CMD_yxTest), Commands::CommandFlags::Base, Interface::test},
@@ -54,10 +56,10 @@ void Interface::init()
 
     Interface::info();
 
-    // ×¢²áÃüÁî
+    // æ³¨å†Œå‘½ä»¤
     Commands::registerYxCmds(Commands::commandInfoList);
 
-    // ÊäÈë·¨×Ô¶¯ÇĞ»»×ÔÆô¶¯ 
+    // è¾“å…¥æ³•è‡ªåŠ¨åˆ‡æ¢è‡ªå¯åŠ¨ 
     bool bAutoStart = false;
     int nAutoMonitorInterval = 200;
     ImeAutoSwitcher::loadSettings(bAutoStart, nAutoMonitorInterval);
@@ -65,22 +67,22 @@ void Interface::init()
     {
         ImeAutoSwitcher::start(nAutoMonitorInterval);
     }
-    // ÏÔÊ¾ÃüÁî±¨±íĞü¸¡´°
+    // æ˜¾ç¤ºå‘½ä»¤æŠ¥è¡¨æ‚¬æµ®çª—
     MainBar::showBar(Commands::commandInfoList);
 }
 
-// ²âÊÔÊ¹ÓÃ
+// æµ‹è¯•ä½¿ç”¨
 void Interface::test()
 {
 }
 
 void Interface::unload()
 {
-    // ¹Ø±ÕÊäÈë·¨×Ô¶¯ÇĞ»»
+    // å…³é—­è¾“å…¥æ³•è‡ªåŠ¨åˆ‡æ¢
     ImeAutoSwitcher::stop();
-    // ¹Ø±ÕÃüÁî²Ëµ¥
+    // å…³é—­å‘½ä»¤èœå•
     MainBar::terminateBar();
-    // Ğ¶ÔØÃüÁî
+    // å¸è½½å‘½ä»¤
     CAcModuleResourceOverride resOverride;
     CString cmdGroup;
     cmdGroup.LoadStringW(IDS_CommandGroup);
@@ -263,7 +265,7 @@ void Interface::cmdInsertBalloonNumberBlockWithStartNumber()
     acutPrintf(L"\n%s\n", title);
 
     GenericPairEditDlg dlg(title, Common::loadString(IDS_LBL_StartNumber), Common::loadString(IDS_LBL_Tip), false, true, true);
-    // ÉèÖÃÄ¬ÈÏ×Ö¸ß
+    // è®¾ç½®é»˜è®¤å­—é«˜
     CString csTips;
     double textsize = Common::getTEXTSIZE();
     double scale = Annotative::getCurrentScaleValue();
@@ -340,9 +342,9 @@ void Interface::cmdExtractAnnotations()
             GeometricTolerance::readFcf(objId, gtData);
             AcString asMText, asDText;
 
-            if (dimData.status) // ³ß´ç
+            if (dimData.status) // å°ºå¯¸
             {
-                // ÃûÒåÖµ
+                // åä¹‰å€¼
                 AcString asMeasuredValue;
                 double dMeasuredValue = dimData.measuredValue;
                 if (dimData.isAngle)
@@ -351,10 +353,10 @@ void Interface::cmdExtractAnnotations()
                 }
                 Common::double2AcString(dMeasuredValue, asMeasuredValue, dimData.measuredValuePrecision);
                 
-                //acutPrintf(L"\nµ÷ÊÔ£º%s %s %f %f ", dimData.prefix.constPtr(), dimData.suffix.constPtr(), dimData.tolUpper, dimData.tolLower);
-                // ¹«²î
+                //acutPrintf(L"\nè°ƒè¯•ï¼š%s %s %f %f ", dimData.prefix.constPtr(), dimData.suffix.constPtr(), dimData.tolUpper, dimData.tolLower);
+                // å…¬å·®
                 AcString asTol,asTolUpper, asTolLower;
-                if (dimData.tolUpper == 0 && dimData.tolLower == 0) // ÎŞ¹«²î
+                if (dimData.tolUpper == 0 && dimData.tolLower == 0) // æ— å…¬å·®
                 {
                     asTol = L"";
                     asTolUpper = L"0";
@@ -362,14 +364,14 @@ void Interface::cmdExtractAnnotations()
                 }
                 else
                 {
-                    if (abs(dimData.tolUpper + dimData.tolLower) < 1e-6) // µÈË«Ïò¹«²î
+                    if (abs(dimData.tolUpper + dimData.tolLower) < 1e-6) // ç­‰åŒå‘å…¬å·®
                     {
                         double dAbsTol = abs(dimData.tolUpper);
                         asTol.format(L"%s%.*g", Common::SymbolCodes::PlusMinus, dimData.tolPrecision, dAbsTol);
                         asTolUpper.format(L"%.*g", dimData.tolPrecision, dAbsTol);
                         asTolLower.format(L"-%.*g", dimData.tolPrecision, dAbsTol);
                     }
-                    else // Ë«Ïò¹«²î
+                    else // åŒå‘å…¬å·®
                     {
                         
                         Common::double2AcString(dimData.tolUpper, asTolUpper, dimData.tolPrecision);
@@ -382,10 +384,10 @@ void Interface::cmdExtractAnnotations()
 
                 AcString asDimText = dimData.prefix + asMeasuredValue + asTol + dimData.suffix;
                 acutPrintf(Common::loadString(IDS_MSG_Dimension_FMT), asDimText.constPtr());
-                std::vector<AcString> row = { asDimText, asMeasuredValue, asTolUpper, asTolLower }; // ÍêÕû³ß´çÎÄ±¾¡¢ÃûÒåÖµ¡¢ÉÏ¼«ÏŞÆ«²î¡¢ÏÂ¼«ÏŞÆ«²î
+                std::vector<AcString> row = { asDimText, asMeasuredValue, asTolUpper, asTolLower }; // å®Œæ•´å°ºå¯¸æ–‡æœ¬ã€åä¹‰å€¼ã€ä¸Šæé™åå·®ã€ä¸‹æé™åå·®
                 csv.writeRow(row);
             }
-            else if (gtData.status) // ¼¸ºÎ¹«²î
+            else if (gtData.status) // å‡ ä½•å…¬å·®
             {
                 for (int i = 0; i < GeometricTolerance::GeometricToleranceDataLen; ++i)
                 {
@@ -560,7 +562,7 @@ void Interface::cmdCloneText()
         acutPrintf(L"\n%s", Common::loadString(IDS_MSG_CancelOperation));
         return;
     }
-    acutPrintf(L"\n¶ÁÈ¡µ½£º%s\n", asSrcTextContent.constPtr());
+    acutPrintf(L"\nè¯»å–åˆ°ï¼š%s\n", asSrcTextContent.constPtr());
 
     acutPrintf(L"\n%s", Common::loadString(IDS_PROMPT_PasteDstText));
     UniversalPicker::run(
@@ -655,11 +657,11 @@ void Interface::cmdBalloonNumberFilter()
                 return Common::loadString(IDS_ERR_BalloonNumberFilterEmptyCriteria);
             }
 
-            // ÑéÖ¤ÊäÈëºÏ·¨ĞÔ
+            // éªŒè¯è¾“å…¥åˆæ³•æ€§
             /////////////////////
-            // ÎŞÏŞÖÆÅĞ¶¨ÖµµÄ·ûºÅÁĞ±í
+            // æ— é™åˆ¶åˆ¤å®šå€¼çš„ç¬¦å·åˆ—è¡¨
             std::vector<CString> opNoLimit = { BalloonNumber::OperatorType::equal, BalloonNumber::OperatorType::notEqual1, BalloonNumber::OperatorType::notEqual2 };
-            // ÏŞÖÆÅĞ¶¨ÖµÎªÊı×ÖµÄÁĞ±í
+            // é™åˆ¶åˆ¤å®šå€¼ä¸ºæ•°å­—çš„åˆ—è¡¨
             std::vector<CString> opNeedNumeric =
             {
                 BalloonNumber::OperatorType::greater1, BalloonNumber::OperatorType::greater2,
@@ -671,9 +673,9 @@ void Interface::cmdBalloonNumberFilter()
             CString strInputOpType = strValue.Left(2);
             CString strInputOpValue = strValue.Mid(2);
             auto it = std::find(opNoLimit.begin(), opNoLimit.end(), strInputOpType);
-            if (it == opNoLimit.end()) // ²»ÔÚÎŞÏŞÖÆÅĞ¶¨ÖµµÄ·ûºÅÁĞ±íÖĞ£¬ÔòÒªÇóÅĞ¶¨Öµ±ØĞëÎªÕıÊı
+            if (it == opNoLimit.end()) // ä¸åœ¨æ— é™åˆ¶åˆ¤å®šå€¼çš„ç¬¦å·åˆ—è¡¨ä¸­ï¼Œåˆ™è¦æ±‚åˆ¤å®šå€¼å¿…é¡»ä¸ºæ­£æ•°
             {
-                // ½øÒ»²½ÅĞ¶ÏÊÇ·ñÊäÈëÁË·Ç·¨·ûºÅ
+                // è¿›ä¸€æ­¥åˆ¤æ–­æ˜¯å¦è¾“å…¥äº†éæ³•ç¬¦å·
                 it = std::find(opNeedNumeric.begin(), opNeedNumeric.end(), strInputOpType);
                 if (it == opNeedNumeric.end())
                 {
@@ -793,8 +795,8 @@ void Interface::cmdImportCsvToMTextMatrix()
         CString title = Common::loadString(IDS_CMD_yxSpatialTableExplorer);
         GenericPairEditDlg dlg(title, Common::loadString(IDS_LBL_Parameter), Common::loadString(IDS_LBL_Tip), false, true, true);
 
-        // Ä¬ÈÏÁĞÈİ²îºÍĞĞÈİ²î
-        // ×Ö¸ßÄ¬ÈÏÊ¹ÓÃ TEXTSIZE ±äÁ¿Öµ£¬ÁĞÈİ²îÄ¬ÈÏ°´×Ö¸ßµÄ 3 ±¶£¬ĞĞÈİ²îÄ¬ÈÏ°´×Ö¸ßµÄ 1 ±¶£¨¿¼ÂÇ×¢ÊÍ±ÈÀıËõ·ÅÖµ£©
+        // é»˜è®¤åˆ—å®¹å·®å’Œè¡Œå®¹å·®
+        // å­—é«˜é»˜è®¤ä½¿ç”¨ TEXTSIZE å˜é‡å€¼ï¼Œåˆ—å®¹å·®é»˜è®¤æŒ‰å­—é«˜çš„ 3 å€ï¼Œè¡Œå®¹å·®é»˜è®¤æŒ‰å­—é«˜çš„ 1 å€ï¼ˆè€ƒè™‘æ³¨é‡Šæ¯”ä¾‹ç¼©æ”¾å€¼ï¼‰
         CString strInitParameter;
         double scale = Annotative::getCurrentScaleValue();
         strInitParameter.Format(L"%g %g", Common::getTEXTSIZE() * scale * 3, Common::getTEXTSIZE() * scale * 1);
@@ -876,6 +878,7 @@ void Interface::cmdImportCsvToMTextMatrix()
 
     void Interface::cmdCheckBalloonNumberMaxMin()
     {
+        CAcModuleResourceOverride resOverride;
         UniversalPicker::AcRxClassVector arcv = { AcDbBlockReference::desc() };
         AcString strValue;
         int max = INT_MIN;
@@ -941,4 +944,41 @@ void Interface::cmdImportCsvToMTextMatrix()
         {
             acutPrintf(Common::loadString(IDS_MSG_EmptyBalloonNumber));
         }
+    }
+
+    void Interface::cmdPasteClipImage()
+    {
+        CAcModuleResourceOverride resOverride;
+        if (!Image::clipboardHasImage())
+        {
+            AfxMessageBox(Common::loadString(IDS_WARN_PasteClipNoImage), MB_OK | MB_ICONWARNING);
+            return;
+        }
+
+        FileDialog::FileDialogFilterBuilder filterBuilder;
+        CString fileFilter = filterBuilder.addFilter(Common::loadString(IDS_FILTER_PngFiles), { L"*.png" }).build();
+        CString defaultFilename;
+        defaultFilename.Format(Common::loadString(IDS_FILE_Png), Common::getTimestamp());
+        CString filename = FileDialog::ShowSaveFileDialog(Common::loadString(IDS_TITLE_SaveImage), defaultFilename, L"png", fileFilter, Common::getCurrPath(true));
+        if (filename.IsEmpty())
+        {
+            acutPrintf(Common::loadString(IDS_MSG_CancelOperation));
+            return;
+        }
+        if (!Image::saveClipboardBitmapToFile(filename))
+        {
+            AfxMessageBox(Common::loadString(IDS_ERR_SaveClipboardBitmapToFileFail), MB_OK | MB_ICONERROR);
+            return;
+        }
+        if (!Image::copyFileToClipboard(filename))
+        {
+            AfxMessageBox(Common::loadString(IDS_ERR_CopyFileToClipboardFail), MB_OK | MB_ICONERROR);
+            return;
+        }
+        const wchar_t* appName = acedGetAppName();
+        Commands::CommandList pszCmdList =
+        {
+            L"PASTECLIP"
+        };
+        Commands::executeCommand(pszCmdList);
     }

@@ -31,5 +31,6 @@ private:
 	static void cmdImportCsvToMTextMatrix();
 	static void cmdSpatialTableExplorer();
 	static void cmdCheckBalloonNumberMaxMin();
+	static void cmdPasteClipImage();
 };
 

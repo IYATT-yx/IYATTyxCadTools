@@ -272,6 +272,17 @@ BEGIN
     IDS_CMD_yxCheckBalloonNumberMaxMin "查找气泡号最大和最小序号"
     IDS_MSG_PrintBalloonNumberMaxAndMin_FMT "\n最大气泡号：%d，最小气泡号：%d"
     IDS_MSG_EmptyBalloonNumber "\n未发现有效数字格式的气泡号"
+    IDS_CMD_yxPasteClipImage "将剪贴板中的截图/图像数据保存到文件并插入图纸中"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_WARN_PasteClipNoImage "剪贴板中没有检测到图像数据。"
+    IDS_TITLE_SaveImage     "选择图片保存路径"
+    IDS_FILTER_PngFiles     "PNG 图片"
+    IDS_FILE_Png            "图片%s.png"
+    IDS_ERR_CopyFileToClipboardFail "复制文件到剪贴板失败"
+    IDS_ERR_SaveClipboardBitmapToFileFail "保存剪贴板图像数据到文件失败"
 END
 
 #endif    // 中文(简体，中国) resources
