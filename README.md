@@ -60,6 +60,7 @@ SDK：
 
 ObjectARX 环境配置参考：https://blog.iyatt.com/?p=21187  
 AutoCAD Mechanical SDK 环境配置参考：https://blog.iyatt.com/?p=23776  
+Visual Studio 2026 配置 Wizards 2026 参考：https://blog.iyatt.com/?p=24263  
 
 ### 项目开发策略
 
