@@ -53,21 +53,9 @@ namespace TextUtil
 			return false;
 		}
 
-		bool bFieldRead = false;
 		if (isRawContents)
 		{
-			AcDbField* pField = nullptr;
-			if (pMText->getField(L"TEXT", pField, AcDb::kForRead) == Acad::eOk)
-			{
-				pField->getFieldCode(text, AcDbField::kAddMarkers);
-				pField->close();
-				bFieldRead = true;
-			}
-
-			if (!bFieldRead)
-			{
-				pMText->contents(text);
-			}
+			pMText->contents(text);
 		}
 		else
 		{
@@ -90,28 +78,9 @@ namespace TextUtil
 			return false;
 		}
 
-		bool bFieldRead = false;
-		if (isRawContents)
+		pText->textString(text);
+		if (!isRawContents)
 		{
-			AcDbField* pField = nullptr;
-			if (pText->getField(L"TEXT", pField, AcDb::kForRead) == Acad::eOk)
-			{
-				if (pField != nullptr)
-				{
-					pField->getFieldCode(text, AcDbField::kAddMarkers);
-					pField->close();
-					bFieldRead = true;
-				}
-			}
-
-			if (!bFieldRead)
-			{
-				pText->textString(text);
-			}
-		}
-		else
-		{
-			pText->textString(text);
 			TextUtil::resolveControlCodes(text);
 		}
 
@@ -121,6 +90,31 @@ namespace TextUtil
 		}
 
 		return true;
+	}
+
+	bool readTextField(const AcDbObjectId& id, AcString& text)
+	{
+		AcDbEntity* pText = Common::getObject<AcDbEntity>(id, AcDb::kForRead);
+		if (pText == nullptr)
+		{
+			return false;
+		}
+		if (!pText->isKindOf(AcDbMText::desc()) && !pText->isKindOf(AcDbText::desc()))
+		{
+			return false;
+		}
+
+		AcDbField* pField = nullptr;
+		if (pText->getField(L"TEXT", pField, AcDb::kForRead) == Acad::eOk)
+		{
+			if (pField != nullptr)
+			{
+                pField->getFieldCode(text, AcDbField::kAddMarkers);
+				pField->close();
+				return true;
+			}
+		}
+		return false;
 	}
 
 	void resolveControlCodes(AcString& text)
@@ -136,88 +130,69 @@ namespace TextUtil
 		resbuf* filterRb = UniversalPicker::buildFilter(&TextUtil::textClassList);
 
 		AcDbObjectId entId = UniversalPicker::getSelectedSingleEntityId(&TextUtil::textClassList);
-		if (TextUtil::readMText(entId, content, true))
+		if (TextUtil::readTextField(entId, content))
 		{
 			return true;
-		}
-		else if (TextUtil::readDText(entId, content, true))
-		{
-            return true;
 		}
         return false;
 	}
 
 	void updateTextEntityContent(const AcDbObjectId& id, const AcString& content)
 	{
-		AcDbMText* pMText = Common::getObject<AcDbMText>(id, AcDb::kForWrite);
-		if (pMText != nullptr)
+		AcDbEntity* pText = Common::getObject<AcDbEntity>(id, AcDb::kForWrite);
+		if (pText == nullptr)
 		{
-			if (content.find(L"AcObjProp") != -1 || content.find(L"AcVar") != -1)
-			{
-				AcDbField* pField = new AcDbField();
-				if (pField != nullptr)
-				{
-					AcDbField::FieldCodeFlag fFlag = static_cast<AcDbField::FieldCodeFlag>(static_cast<int>(AcDbField::kFieldCode) | static_cast<int>(AcDbField::kTextField));
-					pField->setFieldCode(content, fFlag);
-
-					AcDbField::EvalOption eOpt = static_cast<AcDbField::EvalOption>(static_cast<int>(AcDbField::kOnRegen) | static_cast<int>(AcDbField::kOnSave));
-					pField->setEvaluationOption(eOpt);
-
-					if (pField->evaluate(AcDbField::kDemand, pMText->database()) == Acad::eOk)
-					{
-						AcDbObjectId newFieldId;
-						pMText->setField(L"TEXT", pField, newFieldId);
-					}
-					else
-					{
-						pMText->setContents(content);
-					}
-					pField->close();
-				}
-			}
-			else
-			{
-				pMText->setContents(content);
-			}
-
-			pMText->recordGraphicsModified();
+			return;
+		}
+		AcDbMText* pMText = AcDbMText::cast(pText);
+		AcDbText* pDText = AcDbText::cast(pText);
+		if (pMText == nullptr && pDText == nullptr)
+		{
 			return;
 		}
 
-		AcDbText* pDText = Common::getObject<AcDbText>(id, AcDb::kForWrite);
-		if (pDText != nullptr)
-		{
-			if (content.find(L"AcObjProp") != -1 || content.find(L"AcVar") != -1)
+		auto setTextContent = [&]()
 			{
-				AcDbField* pField = new AcDbField();
-				if (pField != nullptr)
+				if (pMText != nullptr)
 				{
-					AcDbField::FieldCodeFlag fFlag = static_cast<AcDbField::FieldCodeFlag>(static_cast<int>(AcDbField::kFieldCode) | static_cast<int>(AcDbField::kTextField));
-					pField->setFieldCode(content, fFlag);
-
-					AcDbField::EvalOption eOpt = static_cast<AcDbField::EvalOption>(static_cast<int>(AcDbField::kOnRegen) | static_cast<int>(AcDbField::kOnSave));
-					pField->setEvaluationOption(eOpt);
-
-					if (pField->evaluate(AcDbField::kDemand, pDText->database()) == Acad::eOk)
-					{
-						AcDbObjectId newFieldId;
-						pDText->setField(L"TEXT", pField, newFieldId);
-					}
-					else
-					{
-						pDText->setTextString(content);
-					}
-					pField->close();
+					pMText->setContents(content.constPtr());
 				}
-			}
-			else
-			{
-				pDText->setTextString(content);
-			}
+				else if (pDText != nullptr)
+				{
+					pDText->setTextString(content.constPtr());
+				}
+			};
 
-			pDText->recordGraphicsModified();
-			return;
+
+		if (content.find(L"AcObjProp") != -1 || content.find(L"AcVar") != -1)
+		{
+			AcDbField* pField = new AcDbField();
+			if (pField != nullptr)
+			{
+				AcDbField::FieldCodeFlag fFlag = static_cast<AcDbField::FieldCodeFlag>(static_cast<int>(AcDbField::kFieldCode) | static_cast<int>(AcDbField::kTextField));
+				pField->setFieldCode(content, fFlag);
+
+				AcDbField::EvalOption eOpt = static_cast<AcDbField::EvalOption>(static_cast<int>(AcDbField::kOnRegen) | static_cast<int>(AcDbField::kOnSave));
+				pField->setEvaluationOption(eOpt);
+
+				if (pField->evaluate(AcDbField::kDemand, pText->database()) == Acad::eOk)
+				{
+					AcDbObjectId newFieldId;
+					pText->setField(L"TEXT", pField, newFieldId);
+				}
+				else
+				{
+					setTextContent();
+				}
+				pField->close();
+			}
 		}
+		else
+		{
+			setTextContent();
+		}
+
+		pText->recordGraphicsModified();
 	}
 
 	void createMTextMatrix(double colWidth, double colStep, double rowStep, const CsvModule::AcStringMatrix& matrixData, AcGePoint3d topLeftPt, double dLineSpacingFactor)
