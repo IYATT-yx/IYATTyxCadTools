@@ -32,5 +32,6 @@ private:
 	static void cmdSpatialTableExplorer();
 	static void cmdCheckBalloonNumberMaxMin();
 	static void cmdPasteClipImage();
+	static void cmdLocateDrawing();
 };
 

@@ -283,6 +283,12 @@ BEGIN
     IDS_FILE_Png            "图片%s.png"
     IDS_ERR_CopyFileToClipboardFail "复制文件到剪贴板失败"
     IDS_ERR_SaveClipboardBitmapToFileFail "保存剪贴板图像数据到文件失败"
+    IDS_CMD_yxLocateDrawing "在文件资源管理器中打开当前图纸"
+    IDS_ERR_DrawingNoSave   "图纸未保存"
+    IDS_ERR_LocateFailed    "定位文件失败"
+    IDS_ERR_FileNotFound    "未见未找到，可能已被移动或删除"
+    IDS_ERR_AccessDenied    "拒绝访问，权限不足"
+    IDS_ERR_Unknown_FMT     "未知错误，错误代码：%d"
 END
 
 #endif    // 中文(简体，中国) resources

@@ -111,6 +111,12 @@
 #define IDS_FILE_Png                    195
 #define IDS_ERR_CopyFileToClipboardFail 196
 #define IDS_ERR_SaveClipboardBitmapToFileFail 197
+#define IDS_CMD_yxLocateDrawing         198
+#define IDS_ERR_DrawingNoSave           199
+#define IDS_ERR_LocateFailed            200
+#define IDS_ERR_FileNotFound            201
+#define IDS_ERR_AccessDenied            202
+#define IDS_ERR_Unknown_FMT             203
 
 // Next default values for new objects
 // 

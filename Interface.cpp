@@ -47,6 +47,7 @@ void Interface::init()
         {L"yxImportCsvToMTextMatrix", Common::loadString(IDS_CMD_yxImportCsvToMTextMatrix), Commands::CommandFlags::PickRedraw, Interface::cmdImportCsvToMTextMatrix},
         {L"yxSpatialTableExplorer", Common::loadString(IDS_CMD_yxSpatialTableExplorer), Commands::CommandFlags::PickRedraw, Interface::cmdSpatialTableExplorer},
         {L"yxPasteClipImage", Common::loadString(IDS_CMD_yxPasteClipImage), Commands::CommandFlags::PickRedraw, Interface::cmdPasteClipImage},
+        {L"yxLocateDrawing", Common::loadString(IDS_CMD_yxLocateDrawing), Commands::CommandFlags::Base, Interface::cmdLocateDrawing},
         {L"yxImeAutoSwitch", Common::loadString(IDS_CMD_yxImeAutoSwitch), Commands::CommandFlags::Base, Interface::cmdImeAutoSwitch},
         {L"yx", Common::loadString(IDS_CMD_yx), Commands::CommandFlags::Base, Interface::cmdYx},
         {L"yxTest", Common::loadString(IDS_CMD_yxTest), Commands::CommandFlags::Base, Interface::test},
@@ -982,4 +983,44 @@ void Interface::cmdImportCsvToMTextMatrix()
             L"PASTECLIP"
         };
         Commands::executeCommand(pszCmdList);
+    }
+
+    void Interface::cmdLocateDrawing()
+    {
+        CString drawingPath = Common::getCurrPath();
+        if (drawingPath.IsEmpty())
+        {
+            AfxMessageBox(Common::loadString(IDS_ERR_DrawingNoSave), MB_OK | MB_ICONERROR);
+            return;
+        }
+
+        CString args;
+        args.Format(L"/select,\"%s\"", drawingPath);
+        HINSTANCE inst = ShellExecuteW(
+            nullptr,
+            L"open",
+            L"explorer.exe",
+            args,
+            nullptr,
+            SW_SHOWNORMAL
+        );
+
+        INT_PTR result = reinterpret_cast<INT_PTR>(inst);
+        if (result <= 32)
+        {
+            CString strErr;
+            if (result == SE_ERR_FNF || result == SE_ERR_PNF)
+            {
+                strErr = Common::loadString(IDS_ERR_FileNotFound);
+            }
+            else if (result == SE_ERR_ACCESSDENIED)
+            {
+                strErr = Common::loadString(IDS_ERR_AccessDenied);
+            }
+            else
+            {
+                strErr.Format(Common::loadString(IDS_ERR_Unknown_FMT), result);
+            }
+            AfxMessageBox(strErr, MB_OK | MB_ICONERROR);
+        }
     }
