@@ -120,6 +120,9 @@
 #define IDS_CMD_yxCheckDuplicateBalloonNumbers 204
 #define IDS_MSG_DuplicateBalloonNumberFound 205
 #define IDS_MSG_NoDuplicateBalloonNumberFound 206
+#define IDS_CMD_yxCheckBalloonNumberBreakpoints 207
+#define IDS_MSG_BalloonBreakpointsFound 208
+#define IDS_MSG_NoBalloonBreakpointsFound 209
 
 // Next default values for new objects
 // 

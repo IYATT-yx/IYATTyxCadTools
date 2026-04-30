@@ -42,6 +42,7 @@ void Interface::init()
         {L"yxBalloonNumberFilter", Common::loadString(IDS_CMD_yxBalloonNumberFilter), Commands::CommandFlags::PickRedraw, Interface::cmdBalloonNumberFilter},
         {L"yxCheckBalloonNumberMaxMin", Common::loadString(IDS_CMD_yxCheckBalloonNumberMaxMin), Commands::CommandFlags::PickRedraw, Interface::cmdCheckBalloonNumberMaxMin},
         {L"yxCheckDuplicateBalloonNumbers", Common::loadString(IDS_CMD_yxCheckDuplicateBalloonNumbers), Commands::CommandFlags::PickRedraw, Interface::cmdCheckDuplicateBalloonNumbers},
+        {L"yxCheckBalloonNumberBreakpoints", Common::loadString(IDS_CMD_yxCheckBalloonNumberBreakpoints), Commands::CommandFlags::PickRedraw, Interface::cmdCheckBalloonNumberBreakpoints},
         {L"yxExtractAnnotations", Common::loadString(IDS_CMD_yxExtractAnnotations), Commands::CommandFlags::Base, Interface::cmdExtractAnnotations},
         {L"yxCloneText", Common::loadString(IDS_CMD_yxCloneText), Commands::CommandFlags::Base, Interface::cmdCloneText},
         {L"yxIntersect", Common::loadString(IDS_CMD_yxIntersect), Commands::CommandFlags::Base, Interface::cmdIntersect},
@@ -1080,5 +1081,96 @@ void Interface::cmdImportCsvToMTextMatrix()
         else
         {
             acutPrintf(L"\n%s",Common::loadString(IDS_MSG_NoDuplicateBalloonNumberFound));
+        }
+    }
+
+    void Interface::cmdCheckBalloonNumberBreakpoints()
+    {
+        CAcModuleResourceOverride resOverride;
+        UniversalPicker::AcRxClassVector arcv = { AcDbBlockReference::desc() };
+
+        // 使用 set 自动去重并升序排序
+        std::set<int> numbers;
+        AcString strValue;
+
+        UniversalPicker::run(
+            &arcv,
+            [&](const AcDbObjectId& id)
+            {
+                if (BalloonNumber::getBalloonAttributeValue(id, strValue))
+                {
+                    try
+                    {
+                        size_t pos = 0;
+                        // 强制宽字符转换，确保完全解析
+                        int number = std::stoi(strValue.constPtr(), &pos);
+
+                        if (pos == static_cast<size_t>(strValue.length()))
+                        {
+                            numbers.insert(number);
+                        }
+                    }
+                    catch (...)
+                    {
+                        // 无法转换为数字的内容不参与断点计算
+                    }
+                }
+            },
+            Common::loadString(IDS_CMD_yxCheckBalloonNumberBreakpoints),
+            UniversalPicker::SelectMode::Batch,
+            true,
+            UniversalPicker::SortMode::None,
+            true
+        );
+
+        // 只有 1 个或 0 个数字无法构成断点
+        if (numbers.size() < 2)
+        {
+            return;
+        }
+
+        std::wstring reportMsg = L"";
+        auto it = numbers.begin();
+        int prev = *it;
+        ++it;
+
+        for (; it != numbers.end(); ++it)
+        {
+            int curr = *it;
+
+            // 检查数字是否连续
+            if (curr != prev + 1)
+            {
+                if (reportMsg.empty() == false)
+                {
+                    reportMsg += L", ";
+                }
+
+                int missStart = prev + 1;
+                int missEnd = curr - 1;
+
+                if (missStart == missEnd)
+                {
+                    // 单点缺失：如 3, 5 -> 4
+                    reportMsg += std::to_wstring(missStart);
+                }
+                else
+                {
+                    // 区间缺失：如 3, 7 -> 4-6
+                    reportMsg += std::to_wstring(missStart) + L"-" + std::to_wstring(missEnd);
+                }
+            }
+            prev = curr;
+        }
+
+        // 结果呈现
+        if (reportMsg.empty() == false)
+        {
+            // 严格使用 L"" 格式化字符串和独立成行的大括号
+            acutPrintf(L"\n%s: %s", Common::loadString(IDS_MSG_BalloonBreakpointsFound), reportMsg.c_str());
+        }
+        else
+        {
+            acutPrintf(L"\n%s", Common::loadString(IDS_MSG_NoBalloonBreakpointsFound));
         }
     }

@@ -34,5 +34,6 @@ private:
 	static void cmdPasteClipImage();
 	static void cmdLocateDrawing();
 	static void cmdCheckDuplicateBalloonNumbers();
+	static void cmdCheckBalloonNumberBreakpoints();
 };
 

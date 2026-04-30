@@ -292,6 +292,13 @@ BEGIN
     IDS_CMD_yxCheckDuplicateBalloonNumbers "检查重复气泡号"
     IDS_MSG_DuplicateBalloonNumberFound "发现重复"
     IDS_MSG_NoDuplicateBalloonNumberFound "未发现重复"
+    IDS_CMD_yxCheckBalloonNumberBreakpoints "检查气泡号断点"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_MSG_BalloonBreakpointsFound "缺失的气泡编号"
+    IDS_MSG_NoBalloonBreakpointsFound "气泡编号连续，未发现断点"
 END
 
 #endif    // 中文(简体，中国) resources
