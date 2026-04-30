@@ -1032,7 +1032,7 @@ void Interface::cmdImportCsvToMTextMatrix()
         CAcModuleResourceOverride resOverride;
         UniversalPicker::AcRxClassVector arcv = { AcDbBlockReference::desc() };
 
-        std::map<std::wstring, AcDbObjectIdArray> numberMap;
+        std::map<AcString, AcDbObjectIdArray> numberMap;
         AcString strValue;
 
         UniversalPicker::run(
@@ -1041,10 +1041,9 @@ void Interface::cmdImportCsvToMTextMatrix()
             {
                 if (BalloonNumber::getBalloonAttributeValue(id, strValue))
                 {
-                    std::wstring key = strValue.constPtr();
-                    if (key.empty() == false)
+                    if (!strValue.isEmpty())
                     {
-                        numberMap[key].append(id);
+                        numberMap[strValue].append(id);
                     }
                 }
             },
@@ -1056,27 +1055,25 @@ void Interface::cmdImportCsvToMTextMatrix()
         );
 
         AcDbObjectIdArray duplicateIds;
-        std::wstring reportMsg = L"";
-
+        AcString reportMsg = L"";
         for (auto const& [text, ids] : numberMap)
         {
             if (ids.length() > 1)
             {
                 duplicateIds.append(ids);
 
-                if (reportMsg.empty() == false)
+                if (!reportMsg.isEmpty())
                 {
-                    reportMsg += L", ";
+                    reportMsg.append(L", ");
                 }
-                reportMsg += text;
+                reportMsg.append(text);
             }
         }
 
         if (duplicateIds.length() > 0)
         {
             UniversalPicker::setSelection(duplicateIds);
-
-            acutPrintf(L"\n%s: %s", Common::loadString(IDS_MSG_DuplicateBalloonNumberFound), reportMsg.c_str());
+            acutPrintf(L"\n%s: %s", Common::loadString(IDS_MSG_DuplicateBalloonNumberFound), reportMsg.constPtr());
         }
         else
         {
@@ -1129,35 +1126,36 @@ void Interface::cmdImportCsvToMTextMatrix()
             return;
         }
 
-        std::wstring reportMsg = L"";
+        AcString reportMsg = L"";
         auto it = numbers.begin();
         int prev = *it;
         ++it;
-
         for (; it != numbers.end(); ++it)
         {
             int curr = *it;
-
             // 检查数字是否连续
             if (curr != prev + 1)
             {
-                if (reportMsg.empty() == false)
+                if (!reportMsg.isEmpty())
                 {
-                    reportMsg += L", ";
+                    reportMsg.append(L", ");
                 }
 
                 int missStart = prev + 1;
                 int missEnd = curr - 1;
-
                 if (missStart == missEnd)
                 {
                     // 单点缺失：如 3, 5 -> 4
-                    reportMsg += std::to_wstring(missStart);
+                    AcString tmp;
+                    tmp.format(L"%d", missStart);
+                    reportMsg.append(tmp);
                 }
                 else
                 {
                     // 区间缺失：如 3, 7 -> 4-6
-                    reportMsg += std::to_wstring(missStart) + L"-" + std::to_wstring(missEnd);
+                    AcString tmp;
+                    tmp.format(L"%d-%d", missStart, missEnd);
+                    reportMsg.append(tmp);
                 }
             }
             prev = curr;
@@ -1166,8 +1164,7 @@ void Interface::cmdImportCsvToMTextMatrix()
         // 结果呈现
         if (reportMsg.empty() == false)
         {
-            // 严格使用 L"" 格式化字符串和独立成行的大括号
-            acutPrintf(L"\n%s: %s", Common::loadString(IDS_MSG_BalloonBreakpointsFound), reportMsg.c_str());
+            acutPrintf(L"\n%s: %s", Common::loadString(IDS_MSG_BalloonBreakpointsFound), reportMsg.constPtr());
         }
         else
         {
