@@ -289,6 +289,9 @@ BEGIN
     IDS_ERR_FileNotFound    "未见未找到，可能已被移动或删除"
     IDS_ERR_AccessDenied    "拒绝访问，权限不足"
     IDS_ERR_Unknown_FMT     "未知错误，错误代码：%d"
+    IDS_CMD_yxCheckDuplicateBalloonNumbers "检查重复气泡号"
+    IDS_MSG_DuplicateBalloonNumberFound "发现重复"
+    IDS_MSG_NoDuplicateBalloonNumberFound "未发现重复"
 END
 
 #endif    // 中文(简体，中国) resources

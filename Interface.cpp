@@ -40,7 +40,8 @@ void Interface::init()
         {L"yxUpdateBalloonNumberBlock", Common::loadString(IDS_CMD_yxUpdateBalloonNumberBlock), Commands::CommandFlags::PickRedraw, Interface::cmdUpdateBalloonNumberBlock},
         {L"yxBalloonNumberOffset", Common::loadString(IDS_CMD_yxBalloonNumberOffset), Commands::CommandFlags::PickRedraw, Interface::cmdBalloonNumberOffset},
         {L"yxBalloonNumberFilter", Common::loadString(IDS_CMD_yxBalloonNumberFilter), Commands::CommandFlags::PickRedraw, Interface::cmdBalloonNumberFilter},
-        {L"yxCheckBalloonNumberMaxMin", Common::loadString(IDS_CMD_yxCheckBalloonNumberMaxMin), Commands::CommandFlags::PickRedraw, cmdCheckBalloonNumberMaxMin},
+        {L"yxCheckBalloonNumberMaxMin", Common::loadString(IDS_CMD_yxCheckBalloonNumberMaxMin), Commands::CommandFlags::PickRedraw, Interface::cmdCheckBalloonNumberMaxMin},
+        {L"yxCheckDuplicateBalloonNumbers", Common::loadString(IDS_CMD_yxCheckDuplicateBalloonNumbers), Commands::CommandFlags::PickRedraw, Interface::cmdCheckDuplicateBalloonNumbers},
         {L"yxExtractAnnotations", Common::loadString(IDS_CMD_yxExtractAnnotations), Commands::CommandFlags::Base, Interface::cmdExtractAnnotations},
         {L"yxCloneText", Common::loadString(IDS_CMD_yxCloneText), Commands::CommandFlags::Base, Interface::cmdCloneText},
         {L"yxIntersect", Common::loadString(IDS_CMD_yxIntersect), Commands::CommandFlags::Base, Interface::cmdIntersect},
@@ -1022,5 +1023,62 @@ void Interface::cmdImportCsvToMTextMatrix()
                 strErr.Format(Common::loadString(IDS_ERR_Unknown_FMT), result);
             }
             AfxMessageBox(strErr, MB_OK | MB_ICONERROR);
+        }
+    }
+
+    void Interface::cmdCheckDuplicateBalloonNumbers()
+    {
+        CAcModuleResourceOverride resOverride;
+        UniversalPicker::AcRxClassVector arcv = { AcDbBlockReference::desc() };
+
+        std::map<std::wstring, AcDbObjectIdArray> numberMap;
+        AcString strValue;
+
+        UniversalPicker::run(
+            &arcv,
+            [&](const AcDbObjectId& id)
+            {
+                if (BalloonNumber::getBalloonAttributeValue(id, strValue))
+                {
+                    std::wstring key = strValue.constPtr();
+                    if (key.empty() == false)
+                    {
+                        numberMap[key].append(id);
+                    }
+                }
+            },
+            Common::loadString(IDS_CMD_yxCheckDuplicateBalloonNumbers),
+            UniversalPicker::SelectMode::Batch,
+            true,
+            UniversalPicker::SortMode::None,
+            true
+        );
+
+        AcDbObjectIdArray duplicateIds;
+        std::wstring reportMsg = L"";
+
+        for (auto const& [text, ids] : numberMap)
+        {
+            if (ids.length() > 1)
+            {
+                duplicateIds.append(ids);
+
+                if (reportMsg.empty() == false)
+                {
+                    reportMsg += L", ";
+                }
+                reportMsg += text;
+            }
+        }
+
+        if (duplicateIds.length() > 0)
+        {
+            UniversalPicker::setSelection(duplicateIds);
+
+            acutPrintf(L"\n%s: %s", Common::loadString(IDS_MSG_DuplicateBalloonNumberFound), reportMsg.c_str());
+        }
+        else
+        {
+            acutPrintf(L"\n%s",Common::loadString(IDS_MSG_NoDuplicateBalloonNumberFound));
         }
     }

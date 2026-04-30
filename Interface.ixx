@@ -33,5 +33,6 @@ private:
 	static void cmdCheckBalloonNumberMaxMin();
 	static void cmdPasteClipImage();
 	static void cmdLocateDrawing();
+	static void cmdCheckDuplicateBalloonNumbers();
 };
 
