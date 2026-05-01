@@ -299,7 +299,7 @@ STRINGTABLE
 BEGIN
     IDS_MSG_BalloonBreakpointsFound "缺失的气泡编号"
     IDS_MSG_NoBalloonBreakpointsFound "气泡编号连续，未发现断点"
-    IDS_CMD_yxForceRemoveImage "删除图纸中的光栅图像，并删除图片文件"
+    IDS_CMD_yxForceRemoveImage "删除光栅图像及图片文件（无法撤销恢复）"
     IDS_Msg_DeleteFailed    "\n[失败] 无法删除文件，请检查文件是否被其它程序占用。路径："
     IDS_MSG_DeleteSuccess   "\n[成功] 删除文件成功。路径："
 END
