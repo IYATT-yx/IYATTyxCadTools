@@ -325,7 +325,9 @@ void UniversalPicker::immediateSelect(UniversalPicker::AcRxClassVectorPtr arcv, 
                             pEnt->close();
                         }
                         // 强制图形系统立即渲染缓冲区中的改变，而非等待命令结束
-                        actrTransactionManager->flushGraphics();
+                        //actrTransactionManager->flushGraphics();
+                        actrTransactionManager->queueForGraphicsFlush();
+                        acedUpdateDisplay();
                         // --- 实时刷新逻辑结束 ---
                     }
                     catch (...)
