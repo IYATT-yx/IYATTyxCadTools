@@ -116,7 +116,7 @@ namespace Image
         {
             if (_wremove(imgFilename.constPtr()) != 0)
             {
-                acutPrintf(L"%s%s", Common::loadString(IDS_MSG_DeleteFailed), imgFilename.constPtr());
+                acutPrintf(L"%s%s", Common::loadString(IDS_ERR_DeleteFailed), imgFilename.constPtr());
             }
             else
             {

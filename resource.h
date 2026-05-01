@@ -124,8 +124,12 @@
 #define IDS_MSG_BalloonBreakpointsFound 208
 #define IDS_MSG_NoBalloonBreakpointsFound 209
 #define IDS_CMD_yxForceRemoveImage      210
-#define IDS_MSG_DeleteFailed            211
+#define IDS_ERR_DeleteFailed            211
 #define IDS_MSG_DeleteSuccess           212
+#define IDS_ERR_StartCharMapFailed      213
+#define IDS_ERR_SetCharMapFontGDTFailed 214
+#define IDS_MSG_HierarchyHeader         215
+#define IDS_MSG_CurrentClassNameMark    216
 
 // Next default values for new objects
 // 

@@ -1,5 +1,6 @@
 ﻿module;
 #include "StdAfx.h"
+#include "resource.h"
 #include <iomanip>
 
 module Common;
@@ -57,6 +58,7 @@ namespace Common
 
 	void startCharMapWithGDT()
 	{
+		CAcModuleResourceOverride resOverride;
 		if (Common::setCharMapFontToGDT())
 		{
 			HINSTANCE inst = ShellExecuteW(
@@ -70,13 +72,13 @@ namespace Common
 
 			if ((INT_PTR)inst <= 32)
 			{
-				AfxMessageBox(L"启动字符映射表失败", MB_OK | MB_ICONERROR);
+				AfxMessageBox(Common::loadString(IDS_ERR_StartCharMapFailed), MB_OK | MB_ICONERROR);
 				return;
 			}
 		}
 		else
 		{
-			AfxMessageBox(L"设置字符映射表字体为 GDT 失败", MB_OK | MB_ICONERROR);
+			AfxMessageBox(Common::loadString(IDS_ERR_SetCharMapFontGDTFailed), MB_OK | MB_ICONERROR);
 		}
 	}
 
@@ -103,16 +105,10 @@ namespace Common
 
 	void printClassHierarchy(const AcDbObjectId& objId)
 	{
-		if (objId.isNull())
-		{
-			acutPrintf(L"\n错误：无效的 ObjectId。");
-			return;
-		}
-
+		CAcModuleResourceOverride resOverride;
 		AcDbObject* pObj = Common::getObject<AcDbObject>(objId, AcDb::kForRead);
-		if (pObj != nullptr)
+		if (pObj == nullptr)
 		{
-			acutPrintf(L"\n错误：无法打开对象进行读取。");
 			return;
 		}
 
@@ -135,7 +131,7 @@ namespace Common
 			pTempClass = pTempClass->myParent();
 		}
 
-		acutPrintf(L"\n--- 继承链 ---");
+		acutPrintf(Common::loadString(IDS_MSG_HierarchyHeader));
 
 		// 从最高层级向当前层级打印
 		for (int i = hierarchy.length() - 1; i >= 0; --i)
@@ -149,7 +145,7 @@ namespace Common
 			// 标记对象自身的最终类名
 			if (i == 0)
 			{
-				acutPrintf(L"  <-- [当前类名]");
+				acutPrintf(Common::loadString(IDS_MSG_CurrentClassNameMark));
 			}
 		}
 
