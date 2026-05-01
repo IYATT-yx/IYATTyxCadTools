@@ -130,6 +130,7 @@
 #define IDS_ERR_SetCharMapFontGDTFailed 214
 #define IDS_MSG_HierarchyHeader         215
 #define IDS_MSG_CurrentClassNameMark    216
+#define IDS_CMD_yxLocateSelf            217
 
 // Next default values for new objects
 // 

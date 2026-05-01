@@ -306,6 +306,7 @@ BEGIN
     IDS_ERR_SetCharMapFontGDTFailed "设置字符映射表字体为 GDT 失败"
     IDS_MSG_HierarchyHeader "\n--- 继承链 ---"
     IDS_MSG_CurrentClassNameMark "<-- [当前类名]"
+    IDS_CMD_yxLocateSelf    "在文件资源管理器中打开本工具文件"
 END
 
 #endif    // 中文(简体，中国) resources

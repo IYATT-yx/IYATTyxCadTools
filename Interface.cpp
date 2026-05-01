@@ -56,6 +56,7 @@ void Interface::init()
         {L"yxTest", Common::loadString(IDS_CMD_yxTest), Commands::CommandFlags::Base, Interface::test},
         {L"yxUnload", Common::loadString(IDS_CMD_yxUnload), Commands::CommandFlags::Base, Interface::cmdUnloadApp},
         {L"yxPrintClassHierarchy", Common::loadString(IDS_CMD_yxPrintClassHierarchy), Commands::CommandFlags::Base, Interface::cmdPrintClassHierarchy},
+        {L"yxLocateSelf", Common::loadString(IDS_CMD_yxLocateSelf), Commands::CommandFlags::Base, Interface::cmdLocateSelf}
     };
 
     Interface::info();
@@ -1158,4 +1159,11 @@ void Interface::cmdImportCsvToMTextMatrix()
             UniversalPicker::SortMode::None,
             true
         );
+    }
+
+    void Interface::cmdLocateSelf()
+    {
+        CAcModuleResourceOverride resOverride;
+        const wchar_t* appName = acedGetAppName();
+        FileDialog::locateFileInExplorer(appName);
     }
