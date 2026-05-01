@@ -4,6 +4,7 @@
 
 module UniversalPicker;
 import Commands;
+import Common;
 
 resbuf* UniversalPicker::buildFilter(UniversalPicker::AcRxClassVectorPtr arcv)
 {
@@ -208,8 +209,8 @@ void UniversalPicker::batchSelect(UniversalPicker::AcRxClassVectorPtr arcv, Univ
         // 统一刷新图形
         for (const auto& id : processedIds)
         {
-            AcDbObjectPointer<AcDbEntity> pEnt(id, AcDb::kForWrite);
-            if (pEnt.openStatus() == Acad::eOk)
+            AcDbEntity* pEnt = Common::getObject<AcDbEntity>(id, AcDb::kForRead);
+            if (pEnt != nullptr)
             {
                 AcDbDimension* pDim = AcDbDimension::cast(pEnt);
                 if (pDim)
@@ -310,9 +311,9 @@ void UniversalPicker::immediateSelect(UniversalPicker::AcRxClassVectorPtr arcv, 
                         pTransMgr->endTransaction();
 
                         // --- 实时刷新逻辑开始 ---
-                        AcDbEntity* pEnt = nullptr;
                         // 事务提交后，只需以只读方式打开进行绘制触发
-                        if (acdbOpenObject(pEnt, id, AcDb::kForRead) == Acad::eOk)
+                        AcDbEntity* pEnt = Common::getObject<AcDbEntity>(id, AcDb::kForRead);
+                        if (pEnt != nullptr)
                         {
                             // 如果是标注类，必须重构其图形块
                             AcDbDimension* pDim = AcDbDimension::cast(pEnt);
@@ -322,7 +323,6 @@ void UniversalPicker::immediateSelect(UniversalPicker::AcRxClassVectorPtr arcv, 
                             }
 
                             pEnt->draw(); // 将更新后的几何数据推送到缓冲区
-                            pEnt->close();
                         }
                         // 强制图形系统立即渲染缓冲区中的改变，而非等待命令结束
                         //actrTransactionManager->flushGraphics();
