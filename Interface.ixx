@@ -35,5 +35,6 @@ private:
 	static void cmdLocateDrawing();
 	static void cmdCheckDuplicateBalloonNumbers();
 	static void cmdCheckBalloonNumberBreakpoints();
+	static void cmdForceRemoveImage();
 };
 

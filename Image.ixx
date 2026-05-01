@@ -26,4 +26,10 @@ export namespace Image
 	 * @return 如果成功将路径设置到剪贴板则返回 true，否则返回 false。
 	 */
 	bool copyFileToClipboard(const CString& filename);
+
+	/**
+	 * @brief 删除光栅图像和引用的图片文件
+	 * @param id 光栅图像 ID
+	 */
+	void forceRemoveImageAndFile(const AcDbObjectId& id);
 };

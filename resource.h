@@ -123,6 +123,11 @@
 #define IDS_CMD_yxCheckBalloonNumberBreakpoints 207
 #define IDS_MSG_BalloonBreakpointsFound 208
 #define IDS_MSG_NoBalloonBreakpointsFound 209
+#define IDS_CMD_yxForceRemoveImage      210
+#define IDS_ERR_DeleteFailed            211
+#define IDS_Msg_DeleteFailed            211
+#define IDS_MSG_DeleteFailed            211
+#define IDS_MSG_DeleteSuccess           212
 
 // Next default values for new objects
 // 

@@ -49,6 +49,7 @@ void Interface::init()
         {L"yxImportCsvToMTextMatrix", Common::loadString(IDS_CMD_yxImportCsvToMTextMatrix), Commands::CommandFlags::PickRedraw, Interface::cmdImportCsvToMTextMatrix},
         {L"yxSpatialTableExplorer", Common::loadString(IDS_CMD_yxSpatialTableExplorer), Commands::CommandFlags::PickRedraw, Interface::cmdSpatialTableExplorer},
         {L"yxPasteClipImage", Common::loadString(IDS_CMD_yxPasteClipImage), Commands::CommandFlags::PickRedraw, Interface::cmdPasteClipImage},
+        {L"yxForceRemoveImage", Common::loadString(IDS_CMD_yxForceRemoveImage), Commands::CommandFlags::PickRedraw, cmdForceRemoveImage},
         {L"yxLocateDrawing", Common::loadString(IDS_CMD_yxLocateDrawing), Commands::CommandFlags::Base, Interface::cmdLocateDrawing},
         {L"yxImeAutoSwitch", Common::loadString(IDS_CMD_yxImeAutoSwitch), Commands::CommandFlags::Base, Interface::cmdImeAutoSwitch},
         {L"yx", Common::loadString(IDS_CMD_yx), Commands::CommandFlags::Base, Interface::cmdYx},
@@ -1170,4 +1171,19 @@ void Interface::cmdImportCsvToMTextMatrix()
         {
             acutPrintf(L"\n%s", Common::loadString(IDS_MSG_NoBalloonBreakpointsFound));
         }
+    }
+
+    void Interface::cmdForceRemoveImage()
+    {
+        CAcModuleResourceOverride resOverride;
+        UniversalPicker::AcRxClassVector arcv = { AcDbRasterImage::desc() };
+        UniversalPicker::run(
+            &arcv,
+            Image::forceRemoveImageAndFile,
+            Common::loadString(IDS_CMD_yxForceRemoveImage),
+            UniversalPicker::SelectMode::Immediate,
+            false,
+            UniversalPicker::SortMode::None,
+            true
+        );
     }
