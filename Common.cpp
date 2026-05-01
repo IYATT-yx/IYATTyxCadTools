@@ -109,8 +109,8 @@ namespace Common
 			return;
 		}
 
-		AcDbObjectPointer<AcDbObject> pObj(objId, AcDb::kForRead);
-		if (pObj.openStatus() != Acad::eOk)
+		AcDbObject* pObj = Common::getObject<AcDbObject>(objId, AcDb::kForRead);
+		if (pObj != nullptr)
 		{
 			acutPrintf(L"\n错误：无法打开对象进行读取。");
 			return;
