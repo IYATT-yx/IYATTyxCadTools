@@ -22,6 +22,12 @@ export namespace FileDialog
 	 * @return 用户选择的完整文件路径，如果取消返回空字符串
 	 */
 	CString ShowOpenFileDialog(const CString& title, const CString& defExt = L"csv", const CString& filter = L"CSV Files (*.csv)|*.csv|All Files (*.*)|*.*||");
+
+    /**
+     * @brief 弹出文件资源管理器，打开文件所在目录并选中文件
+     * @param filename 文件名
+     */
+    void locateFileInExplorer(const CString& filename);
 };
 
 export namespace FileDialog

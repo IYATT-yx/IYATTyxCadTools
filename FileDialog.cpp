@@ -1,7 +1,9 @@
 ﻿module;
 #include "stdafx.h"
+#include "resource.h"
 
 module FileDialog;
+import Common;
 
 namespace FileDialog
 {
@@ -37,6 +39,39 @@ namespace FileDialog
 		}
 
 		return L"";
+	}
+
+	void locateFileInExplorer(const CString& filename)
+	{
+		CString args;
+		args.Format(L"/select,\"%s\"", filename);
+		HINSTANCE inst = ShellExecuteW(
+			nullptr,
+			L"open",
+			L"explorer.exe",
+			args,
+			nullptr,
+			SW_SHOWNORMAL
+		);
+
+		INT_PTR result = reinterpret_cast<INT_PTR>(inst);
+		if (result <= 32)
+		{
+			CString strErr;
+			if (result == SE_ERR_FNF || result == SE_ERR_PNF)
+			{
+				strErr = Common::loadString(IDS_ERR_FileNotFound);
+			}
+			else if (result == SE_ERR_ACCESSDENIED)
+			{
+				strErr = Common::loadString(IDS_ERR_AccessDenied);
+			}
+			else
+			{
+				strErr.Format(Common::loadString(IDS_ERR_Unknown_FMT), result);
+			}
+			AfxMessageBox(strErr, MB_OK | MB_ICONERROR);
+		}
 	}
 };
 
