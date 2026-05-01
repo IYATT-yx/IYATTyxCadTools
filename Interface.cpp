@@ -91,7 +91,7 @@ void Interface::unload()
     CString cmdGroup;
     cmdGroup.LoadStringW(IDS_CommandGroup);
 	acedRegCmds->removeGroup(cmdGroup);
-    acutPrintf(Common::loadString(IDS_Msg_Unload_FMT), Common::loadString(IDS_VAL_LocaleProjectName));
+    acutPrintf(Common::loadString(IDS_MSG_Unload_FMT), Common::loadString(IDS_VAL_LocaleProjectName));
 }
 
 void Interface::cmdUnloadApp()
@@ -737,11 +737,11 @@ void Interface::cmdBalloonNumberFilter()
     if (matchedIds.length() > 0)
     {
         UniversalPicker::setSelection(matchedIds);
-        acutPrintf(Common::loadString(IDS_Msg_BalloonNumberFilterMatchCount_FMT), matchedIds.length());
+        acutPrintf(Common::loadString(IDS_MSG_BalloonNumberFilterMatchCount_FMT), matchedIds.length());
     }
     else
     {
-        acutPrintf(Common::loadString(IDS_Msg_BalloonNumberFilterNoMatch));
+        acutPrintf(Common::loadString(IDS_MSG_BalloonNumberFilterNoMatch));
     }
 }
 

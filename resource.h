@@ -61,7 +61,7 @@
 #define IDS_ImeAutoSwitchStartPrompt_FMT 146
 #define IDS_ImeAutoSwitchStopPrompt     147
 #define IDS_CMD_yxUnload                148
-#define IDS_Msg_Unload_FMT              149
+#define IDS_MSG_Unload_FMT              149
 #define IDS_CMD_yxCloneText             150
 #define IDS_PROMPT_CopySrcText          151
 #define IDS_PROMPT_PasteDstText         152
@@ -82,9 +82,9 @@
 #define IDS_ERR_BalloonNumberFilterEmptyCriteria 167
 #define IDS_ERR_BalloonNumberFilterInvalidOperatorType 168
 #define IDS_ERR_BalloonNumberFilterNeedInterger 169
-#define IDS_Msg_BalloonNumberFilterMatchCount_FMT 170
-#define IDS_Msg_NoMatch                 171
-#define IDS_Msg_BalloonNumberFilterNoMatch 171
+#define IDS_MSG_BalloonNumberFilterMatchCount_FMT 170
+#define IDS_MSG_NoMatch                 171
+#define IDS_MSG_BalloonNumberFilterNoMatch 171
 #define IDS_ERR_GetCurrentScaleValue_FMT 172
 #define IDS_ERR_LineSpacingFactorOutOfRange 173
 #define IDS_FILTER_CsvFiles             174
@@ -124,8 +124,6 @@
 #define IDS_MSG_BalloonBreakpointsFound 208
 #define IDS_MSG_NoBalloonBreakpointsFound 209
 #define IDS_CMD_yxForceRemoveImage      210
-#define IDS_ERR_DeleteFailed            211
-#define IDS_Msg_DeleteFailed            211
 #define IDS_MSG_DeleteFailed            211
 #define IDS_MSG_DeleteSuccess           212
 

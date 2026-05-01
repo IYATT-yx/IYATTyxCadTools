@@ -219,7 +219,7 @@ BEGIN
     IDS_ImeAutoSwitchStartPrompt_FMT "\n启动输入法自动切换，切换间隔：%dms\n"
     IDS_ImeAutoSwitchStopPrompt "\n停止输入法自动切换\n"
     IDS_CMD_yxUnload        "关闭本插件"
-    IDS_Msg_Unload_FMT      "\n已卸载 %s"
+    IDS_MSG_Unload_FMT      "\n已卸载 %s"
     IDS_CMD_yxCloneText     "将多行/单行文本内容复制给其它多行/单行文本"
     IDS_PROMPT_CopySrcText  "请选择要复制的源文本对象"
     IDS_PROMPT_PasteDstText "请选择要粘贴到的文本对象"
@@ -245,8 +245,8 @@ BEGIN
     IDS_ERR_BalloonNumberFilterEmptyCriteria "筛选条件不能为空。"
     IDS_ERR_BalloonNumberFilterInvalidOperatorType "输入的符号不合法。"
     IDS_ERR_BalloonNumberFilterNeedInterger "非等于或不等于判定时，判定值必须为整数。"
-    IDS_Msg_BalloonNumberFilterMatchCount_FMT "\n筛选完成：%d 个匹配项。"
-    IDS_Msg_BalloonNumberFilterNoMatch "\n未发现符合条件的气泡号。"
+    IDS_MSG_BalloonNumberFilterMatchCount_FMT "\n筛选完成：%d 个匹配项。"
+    IDS_MSG_BalloonNumberFilterNoMatch "\n未发现符合条件的气泡号。"
     IDS_ERR_GetCurrentScaleValue_FMT "\n获取注释比例缩放系数失败，已重置为：%g"
     IDS_ERR_LineSpacingFactorOutOfRange "行距比例不可小于0.25，且不可大于4.0。"
     IDS_FILTER_CsvFiles     "CSV 文件"
@@ -300,7 +300,7 @@ BEGIN
     IDS_MSG_BalloonBreakpointsFound "缺失的气泡编号"
     IDS_MSG_NoBalloonBreakpointsFound "气泡编号连续，未发现断点"
     IDS_CMD_yxForceRemoveImage "删除光栅图像及图片文件（无法撤销恢复）"
-    IDS_Msg_DeleteFailed    "\n[失败] 无法删除文件，请检查文件是否被其它程序占用。路径："
+    IDS_MSG_DeleteFailed    "\n[失败] 无法删除文件，请检查文件是否被其它程序占用。路径："
     IDS_MSG_DeleteSuccess   "\n[成功] 删除文件成功。路径："
 END
 
