@@ -43,32 +43,49 @@ namespace FileDialog
 
 	void locateFileInExplorer(const CString& filename)
 	{
-		CString args;
-		args.Format(L"/select,\"%s\"", filename);
-		HINSTANCE inst = ShellExecuteW(
-			nullptr,
-			L"open",
-			L"explorer.exe",
-			args,
-			nullptr,
-			SW_SHOWNORMAL
-		);
+		if (filename.IsEmpty())
+		{
+			return;
+		}
 
-		INT_PTR result = reinterpret_cast<INT_PTR>(inst);
-		if (result <= 32)
+		// 获取文件的 PIDL (Item ID List)
+		// 这是实现“确保可见 (EnsureVisible)”最可靠的底层方式
+		PIDLIST_ABSOLUTE pidl = nullptr;
+		HRESULT hr = SHParseDisplayName(filename, nullptr, &pidl, 0, nullptr);
+
+		if (SUCCEEDED(hr))
+		{
+			if (pidl != nullptr)
+			{
+				// 执行定位：此 API 会自动打开文件夹、选中文件并滚动到视野中
+				hr = SHOpenFolderAndSelectItems(pidl, 0, nullptr, 0);
+
+				if (FAILED(hr))
+				{
+					// 如果 API 失败（某些极端受限环境），弹出未知错误
+					CString strErr;
+					strErr.Format(Common::loadString(IDS_ERR_Unknown_FMT), hr);
+					AfxMessageBox(strErr, MB_OK | MB_ICONERROR);
+				}
+
+				// 必须手动释放 Shell 分配的内存
+				CoTaskMemFree(pidl);
+			}
+		}
+		else
 		{
 			CString strErr;
-			if (result == SE_ERR_FNF || result == SE_ERR_PNF)
+			if (hr == HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) || hr == HRESULT_FROM_WIN32(ERROR_PATH_NOT_FOUND))
 			{
 				strErr = Common::loadString(IDS_ERR_FileNotFound);
 			}
-			else if (result == SE_ERR_ACCESSDENIED)
+			else if (hr == E_ACCESSDENIED)
 			{
 				strErr = Common::loadString(IDS_ERR_AccessDenied);
 			}
 			else
 			{
-				strErr.Format(Common::loadString(IDS_ERR_Unknown_FMT), result);
+				strErr.Format(Common::loadString(IDS_ERR_Unknown_FMT), hr);
 			}
 			AfxMessageBox(strErr, MB_OK | MB_ICONERROR);
 		}
