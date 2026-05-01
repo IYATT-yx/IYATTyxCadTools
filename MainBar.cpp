@@ -47,7 +47,14 @@ END_MESSAGE_MAP()
 //----- pInstance->RestoreControlBar () ;
 
 //-----------------------------------------------------------------------------
-static CLSID clsMainBar = {0xeab78c04, 0x2194, 0x47ad, {0xa4, 0xf2, 0xad, 0xca, 0x3e, 0x3b, 0xb6, 0x3c}} ;
+// {AF1077A2-4013-4B0D-A115-A21137ADA1BC}
+static const GUID clsMainBar = 
+{ 
+    0xaf1077a2, 
+    0x4013, 
+    0x4b0d, 
+    { 0xa1, 0x15, 0xa2, 0x11, 0x37, 0xad, 0xa1, 0xbc } 
+};
 
 
 //-----------------------------------------------------------------------------
@@ -84,7 +91,7 @@ BOOL MainBar::Create (CWnd *pParent, LPCTSTR lpszTitle) {
 	SetToolID (&clsMainBar) ;
 
 	// TODO: Add your code here
-	
+
 	return (TRUE) ;
 }
 
@@ -151,7 +158,6 @@ void MainBar::showBar(Commands::CommandInfoList& commandInfoList)
 		else
 		{
 			acedGetAcadFrame()->ShowControlBar(gpMainBar, TRUE, FALSE);
-			gpMainBar->RestoreControlBar();
 			gpMainBar->SendMessage(WM_NCPAINT);
 		}
 		return; // 这里直接返回，不再执行后续插入逻辑
@@ -199,7 +205,6 @@ void MainBar::terminateBar()
 	{
 		// 强制失去焦点
 		::SetFocus(acedGetAcadFrame()->GetSafeHwnd());
-
 		// 销毁窗口
 		gpMainBar->DestroyWindow();
 	}
