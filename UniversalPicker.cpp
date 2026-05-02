@@ -564,9 +564,5 @@ void UniversalPicker::setSelection(const AcDbObjectIdArray& idArray)
     }
 
     int result = acedSSSetFirst(ss, ss);
-
     acedSSFree(ss);
-
-    Commands::CommandList pszCmdList = { L"SELECT" };
-    Commands::executeCommand(pszCmdList);
 }
