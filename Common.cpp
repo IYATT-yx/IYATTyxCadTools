@@ -230,4 +230,35 @@ namespace Common
 		woss << std::put_time(&nowTm, L"%Y%m%d_%H%M%S");
 		return woss.str().c_str();
 	}
+
+	AcDbObjectIdArray getNeighborsAtPoint(const AcGePoint3d& pt, resbuf* pFilter)
+	{
+		AcDbObjectIdArray neighbors;
+		ads_point adsPt;
+		adsPt[X] = pt.x;
+		adsPt[Y] = pt.y;
+		adsPt[Z] = pt.z;
+
+		ads_name ss;
+		// 在坐标点处进行 Crossing 检索
+		if (acedSSGet(L"C", adsPt, adsPt, pFilter, ss) == RTNORM)
+		{
+			Adesk::Int32 length = 0;
+			acedSSLength(ss, &length);
+
+			for (long i = 0; i < length; ++i)
+			{
+				ads_name ent;
+				acedSSName(ss, i, ent);
+
+				AcDbObjectId objId;
+				if (acdbGetObjectId(objId, ent) == Acad::eOk)
+				{
+					neighbors.append(objId);
+				}
+			}
+			acedSSFree(ss);
+		}
+		return neighbors;
+	}
 }

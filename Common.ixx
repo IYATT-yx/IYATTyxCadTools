@@ -119,6 +119,22 @@ export namespace Common
 	 * @return 当前时间戳字符串
 	 */
 	CString getTimestamp();
+
+	/**
+     * @brief 获取指定坐标点处的相邻实体
+     * 
+     * 使用 AutoCAD Crossing (C) 模式在指定点进行空间检索。
+     * 检索逻辑会将与该点接触或包含该点的所有符合过滤条件的实体纳入结果集。
+     * 
+     * @param pt      检索的基准坐标点（世界坐标系 WCS）。
+     * @param pFilter 实体过滤器链表（resbuf），用于限制检索范围（如仅检索直线、圆弧等）。
+     *                注意：调用者负责该过滤器的创建，本函数内部不释放该指针。
+     * @return AcDbObjectIdArray 检索到的实体 ObjectId 集合。若未找到任何匹配实体，则返回空数组。
+     * 
+     * @note 1. 内部调用 acedSSGet(L"C", ...)，受当前视图显示范围及图层锁定状态影响。
+     * @note 2. 检索结果包含所有重叠在 pt 处的实体，不区分实体的几何起始或终点。
+     */
+	AcDbObjectIdArray getNeighborsAtPoint(const AcGePoint3d& pt, resbuf* pFilter);
 }
 
 // 常量
