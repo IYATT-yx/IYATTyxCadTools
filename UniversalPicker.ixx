@@ -66,12 +66,6 @@ private:
 	static void immediateSelect(UniversalPicker::AcRxClassVectorPtr arcv, UniversalPicker::EntityProcessor processor);
 
 	/**
-	 * @brief 释放过滤器链表
-	 * @param filterRb 过滤器链表，调用者负责传入，函数内部会释放
-	 */
-	static void freeFilter(resbuf* filterRb);
-
-	/**
 	 * @brief 根据指定的方位模式比较两个实体的空间位置
 	 * @param a 实体 A
 	 * @param b 实体 B
@@ -108,6 +102,12 @@ public:
 	 * @return 过滤器链表，调用者负责释放
 	 */
 	static resbuf* buildFilter(UniversalPicker::AcRxClassVectorPtr arcv);
+
+	/**
+	 * @brief 释放过滤器链表
+	 * @param filterRb 过滤器链表，调用者负责传入，函数内部会释放
+	 */
+	static void freeFilter(resbuf* filterRb);
 
 	/**
 	 * @brief 获取用户选中的单个实体 ID
