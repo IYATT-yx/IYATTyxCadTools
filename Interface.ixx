@@ -37,5 +37,6 @@ private:
 	static void cmdCheckBalloonNumberBreakpoints();
 	static void cmdForceRemoveImage();
 	static void cmdLocateSelf();
+	static void cmdChainSelection();
 };
 

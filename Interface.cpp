@@ -28,6 +28,7 @@ void Interface::init()
     Commands::commandInfoList =
     {
         {L"yxSetByLayer", Common::loadString(IDS_CMD_yxSetByLayer), Commands::CommandFlags::PickRedraw, Interface::cmdSetByLayer},
+        {L"yxChainSelection", Common::loadString(IDS_CMD_yxChainSelection), Commands::CommandFlags::PickRedraw, Interface::cmdChainSelection},
         {L"yxDimensionFix", Common::loadString(IDS_CMD_yxDimensionFix), Commands::CommandFlags::PickRedraw, Interface::cmdDimensionFix},
         {L"yxDimensionResume", Common::loadString(IDS_CMD_yxDimensionResume), Commands::CommandFlags::PickRedraw, Interface::cmdDimensionResume},
         {L"yxAddSurroundingCharsForDimension", Common::loadString(IDS_CMD_yxAddSurroundingCharsForDimension), Commands::CommandFlags::PickRedraw, Interface::cmdAddSurroundingCharsForDimension},
@@ -1166,4 +1167,77 @@ void Interface::cmdImportCsvToMTextMatrix()
         CAcModuleResourceOverride resOverride;
         const wchar_t* appName = acedGetAppName();
         FileDialog::locateFileInExplorer(appName);
+    }
+
+    void Interface::cmdChainSelection()
+    {
+        CAcModuleResourceOverride resOverride;
+        UniversalPicker::AcRxClassVector arcv = { AcDbArc::desc(), AcDbPolyline::desc(), AcDbLine::desc(), AcDbSpline::desc() };
+        resbuf* pFilter = UniversalPicker::buildFilter(&arcv);
+
+        UniversalPicker::run(
+            &arcv,
+            [&](const AcDbObjectId& id, bool& bBreak)
+            {
+                // 局部容器：确保每次点击都是独立的搜索过程
+                std::queue<AcDbObjectId> waitingQueue;
+                std::set<AcDbObjectId> processedIds;
+                AcDbObjectIdArray resultIds;
+
+                waitingQueue.push(id);
+                processedIds.insert(id);
+
+                // 广度优先搜索 (BFS)
+                while (!waitingQueue.empty())
+                {
+                    AcDbObjectId currentId = waitingQueue.front();
+                    waitingQueue.pop();
+                    resultIds.append(currentId);
+
+                    AcDbCurve* pCurve = Common::getObject<AcDbCurve>(currentId, AcDb::kForRead);
+                    if (pCurve == nullptr)
+                    {
+                        continue;
+                    }
+
+                    AcGePoint3d startPt, endPt;
+                    if (pCurve->getStartPoint(startPt) == Acad::eOk && pCurve->getEndPoint(endPt) == Acad::eOk)
+                    {
+                        AcGePoint3d checkPts[2] = { startPt, endPt };
+
+                        for (const auto& pt : checkPts)
+                        {
+                            AcDbObjectIdArray neighbors = Common::getNeighborsAtPoint(pt, pFilter);
+
+                            for (int i = 0; i < neighbors.length(); ++i)
+                            {
+                                AcDbObjectId nId = neighbors[i];
+
+                                // 严格去重：
+                                // 1. 跳过当前正在处理的实体本身 (nId != currentId)
+                                // 2. 跳过已经进入过队列或处理过的实体 (processedIds.find == end)
+                                if (nId != currentId && processedIds.find(nId) == processedIds.end())
+                                {
+                                    processedIds.insert(nId);
+                                    waitingQueue.push(nId);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (resultIds.length() > 0)
+                {
+                    UniversalPicker::setSelection(resultIds);
+                    acutPrintf(Common::loadString(IDS_MSG_ChainSelectionSuccess_FMT), resultIds.length());
+                    bBreak = true;
+                }
+            },
+            Common::loadString(IDS_CMD_yxChainSelection),
+            UniversalPicker::SelectMode::Immediate,
+            true
+        );
+
+        // 5. 清理过滤器资源
+        UniversalPicker::freeFilter(pFilter);
     }

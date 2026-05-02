@@ -131,6 +131,8 @@
 #define IDS_MSG_HierarchyHeader         215
 #define IDS_MSG_CurrentClassNameMark    216
 #define IDS_CMD_yxLocateSelf            217
+#define IDS_CMD_yxChainSelection        218
+#define IDS_MSG_ChainSelectionSuccess_FMT 219
 
 // Next default values for new objects
 // 
