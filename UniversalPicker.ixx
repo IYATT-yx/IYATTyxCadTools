@@ -43,6 +43,7 @@ public:
 
 	// 处理函数原型
 	using EntityProcessor = std::function<void(const AcDbObjectId&)>;
+	using EntityProcessorBreak = std::function<void(const AcDbObjectId&, bool&)>;
 	// 实体类型数组
 	using AcRxClassVector = std::vector<AcRxClass*>;
 	using AcRxClassVectorPtr = AcRxClassVector*;
@@ -56,14 +57,31 @@ private:
 	 * @param isLocked 是否锁定选择模式
  	 * @param tol 坐标容差
 	 */
-	static void batchSelect(UniversalPicker::AcRxClassVectorPtr arcv, UniversalPicker::EntityProcessor processor, SortMode defaultSortMode, bool isLocked, double tol);
+	static inline void batchSelect(UniversalPicker::AcRxClassVectorPtr arcv, UniversalPicker::EntityProcessor processor, SortMode defaultSortMode, bool isLocked, double sortTol);
+
+	/**
+	 * @brief 批量选择处理，带单次执行中断参数，仅用于兼容立即模式的中断参数，实际没有作用的
+	 * @param arcv 
+	 * @param processor 带中断参数的处理函数
+	 * @param defaultSortMode 
+	 * @param isLocked 
+	 * @param tol 
+	 */
+	static void batchSelect(UniversalPicker::AcRxClassVectorPtr arcv, UniversalPicker::EntityProcessorBreak processor, SortMode defaultSortMode, bool isLocked, double tol);
 
 	/**
 	 * @brief 即时选择处理
 	 * @param arcv 实体类型数组指针，用于过滤选择对象 
 	 * @param processor 处理函数，接受一个实体ID参数
 	 */
-	static void immediateSelect(UniversalPicker::AcRxClassVectorPtr arcv, UniversalPicker::EntityProcessor processor);
+	static inline void immediateSelect(UniversalPicker::AcRxClassVectorPtr arcv, UniversalPicker::EntityProcessor processor);
+
+	/**
+	 * @brief 即时选择处理，带单次执行中断参数
+	 * @param arcv 实体类型数组指针，用于过滤选择对象
+	 * @param processor 处理函数，接受一个实体ID参数和一个bool中断参数。处理函数中将中断参数设为 true 时，则单次执行后结束，否则可以继续选择实体进行处理。
+	 */
+	static void immediateSelect(UniversalPicker::AcRxClassVectorPtr arcv, UniversalPicker::EntityProcessorBreak processor);
 
 	/**
 	 * @brief 根据指定的方位模式比较两个实体的空间位置
@@ -94,7 +112,20 @@ public:
 	 * @param lockSortMode 是否锁定排序模式，默认锁定
 	 * @param sortTol 坐标容差，默认为 3.5。坐标超过容差认为是不同行或不同列。
 	 */
-	static void run(UniversalPicker::AcRxClassVectorPtr arcv, UniversalPicker::EntityProcessor processor, const wchar_t* prompt, UniversalPicker::SelectMode defaultSelectMode = UniversalPicker::SelectMode::Batch, bool lockSelectMode = false, SortMode defaultSortMode = UniversalPicker::SortMode::None, bool lockSortMode = true, double sortTol = 3.5);
+	static inline void run(UniversalPicker::AcRxClassVectorPtr arcv, UniversalPicker::EntityProcessor processor, const wchar_t* prompt, UniversalPicker::SelectMode defaultSelectMode = UniversalPicker::SelectMode::Batch, bool lockSelectMode = false, SortMode defaultSortMode = UniversalPicker::SortMode::None, bool lockSortMode = true, double sortTol = 3.5);
+
+	/**
+	 * @brief 运行选择器，带单次执行中断参数
+	 * @param arcv 
+	 * @param processor 处理函数，接受一个实体ID参数和一个bool中断参数。选择模式为立即时，处理函数中将中断参数设为 true 时，则单次执行后结束，否则可以继续选择实体进行处理。
+	 * @param prompt 
+	 * @param defaultSelectMode 
+	 * @param lockSelectMode 
+	 * @param defaultSortMode 
+	 * @param lockSortMode 
+	 * @param sortTol 
+	 */
+	static void run(UniversalPicker::AcRxClassVectorPtr arcv, UniversalPicker::EntityProcessorBreak processor, const wchar_t* prompt, UniversalPicker::SelectMode defaultSelectMode = UniversalPicker::SelectMode::Batch, bool lockSelectMode = false, SortMode defaultSortMode = UniversalPicker::SortMode::None, bool lockSortMode = true, double sortTol = 3.5);
 
 	/**
 	 * @brief 构建过滤器
@@ -123,3 +154,47 @@ public:
 	static void setSelection(const AcDbObjectIdArray& ids);
 };
 
+export void UniversalPicker::batchSelect(UniversalPicker::AcRxClassVectorPtr arcv, UniversalPicker::EntityProcessor processor, SortMode defaultSortMode, bool isLocked, double sortTol)
+{
+	UniversalPicker::batchSelect(
+		arcv,
+		[processor](const AcDbObjectId& id, bool& bBreak)
+		{
+			processor(id);
+			bBreak = false;
+		},
+		defaultSortMode,
+		isLocked,
+		sortTol
+	);
+}
+
+export void UniversalPicker::immediateSelect(UniversalPicker::AcRxClassVectorPtr arcv, UniversalPicker::EntityProcessor processor)
+{
+	UniversalPicker::immediateSelect(
+		arcv,
+		[processor](const AcDbObjectId& id, bool& bBreak)
+		{
+			processor(id);
+			bBreak = false;
+		}
+	);
+}
+
+export void UniversalPicker::run(UniversalPicker::AcRxClassVectorPtr arcv, UniversalPicker::EntityProcessor processor, const wchar_t* prompt, UniversalPicker::SelectMode defaultSelectMode, bool lockSelectMode, SortMode defaultSortMode, bool lockSortMode, double sortTol)
+{
+	UniversalPicker::run(
+		arcv,
+		[processor](const AcDbObjectId& id, bool& bBreak)
+		{
+			processor(id);
+			bBreak = false;
+		},
+		prompt,
+		defaultSelectMode,
+		lockSelectMode,
+		defaultSortMode,
+		lockSortMode,
+		sortTol
+	);
+}

@@ -53,7 +53,7 @@ resbuf* UniversalPicker::buildFilter(UniversalPicker::AcRxClassVectorPtr arcv)
     return head;
 }
 
-void UniversalPicker::batchSelect(UniversalPicker::AcRxClassVectorPtr arcv, UniversalPicker::EntityProcessor processor, SortMode defaultSortMode, bool isLocked, double sortTol)
+void UniversalPicker::batchSelect(UniversalPicker::AcRxClassVectorPtr arcv, UniversalPicker::EntityProcessorBreak processor, SortMode defaultSortMode, bool isLocked, double sortTol)
 {
     ads_name ss;
     resbuf* filterRb = buildFilter(arcv);
@@ -72,6 +72,7 @@ void UniversalPicker::batchSelect(UniversalPicker::AcRxClassVectorPtr arcv, Univ
         UniversalPicker::freeFilter(filterRb);
         return;
     }
+    bool bBreak; // 实际不使用，只是为了兼容带中断参数的回调函数
 
     // 确定排序模式（提前获取模式以决定后续路径）
     SortMode finalMode = defaultSortMode;
@@ -158,7 +159,7 @@ void UniversalPicker::batchSelect(UniversalPicker::AcRxClassVectorPtr arcv, Univ
             if (finalMode == SortMode::None)
             {
                 // 不排序，直接执行
-                processor(id);
+                processor(id, bBreak);
                 processedIds.push_back(id);
             }
             else
@@ -196,7 +197,7 @@ void UniversalPicker::batchSelect(UniversalPicker::AcRxClassVectorPtr arcv, Univ
 
             for (const auto& item : entities)
             {
-                processor(item.id);
+                processor(item.id, bBreak);
                 processedIds.push_back(item.id);
             }
         }
@@ -276,11 +277,12 @@ AcDbObjectId UniversalPicker::getSelectedSingleEntityId(UniversalPicker::AcRxCla
     return selectedId;
 }
 
-void UniversalPicker::immediateSelect(UniversalPicker::AcRxClassVectorPtr arcv, UniversalPicker::EntityProcessor processor)
+void UniversalPicker::immediateSelect(UniversalPicker::AcRxClassVectorPtr arcv, UniversalPicker::EntityProcessorBreak processor)
 {
     AcDbTransactionManager* pTransMgr = acdbHostApplicationServices()->workingDatabase()->transactionManager();
     resbuf* filterRb = buildFilter(arcv);
     ads_name ss;
+    bool bBreak;
 
     while (true)
     {
@@ -307,7 +309,7 @@ void UniversalPicker::immediateSelect(UniversalPicker::AcRxClassVectorPtr arcv, 
                 {
                     try
                     {
-                        processor(id); // 调用业务回调
+                        processor(id, bBreak); // 调用业务回调
                         pTransMgr->endTransaction();
 
                         // --- 实时刷新逻辑开始 ---
@@ -338,12 +340,15 @@ void UniversalPicker::immediateSelect(UniversalPicker::AcRxClassVectorPtr arcv, 
             }
         }
         acedSSFree(ss);
+        if (bBreak)
+        {
+            break;
+        }
     }
     UniversalPicker::freeFilter(filterRb);
 }
 
-
-void UniversalPicker::run(UniversalPicker::AcRxClassVectorPtr arcv, UniversalPicker::EntityProcessor processor, const wchar_t* prompt, UniversalPicker::SelectMode defaultSelectMode, bool lockSelectMode, SortMode defaultSortMode, bool lockSortMode, double sortTol)
+void UniversalPicker::run(UniversalPicker::AcRxClassVectorPtr arcv, UniversalPicker::EntityProcessorBreak processor, const wchar_t* prompt, UniversalPicker::SelectMode defaultSelectMode, bool lockSelectMode, SortMode defaultSortMode, bool lockSortMode, double sortTol)
 {
     if (prompt != nullptr)
     {
