@@ -309,6 +309,11 @@ BEGIN
     IDS_CMD_yxLocateSelf    "在文件资源管理器中打开本工具文件"
     IDS_CMD_yxChainSelection "选中实体后自动链式选择"
     IDS_MSG_ChainSelectionSuccess_FMT "\n自动链式选择成功：共选中 %d 条线条实体。"
+    IDS_CMD_yxDimensionTolerancePrecision "设置尺寸标注的主单位精度和公差精度"
+    IDS_LBL_DimensionPrecision "主单位精度"
+    IDS_LBL_TolerancePrecision "公差精度"
+    IDS_ERR_InvalidDimensionTolerancePreccision 
+                            "精度值只能是 0 至 8 的整数，输入 -1 时不修改精度。"
 END
 
 #endif    // 中文(简体，中国) resources

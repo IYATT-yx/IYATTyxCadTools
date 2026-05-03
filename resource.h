@@ -133,6 +133,10 @@
 #define IDS_CMD_yxLocateSelf            217
 #define IDS_CMD_yxChainSelection        218
 #define IDS_MSG_ChainSelectionSuccess_FMT 219
+#define IDS_CMD_yxDimensionTolerancePrecision 220
+#define IDS_LBL_DimensionPrecision      221
+#define IDS_LBL_TolerancePrecision      222
+#define IDS_ERR_InvalidDimensionTolerancePreccision 223
 
 // Next default values for new objects
 // 

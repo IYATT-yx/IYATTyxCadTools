@@ -31,6 +31,7 @@ void Interface::init()
         {L"yxChainSelection", Common::loadString(IDS_CMD_yxChainSelection), Commands::CommandFlags::PickRedraw, Interface::cmdChainSelection},
         {L"yxDimensionFix", Common::loadString(IDS_CMD_yxDimensionFix), Commands::CommandFlags::PickRedraw, Interface::cmdDimensionFix},
         {L"yxDimensionResume", Common::loadString(IDS_CMD_yxDimensionResume), Commands::CommandFlags::PickRedraw, Interface::cmdDimensionResume},
+        {L"yxDimensionTolerancePrecision", Common::loadString(IDS_CMD_yxDimensionTolerancePrecision), Commands::CommandFlags::PickRedraw, Interface::cmdDimensionTolerancePrecision},
         {L"yxAddSurroundingCharsForDimension", Common::loadString(IDS_CMD_yxAddSurroundingCharsForDimension), Commands::CommandFlags::PickRedraw, Interface::cmdAddSurroundingCharsForDimension},
         {L"yxRemoveSurroundingCharsForDimension", Common::loadString(IDS_CMD_yxRemoveSurroundingCharsForDimension), Commands::CommandFlags::PickRedraw, Interface::cmdRemoveSurroundingCharsForDimension},
         {L"yxSetBasicBox", Common::loadString(IDS_CMD_yxSetBasicBox), Commands::CommandFlags::PickRedraw, Interface::cmdSetBasicBox},
@@ -1240,4 +1241,77 @@ void Interface::cmdImportCsvToMTextMatrix()
 
         // 5. 清理过滤器资源
         UniversalPicker::freeFilter(pFilter);
+    }
+
+    void Interface::cmdDimensionTolerancePrecision()
+    {
+        CAcModuleResourceOverride resOverride;
+        CString title = Common::loadString(IDS_CMD_yxDimensionTolerancePrecision);
+
+        GenericPairEditDlg dlg(title, Common::loadString(IDS_LBL_DimensionPrecision), Common::loadString(IDS_LBL_TolerancePrecision), false, true, true);
+        // 设置 -1 表示不修改精度 
+        CString strDimPrec = L"-1";
+        CString strTolPrec = L"-1";
+        dlg.modifyEditControl(strDimPrec, strTolPrec);
+
+        int iDimPrec = -1;
+        int iTolPrec = -1;
+        dlg.setValidatorAndParser([&](const CString& val1, const CString& val2) -> CString
+            {
+                try
+                {
+                    size_t pos;
+                    iDimPrec = std::stoi(val1.GetString(), &pos);
+                    if (pos != val1.GetLength())
+                    {
+                        throw std::exception();
+                    }
+                    if (iDimPrec < 0 && iDimPrec != -1)
+                    {
+                        throw std::exception();
+                    }
+                    if (iDimPrec > 8)
+                    {
+                        throw std::exception();
+                    }
+
+                    iTolPrec = std::stoi(val2.GetString(), &pos);
+                    if (pos != val2.GetLength())
+                    {
+                        throw std::exception();
+                    }
+                    if (iTolPrec < 0 && iTolPrec != -1)
+                    {
+                        throw std::exception();
+                    }
+                    if (iTolPrec > 8)
+                    {
+                        throw std::exception();
+                    }
+                }
+                catch (...)
+                {
+                    return Common::loadString(IDS_ERR_InvalidDimensionTolerancePreccision);
+                }
+                return GenericPairEditDlg::ValidatorOk;
+            });
+
+        if (dlg.DoModal() != IDOK)
+        {
+            acutPrintf(L"\n%s", Common::loadString(IDS_MSG_CancelOperation));
+            return;
+        }
+
+        UniversalPicker::run(
+            &Common::DimensionSubClasses,
+            [&](const AcDbObjectId& id)
+            {
+                Dimension::setDimensionTolerancePreccision(id, iDimPrec, iTolPrec);
+            },
+            title,
+            UniversalPicker::SelectMode::Immediate,
+            false,
+            UniversalPicker::SortMode::None,
+            true
+        );
     }

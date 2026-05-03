@@ -38,5 +38,6 @@ private:
 	static void cmdForceRemoveImage();
 	static void cmdLocateSelf();
 	static void cmdChainSelection();
+	static void cmdDimensionTolerancePrecision();
 };
 

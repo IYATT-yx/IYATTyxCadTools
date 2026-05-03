@@ -2,9 +2,9 @@
 #include "stdafx.h"
 
 module Dimension;
-
 import Common;
 import TextUtil;
+import std;
 
 namespace Dimension
 {
@@ -255,5 +255,65 @@ namespace Dimension
 		newValue.format(L"%s%s%s", data.prefix.constPtr(), strMeasurement.constPtr(), data.suffix.constPtr());
         data.plainText.replace(Common::ACDB_DIM_TEXT_DEFAULT, newValue.constPtr());
 		TextUtil::resolveControlCodes(data.plainText);
+	}
+
+	void setDimensionTolerancePreccision(const AcDbObjectId& id, const int& iDimPrec, const int& iTolPrec)
+	{
+        AcDbDimension* pDim = Common::getObject<AcDbDimension>(id, AcDb::kForWrite);
+		if (pDim == nullptr)
+		{
+			return;
+		}
+
+		if (iDimPrec >= 0)
+		{
+			pDim->setDimdec(iDimPrec);
+		}
+		if (iTolPrec >= 0)
+		{
+			pDim->setDimtdec(iTolPrec);
+			double dUpper = pDim->dimtp();
+            double dLower = pDim->dimtm() * -1.0; // 注意内部符号是相反的，所以这里取相反数
+			std::wstring dimText = pDim->dimensionText();
+
+			// 定位文本替代里的 \S 公差字段
+			// 正则解释：匹配 \S 段落直至分号结束
+			std::wregex tolRegex(L"\\\\S([^\\^;]+)\\^([^;]+);");
+			std::wsmatch match;
+
+			if (std::regex_search(dimText, match, tolRegex))
+			{
+				AcString acStrUpper, acStrLower;
+
+				// 上偏差
+				Common::double2AcString(dUpper, acStrUpper, iTolPrec);
+				std::wstring newUpper = acStrUpper.constPtr();
+				if (dUpper > 0)
+				{
+					newUpper = L"+" + newUpper;
+				}
+				else if (fabs(dUpper) <= Common::Epsilon)
+				{
+					newUpper = L" " + newUpper;
+				}
+
+				// 下偏差
+				Common::double2AcString(dLower, acStrLower, iTolPrec);
+				std::wstring newLower = acStrLower.constPtr();
+				if (dLower > 0)
+				{
+					newLower = L"+" + newLower;
+				}
+				else if(fabs(dLower) <= Common::Epsilon)
+				{
+                    newLower = L" " + newLower;
+				}
+
+				// 构造新的堆叠字段并执行替换
+				std::wstring newStack = L"\\S" + newUpper + L"^" + newLower + L";";
+				dimText.replace(match.position(0), match.length(0), newStack);
+				pDim->setDimensionText(dimText.c_str());
+			}
+		}
 	}
 }

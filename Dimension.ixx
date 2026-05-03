@@ -91,5 +91,13 @@ export namespace Dimension
 	 * @param data 传出数据
 	 */
 	void readDim(const AcDbObjectId& id, DimensionData& data);
+
+	/**
+	 * @brief 设置标注精度
+	 * @param id 标注对象ID
+	 * @param iDimPrec 主单位精度，-1 表示不修改，0 至 8 的整数修改精度
+	 * @param iTolPrec 公差精度，-1 表示不修改，0 至 8 的整数修改精度
+	 */
+	void setDimensionTolerancePreccision(const AcDbObjectId& id, const int& iDimPrec = -1, const int& iTolPrec = -1);
 }
 
