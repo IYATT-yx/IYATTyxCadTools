@@ -149,6 +149,9 @@ export namespace Common
 		constexpr const wchar_t* Radius = L"R";
 	}
 
+	// 极小值
+	constexpr double Epsilon = 1e-6;
+
 	// 单位模式
 	enum UnitMode
 	{
