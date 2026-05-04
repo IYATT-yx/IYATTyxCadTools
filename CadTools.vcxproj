@@ -52,8 +52,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="LineUtil.cpp" />
+    <ClCompile Include="LineUtil.ixx" />
     <ClCompile Include="MainBar.cpp" />
     <ClCompile Include="MainBarChildDlg.cpp" />
+    <ClCompile Include="PointUtil.cpp" />
+    <ClCompile Include="PointUtil.ixx" />
     <ClCompile Include="TextUtil.cpp" />
     <ClCompile Include="TextUtil.ixx" />
     <ClCompile Include="StdAfx.cpp">

@@ -126,6 +126,18 @@
     <ClCompile Include="Image.ixx">
       <Filter>头文件</Filter>
     </ClCompile>
+    <ClCompile Include="LineUtil.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="PointUtil.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="LineUtil.ixx">
+      <Filter>头文件</Filter>
+    </ClCompile>
+    <ClCompile Include="PointUtil.ixx">
+      <Filter>头文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StdAfx.h">
