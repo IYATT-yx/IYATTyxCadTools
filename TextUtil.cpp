@@ -134,6 +134,14 @@ namespace TextUtil
 		{
 			return true;
 		}
+		if (TextUtil::readMText(entId, content, true))
+		{
+			return true;
+		}
+		if (TextUtil::readDText(entId, content, true))
+		{
+			return true;
+		}
         return false;
 	}
 
