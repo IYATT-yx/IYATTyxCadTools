@@ -316,6 +316,15 @@ BEGIN
                             "精度值只能是 0 至 8 的整数，输入 -1 时不修改精度。"
 END
 
+STRINGTABLE
+BEGIN
+    IDS_CMD_yxCreateIntersectionPoints "创建两条线(及延长线)的交点。可使用PTYPE设置点样式。"
+    IDS_MSG_PickFirstCurve  "\n请选择第一条线："
+    IDS_MSG_PickSecondCurve "\n请选择第二条线："
+    IDS_MSG_IntersectionPointsCount_FMT "\n成功创建 %d 个交点"
+    IDS_MSG_NoIntersectionPoints "\n未发现交点"
+END
+
 #endif    // 中文(简体，中国) resources
 /////////////////////////////////////////////////////////////////////////////
 

@@ -137,6 +137,11 @@
 #define IDS_LBL_DimensionPrecision      221
 #define IDS_LBL_TolerancePrecision      222
 #define IDS_ERR_InvalidDimensionTolerancePreccision 223
+#define IDS_CMD_yxCreateIntersectionPoints 224
+#define IDS_MSG_PickFirstCurve          225
+#define IDS_MSG_PickSecondCurve         226
+#define IDS_MSG_IntersectionPointsCount_FMT 227
+#define IDS_MSG_NoIntersectionPoints    228
 
 // Next default values for new objects
 // 

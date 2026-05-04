@@ -39,5 +39,6 @@ private:
 	static void cmdLocateSelf();
 	static void cmdChainSelection();
 	static void cmdDimensionTolerancePrecision();
+	static void cmdCreateIntersectionPoints();
 };
 

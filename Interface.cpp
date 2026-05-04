@@ -20,6 +20,8 @@ import Commands;
 import FileDialog;
 import Annotative;
 import Image;
+import LineUtil;
+import PointUtil;
 
 void Interface::init()
 {
@@ -53,6 +55,7 @@ void Interface::init()
         {L"yxPasteClipImage", Common::loadString(IDS_CMD_yxPasteClipImage), Commands::CommandFlags::PickRedraw, Interface::cmdPasteClipImage},
         {L"yxForceRemoveImage", Common::loadString(IDS_CMD_yxForceRemoveImage), Commands::CommandFlags::PickRedraw, cmdForceRemoveImage},
         {L"yxLocateDrawing", Common::loadString(IDS_CMD_yxLocateDrawing), Commands::CommandFlags::Base, Interface::cmdLocateDrawing},
+        {L"yxCreateIntersectionPoints", Common::loadString(IDS_CMD_yxCreateIntersectionPoints), Commands::CommandFlags::Base, Interface::cmdCreateIntersectionPoints},
         {L"yxImeAutoSwitch", Common::loadString(IDS_CMD_yxImeAutoSwitch), Commands::CommandFlags::Base, Interface::cmdImeAutoSwitch},
         {L"yx", Common::loadString(IDS_CMD_yx), Commands::CommandFlags::Base, Interface::cmdYx},
         {L"yxTest", Common::loadString(IDS_CMD_yxTest), Commands::CommandFlags::Base, Interface::test},
@@ -1312,6 +1315,60 @@ void Interface::cmdImportCsvToMTextMatrix()
             UniversalPicker::SelectMode::Immediate,
             false,
             UniversalPicker::SortMode::None,
+            true
+        );
+    }
+
+    void Interface::cmdCreateIntersectionPoints()
+    {
+        // AcDbCurve 曲线类的子类
+        UniversalPicker::AcRxClassVector arcv =
+        {
+            AcDb2dPolyline::desc(),
+            AcDb3dPolyline::desc(),
+            AcDbArc::desc(),
+            AcDbCircle::desc(),
+            AcDbEllipse::desc(),
+            AcDbLeader::desc(),
+            AcDbLine::desc(),
+            AcDbPolyline::desc(),
+            AcDbRay::desc(),
+            AcDbSpline::desc(),
+            //AcDbHelix::desc(), // 不清楚是哪个库文件中定义的
+            AcDbXline::desc()
+        };
+
+        CAcModuleResourceOverride resOverride;
+        AcDbObjectId lastId = AcDbObjectId::kNull;
+        acutPrintf(Common::loadString(IDS_MSG_PickFirstCurve));
+        UniversalPicker::run(
+            &arcv,
+            [&](const AcDbObjectId& id)
+            {
+                if (lastId == AcDbObjectId::kNull)
+                {
+                    lastId = id;
+                    acutPrintf(Common::loadString(IDS_MSG_PickSecondCurve));
+                }
+                else if (lastId != id)
+                {
+                    AcGePoint3dArray intersectionPoints;
+                    if (LineUtil::calculateLineIntersection(lastId, id, intersectionPoints))
+                    {
+                        PointUtil::drawPoints(intersectionPoints);
+                        acutPrintf(Common::loadString(IDS_MSG_IntersectionPointsCount_FMT), intersectionPoints.length());
+                    }
+                    else
+                    {
+                        acutPrintf(Common::loadString(IDS_MSG_NoIntersectionPoints));
+                    }
+                    lastId = AcDbObjectId::kNull;
+                    acutPrintf(Common::loadString(IDS_MSG_PickFirstCurve));
+                }
+
+            },
+            Common::loadString(IDS_CMD_yxCreateIntersectionPoints),
+            UniversalPicker::SelectMode::Immediate,
             true
         );
     }
