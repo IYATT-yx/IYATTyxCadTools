@@ -142,6 +142,16 @@
 #define IDS_MSG_PickSecondCurve         226
 #define IDS_MSG_IntersectionPointsCount_FMT 227
 #define IDS_MSG_NoIntersectionPoints    228
+#define IDS_ERR_CannotCreateFile        229
+#define IDS_ERR_ReopenFailed            230
+#define IDS_ERR_SaveOpenFailed          231
+#define IDS_ERR_JsonParseEx             232
+#define IDS_ERR_UnknownEx               233
+#define IDS_ERR_FileWriteEx             234
+#define IDS_ERR_PathEmpty               235
+#define IDS_ERR_StructMapFailed         236
+#define IDS_ERR_DiskSaveFailed          237
+#define IDS_ERR_SerializeFailed         238
 
 // Next default values for new objects
 // 

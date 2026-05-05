@@ -323,6 +323,16 @@ BEGIN
     IDS_MSG_PickSecondCurve "\n请选择第二条线："
     IDS_MSG_IntersectionPointsCount_FMT "\n成功创建 %d 个交点"
     IDS_MSG_NoIntersectionPoints "\n未发现交点"
+    IDS_ERR_CannotCreateFile "无法创建或打开文件，请检查目录权限。"
+    IDS_ERR_ReopenFailed    "文件创建后重开失败。"
+    IDS_ERR_SaveOpenFailed  "保存时无法打开写入流。"
+    IDS_ERR_JsonParseEx     "JSON 解析异常:"
+    IDS_ERR_UnknownEx       "发生未知解析异常。"
+    IDS_ERR_FileWriteEx     "文件写入异常："
+    IDS_ERR_PathEmpty       "未设置路径"
+    IDS_ERR_StructMapFailed "结构映射失败："
+    IDS_ERR_DiskSaveFailed  "硬盘持久化失败："
+    IDS_ERR_SerializeFailed "序列化失败："
 END
 
 #endif    // 中文(简体，中国) resources

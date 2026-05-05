@@ -26,6 +26,14 @@
     <ClCompile Include="Common-Inline.ixx" />
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="Common.ixx" />
+    <ClCompile Include="ConfigManager.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ConfigManager.ixx">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="CsvModule.cpp" />
     <ClCompile Include="CsvModule.ixx" />
     <ClCompile Include="Dimension.cpp" />
