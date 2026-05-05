@@ -138,6 +138,18 @@
     <ClCompile Include="PointUtil.ixx">
       <Filter>头文件</Filter>
     </ClCompile>
+    <ClCompile Include="IYATTyxJsonWrapper.ixx">
+      <Filter>头文件</Filter>
+    </ClCompile>
+    <ClCompile Include="EncodingConverter.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="EncodingConverter.ixx">
+      <Filter>头文件</Filter>
+    </ClCompile>
+    <ClCompile Include="IYATTyxJsonWrapper.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StdAfx.h">
@@ -156,6 +168,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="MainBar.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdparty\nlohmann\json.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
