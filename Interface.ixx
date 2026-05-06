@@ -40,5 +40,6 @@ private:
 	static void cmdChainSelection();
 	static void cmdDimensionTolerancePrecision();
 	static void cmdCreateIntersectionPoints();
+	static void cmdPrintConfigFilename();
 };
 

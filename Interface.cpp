@@ -22,6 +22,7 @@ import Annotative;
 import Image;
 import LineUtil;
 import PointUtil;
+import ConfigManager;
 
 void Interface::init()
 {
@@ -61,7 +62,8 @@ void Interface::init()
         {L"yxTest", Common::loadString(IDS_CMD_yxTest), Commands::CommandFlags::Base, Interface::test},
         {L"yxUnload", Common::loadString(IDS_CMD_yxUnload), Commands::CommandFlags::Base, Interface::cmdUnloadApp},
         {L"yxPrintClassHierarchy", Common::loadString(IDS_CMD_yxPrintClassHierarchy), Commands::CommandFlags::Base, Interface::cmdPrintClassHierarchy},
-        {L"yxLocateSelf", Common::loadString(IDS_CMD_yxLocateSelf), Commands::CommandFlags::Base, Interface::cmdLocateSelf}
+        {L"yxLocateSelf", Common::loadString(IDS_CMD_yxLocateSelf), Commands::CommandFlags::Base, Interface::cmdLocateSelf},
+        {L"yxPrintConfigFilename", Common::loadString(IDS_CMD_yxPrintConfigFilename), Commands::CommandFlags::Base, cmdPrintConfigFilename}
     };
 
     Interface::info();
@@ -69,13 +71,24 @@ void Interface::init()
     // 注册命令
     Commands::registerYxCmds(Commands::commandInfoList);
 
-    // 输入法自动切换自启动 
-    bool bAutoStart = false;
-    int nAutoMonitorInterval = 200;
-    ImeAutoSwitcher::loadSettings(bAutoStart, nAutoMonitorInterval);
-    if (bAutoStart)
+    // 输入法语言自动切换自启动 
+    auto& manager = ConfigManager::getInstance();
+    auto appPath = Common::getAppSubFolder();
+    if (!appPath.has_value())
     {
-        ImeAutoSwitcher::start(nAutoMonitorInterval);
+        AfxMessageBox(Common::loadString(IDS_ERR_GetAppSubFolder), MB_OK | MB_ICONERROR);
+        return;
+    }
+    std::filesystem::path configPathObj = appPath.value() / Common::Config::configName;
+    if (!manager.loadConfig(configPathObj.wstring()))
+    {
+        std::wstring err = manager.getLastError();
+        AfxMessageBox(err.c_str(), MB_OK | MB_ICONERROR);
+    }
+    auto& config = manager.getConfig();
+    if (config.imeSettings.bAutoStart)
+    {
+        ImeAutoSwitcher::start(config.imeSettings.iIntervalMs);
     }
     // 显示命令报表悬浮窗
     MainBar::showBar(Commands::commandInfoList);
@@ -507,11 +520,12 @@ void Interface::cmdImeAutoSwitch()
     GenericPairEditDlg dlg(title, Common::loadString(IDS_LBL_AutoStart), Common::loadString(IDS_LBL_Interval), false, true, true);
 
     CString edit1Result, edit2Result;
-    bool bAutoStart;
-    int nInterval;
-    ImeAutoSwitcher::loadSettings(bAutoStart, nInterval);
-    edit1Result.Format(L"%d", bAutoStart);
-    edit2Result.Format(L"%d", nInterval);
+    auto& manager = ConfigManager::getInstance();
+    auto& config = manager.getConfig();
+    bool bAutoStart = config.imeSettings.bAutoStart;
+    unsigned long iInterval = config.imeSettings.iIntervalMs;
+    edit1Result.Format(L"%d", config.imeSettings.bAutoStart);
+    edit2Result.Format(L"%d", config.imeSettings.iIntervalMs);
     dlg.modifyEditControl(edit1Result, edit2Result);
 
     dlg.setValidatorAndParser([&](const CString& value1, const CString& value2) -> CString
@@ -527,12 +541,12 @@ void Interface::cmdImeAutoSwitch()
             try
             {
                 size_t pos;
-                nInterval = std::stoi(value2.GetString(), &pos);
+                config.imeSettings.iIntervalMs = std::stoi(value2.GetString(), &pos);
                 if (pos != value2.GetLength())
                 {
                     throw std::exception();
                 }
-                if (nInterval < ImeAutoSwitcher::defaultIntervalMs)
+                if (config.imeSettings.iIntervalMs < ImeAutoSwitcher::defaultIntervalMs)
                 {
                     throw std::exception();
                 }
@@ -554,13 +568,20 @@ void Interface::cmdImeAutoSwitch()
         return;
     }
 
-    bAutoStart = edit1Result == L"1";
+    config.imeSettings.bAutoStart = (edit1Result == L"1");
     ImeAutoSwitcher::stop();
-    if (bAutoStart)
+    if (!manager.saveConfig())
     {
-        ImeAutoSwitcher::start(nInterval);
+        std::wstring err = manager.getLastError();
+        AfxMessageBox(err.c_str(), MB_OK | MB_ICONERROR);
+        // 保存失败，还原状态
+        config.imeSettings.bAutoStart = bAutoStart;
+        config.imeSettings.iIntervalMs = iInterval;
     }
-    ImeAutoSwitcher::saveSettings(bAutoStart, nInterval);
+    if (config.imeSettings.bAutoStart)
+    {
+        ImeAutoSwitcher::start(config.imeSettings.iIntervalMs);
+    }
 }
 
 void Interface::cmdCloneText()
@@ -1371,4 +1392,12 @@ void Interface::cmdImportCsvToMTextMatrix()
             UniversalPicker::SelectMode::Immediate,
             true
         );
+    }
+
+    void Interface::cmdPrintConfigFilename()
+    {
+        CAcModuleResourceOverride resOverride;
+        auto& manager = ConfigManager::getInstance();
+        std::wstring configFilename = manager.getConfigFilename();
+        acutPrintf(Common::loadString(IDS_MSG_ConfigFilename_FMT), configFilename.c_str());
     }

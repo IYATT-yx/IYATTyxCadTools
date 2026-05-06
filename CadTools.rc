@@ -157,11 +157,11 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PROJNAME            "CadTools"
+    IDS_PROJNAME            "IYATTyxCadTools"
     IDS_LBL_ShortCommandName "精简命令名"
     IDS_LBL_CommandName     "命令名"
     IDS_LBL_CommandDescription "命令描述"
-    IDS_CommandGroup        "IYATTyxCadTools"
+    IDS_CommandGroup        "IYATTyxCadToolsGlobalGroup"
     IDS_VAL_LocaleProjectName "AutoCAD Mechanical 2026 思能工具箱"
     IDS_LBL_PrefixSymbol    "前缀符号"
     IDS_CMD_yx              "显示或隐藏命令菜单"
@@ -215,9 +215,9 @@ END
 STRINGTABLE
 BEGIN
     IDS_ERR_InvalidInterval_FMT "切换间隔必须为不小于 %d 的整数"
-    IDS_ImeAutoSwitchPrompt "已自动切换输入法"
-    IDS_ImeAutoSwitchStartPrompt_FMT "\n启动输入法自动切换，切换间隔：%dms\n"
-    IDS_ImeAutoSwitchStopPrompt "\n停止输入法自动切换\n"
+    IDS_ImeAutoSwitchPrompt "已自动切换输入法语言"
+    IDS_ImeAutoSwitchStartPrompt_FMT "\n启动输入法语言自动切换，切换间隔：%dms\n"
+    IDS_ImeAutoSwitchStopPrompt "\n停止输入法语言自动切换\n"
     IDS_CMD_yxUnload        "关闭本插件"
     IDS_MSG_Unload_FMT      "\n已卸载 %s"
     IDS_CMD_yxCloneText     "将多行/单行文本内容复制给其它多行/单行文本"
@@ -333,6 +333,13 @@ BEGIN
     IDS_ERR_StructMapFailed "结构映射失败："
     IDS_ERR_DiskSaveFailed  "硬盘持久化失败："
     IDS_ERR_SerializeFailed "序列化失败："
+    IDS_ERR_GetAppSubFolder "获取程序数据目录失败"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_CMD_yxPrintConfigFilename "显示配置文件路径"
+    IDS_MSG_ConfigFilename_FMT "\n配置文件路径：%s"
 END
 
 #endif    // 中文(简体，中国) resources

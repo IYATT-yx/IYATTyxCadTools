@@ -152,6 +152,9 @@
 #define IDS_ERR_StructMapFailed         236
 #define IDS_ERR_DiskSaveFailed          237
 #define IDS_ERR_SerializeFailed         238
+#define IDS_ERR_GetAppSubFolder         239
+#define IDS_CMD_yxPrintConfigFilename   240
+#define IDS_MSG_ConfigFilename_FMT      241
 
 // Next default values for new objects
 // 
