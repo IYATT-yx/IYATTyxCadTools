@@ -1,4 +1,12 @@
-﻿module;
+﻿/**
+ * @file      ImeAutoSwitcher.ixx
+ * @brief     ImeAutoSwitcher 模块的接口定义。
+ * @details   定义了用于 AutoCAD 环境下自动切换输入法语言的配置常量、启动与停止接口。
+ * @author    IYATT-yx
+ * @copyright Copyright (c) 2026 IYATT-yx.
+ *            Licensed under the MIT License. See LICENSE file in the project root for full license information.
+ */
+module;
 #include "StdAfx.h"
 
 export module ImeAutoSwitcher;
@@ -6,9 +14,6 @@ export module ImeAutoSwitcher;
 namespace ImeAutoSwitcher
 {
     constexpr const wchar_t* cmdActive = L"CMDACTIVE";
-    constexpr const wchar_t* regAutoStartKey = L"ImeAutoSwitcherAutoStart";
-    constexpr const wchar_t* regIntervalKey = L"ImeAutoSwitcherIntervalMs";
-    constexpr const wchar_t* regSettingsPath = L"\\Applications\\IYATTyxCadTools\\Settings";
 };
 
 export namespace ImeAutoSwitcher
@@ -28,24 +33,6 @@ export namespace ImeAutoSwitcher
      * @brief 停止输入法自动切换
      */
     void stop();
-
-    /**
-     * @brief 保存配置到注册表
-     * @param bAutoStart 是否自启动
-     * @param nIntervalMS 语言切换间隔时间
-     * @return true 保存成功
-     * @return false 保存失败
-     */
-    bool saveSettings(bool bAutoStart, int nIntervalMS);
-
-    /**
-     * @brief 从注册表加载配置
-     * * @param bAutoStart [out] 输入法自动切换启用状态
-     * @param nIntervalMS [out] 语言切换间隔时间
-     * @return true 加载成功
-     * @return false 加载失败，返回默认值
-     */
-    bool loadSettings(bool& bAutoStart, int& nIntervalMS);
 }
 
 namespace ImeAutoSwitcher

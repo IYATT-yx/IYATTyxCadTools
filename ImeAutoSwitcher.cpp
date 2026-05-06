@@ -1,4 +1,13 @@
-﻿module;
+﻿/**
+ * @file      ImeAutoSwitcher.cpp
+ * @brief     ImeAutoSwitcher 模块的具体逻辑实现。
+ * @details   通过设置全局低级键盘钩子 (WH_KEYBOARD_LL) 监控按键，并结合 AutoCAD 的 CMDACTIVE
+ *            系统变量，实现当 CAD 处于空闲状态且按下字母键时，自动强制切换为英文输入模式。
+ * @author    IYATT-yx
+ * @copyright Copyright (c) 2026 IYATT-yx.
+ *            Licensed under the MIT License. See LICENSE file in the project root for full license information.
+ */
+module;
 #include "stdafx.h"
 #include "resource.h"
 #include <imm.h>
@@ -115,85 +124,5 @@ namespace ImeAutoSwitcher
             CAcModuleResourceOverride resOverride;
             acutPrintf(L"\n%s", Common::loadString(IDS_ImeAutoSwitchStopPrompt));
         }
-    }
-
-    bool saveSettings(bool bAutoStart, int nIntervalMS)
-    {
-        HKEY hKey;
-        const wchar_t* pProductRoot = acdbHostApplicationServices()->getMachineRegistryProductRootKey();
-
-        if (pProductRoot == nullptr)
-        {
-            return false;
-        }
-
-        AcString sFullKey;
-        sFullKey.format(L"%s%s", pProductRoot, ImeAutoSwitcher::regSettingsPath);
-
-        LSTATUS ls = RegCreateKeyEx(
-            HKEY_CURRENT_USER,
-            sFullKey.constPtr(),
-            0,
-            nullptr,
-            REG_OPTION_NON_VOLATILE,
-            KEY_WRITE,
-            nullptr,
-            &hKey,
-            nullptr
-        );
-
-        if (ls != ERROR_SUCCESS)
-        {
-            return false;
-        }
-
-        DWORD dwAuto = bAutoStart ? 1 : 0;
-        DWORD dwInterval = static_cast<DWORD>(nIntervalMS);
-
-        RegSetValueEx(hKey, ImeAutoSwitcher::regAutoStartKey, 0, REG_DWORD, reinterpret_cast<BYTE*>(&dwAuto), sizeof(DWORD));
-        RegSetValueEx(hKey, ImeAutoSwitcher::regIntervalKey, 0, REG_DWORD, reinterpret_cast<BYTE*>(&dwInterval), sizeof(DWORD));
-
-        RegCloseKey(hKey);
-        return true;
-    }
-
-    bool loadSettings(bool& bAutoStart, int& nIntervalMS)
-    {
-        HKEY hKey;
-        const wchar_t* pProductRoot = acdbHostApplicationServices()->getMachineRegistryProductRootKey();
-
-        if (pProductRoot == nullptr)
-        {
-            bAutoStart = false;
-            nIntervalMS = ImeAutoSwitcher::defaultIntervalMs;
-            return false;
-        }
-
-        AcString sFullKey;
-        sFullKey.format(L"%s%s", pProductRoot, ImeAutoSwitcher::regSettingsPath);
-
-        LSTATUS ls = RegOpenKeyEx(HKEY_CURRENT_USER, sFullKey.constPtr(), 0, KEY_READ, &hKey);
-
-        if (ls != ERROR_SUCCESS)
-        {
-            bAutoStart = false;
-            nIntervalMS = ImeAutoSwitcher::defaultIntervalMs;
-            return false;
-        }
-
-        DWORD dwAuto = 0;
-        DWORD dwInterval = ImeAutoSwitcher::defaultIntervalMs;
-        DWORD dwSize = sizeof(DWORD);
-
-        RegQueryValueEx(hKey, ImeAutoSwitcher::regAutoStartKey, nullptr, nullptr, reinterpret_cast<BYTE*>(&dwAuto), &dwSize);
-
-        dwSize = sizeof(DWORD);
-        RegQueryValueEx(hKey, ImeAutoSwitcher::regIntervalKey, nullptr, nullptr, reinterpret_cast<BYTE*>(&dwInterval), &dwSize);
-
-        bAutoStart = (dwAuto != 0);
-        nIntervalMS = static_cast<int>(dwInterval);
-
-        RegCloseKey(hKey);
-        return true;
     }
 }
