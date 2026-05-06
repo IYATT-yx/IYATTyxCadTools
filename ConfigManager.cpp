@@ -76,3 +76,8 @@ ConfigManager& ConfigManager::getInstance()
     static ConfigManager instance;
     return instance;
 }
+
+std::wstring ConfigManager::getConfigFilename()
+{
+    return this->mConfigFilename;
+}

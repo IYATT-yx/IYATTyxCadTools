@@ -82,4 +82,10 @@ public:
 	* @return 宽字符串格式的错误信息。
 	*/
 	std::wstring ConfigManager::getLastError() const;
+
+	/**
+	* @brief 获取当前加载的配置文件全路径。
+	* @return 存储配置文件的完整物理路径字符串；若尚未加载配置，则返回空字符串。
+	*/
+	std::wstring getConfigFilename();
 };
