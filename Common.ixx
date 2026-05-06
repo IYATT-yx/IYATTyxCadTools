@@ -1,4 +1,12 @@
-﻿module;
+﻿/**
+ * @file      Common.ixx
+ * @brief     通用工具模块，提供 AutoCAD 开发的基础函数库与全局常量。
+ * @details   本模块整合了对象访问、几何运算、字符处理、环境配置及 UI 辅助等核心工具。
+ * @author    IYATT-yx
+ * @copyright Copyright (c) 2026 IYATT-yx.
+ *            Licensed under the MIT License. See LICENSE file in the project root for full license information.
+ */
+module;
 #include "StdAfx.h"
 
 export module Common;
@@ -135,11 +143,23 @@ export namespace Common
      * @note 2. 检索结果包含所有重叠在 pt 处的实体，不区分实体的几何起始或终点。
      */
 	AcDbObjectIdArray getNeighborsAtPoint(const AcGePoint3d& pt, resbuf* pFilter);
+
+	/**
+	 * @brief 获取并确保 AppData 下的插件专用目录
+	 * @return std::optional<std::filesystem::path> 成功返回目录路径，失败返回 nullopt
+	 */
+	std::optional<std::filesystem::path> getAppSubFolder();
 }
 
 // 常量
 export namespace Common
 {
+	// 配置
+	namespace Config
+	{
+		constexpr const wchar_t* configName = L"config.json";
+	};
+
 	// 符号代码
 	namespace SymbolCodes
 	{

@@ -1,4 +1,12 @@
-﻿module;
+﻿/**
+ * @file      Common.cpp
+ * @brief     通用工具模块的实现文件。
+ * @details   本文件实现了 Common 模块中声明的各类辅助工具函数。
+ * @author    IYATT-yx
+ * @copyright Copyright (c) 2026 IYATT-yx.
+ *            Licensed under the MIT License. See LICENSE file in the project root for full license information.
+ */
+module;
 #include "StdAfx.h"
 #include "resource.h"
 #include <iomanip>
@@ -260,5 +268,40 @@ namespace Common
 			acedSSFree(ss);
 		}
 		return neighbors;
+	}
+
+	std::optional<std::filesystem::path> getAppSubFolder()
+	{
+		wchar_t* pathTmp = nullptr;
+
+		// 获取 Roaming AppData 基础路径
+		HRESULT hr = SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, nullptr, &pathTmp);
+		if (FAILED(hr))
+		{
+			return std::nullopt;
+		}
+
+		try
+		{
+			std::filesystem::path folderPath(pathTmp);
+			CoTaskMemFree(pathTmp); // 释放系统分配内存
+			folderPath /= Common::loadString(IDS_PROJNAME).GetString();
+
+			// 递归创建目录（如果不存在）
+			std::error_code ec;
+			if (!std::filesystem::exists(folderPath))
+			{
+				if (!std::filesystem::create_directories(folderPath, ec))
+				{
+					return std::nullopt;
+				}
+			}
+
+			return folderPath;
+		}
+		catch (...)
+		{
+			return std::nullopt;
+		}
 	}
 }
