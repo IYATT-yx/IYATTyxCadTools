@@ -1,4 +1,13 @@
-﻿module;
+﻿/**
+ * @file      UniversalPicker.ixx
+ * @brief     实体通用选择器模块，负责 AutoCAD 交互式对象筛选与空间排序。
+ * @details   集成批量与即时选择模式，支持通过坐标容差进行九轴空间定位排序。
+ *            内置高亮与夹点同步机制，确保自定义实体在 API 选中后的视觉反馈。
+ * @author    IYATT-yx
+ * @copyright Copyright (c) 2026 IYATT-yx.
+ *            Licensed under the MIT License. See LICENSE file in the project root for full license information.
+ */
+module;
 #include "StdAfx.h"
 
 export module UniversalPicker;

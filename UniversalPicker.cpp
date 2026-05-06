@@ -1,4 +1,11 @@
-﻿module;
+﻿/**
+ * @file      UniversalPicker.cpp
+ * @brief     实体通用选择器模块实现，处理交互逻辑与空间算法。
+ * @author    IYATT-yx
+ * @copyright Copyright (c) 2026 IYATT-yx.
+ *            Licensed under the MIT License. See LICENSE file in the project root for full license information.
+ */
+module;
 #include "stdafx.h"
 #include "dbtrans.h"
 
@@ -570,4 +577,9 @@ void UniversalPicker::setSelection(const AcDbObjectIdArray& idArray)
 
     int result = acedSSSetFirst(ss, ss);
     acedSSFree(ss);
+    Commands::CommandList cmdList =
+    {
+        L"SELECT"
+    };
+    Commands::executeCommand(cmdList);
 }
