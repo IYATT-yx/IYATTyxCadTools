@@ -1,4 +1,12 @@
-﻿module;
+﻿/**
+ * @file      Common-Inline.ixx
+ * @brief     通用工具模块的内联分区，包含高性能模板函数与常量表达式。
+ * @details   本文件作为 Common 模块的内联分区（Module Partition）。
+ * @author    IYATT-yx
+ * @copyright Copyright (c) 2026 IYATT-yx.
+ *            Licensed under the MIT License. See LICENSE file in the project root for full license information.
+ */
+module;
 #include "StdAfx.h"
 
 export module Common:Inline;
