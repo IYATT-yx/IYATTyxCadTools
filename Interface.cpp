@@ -23,6 +23,7 @@ import Image;
 import LineUtil;
 import PointUtil;
 import ConfigManager;
+import MiddleClickManager;
 
 void Interface::init()
 {
@@ -58,6 +59,7 @@ void Interface::init()
         {L"yxLocateDrawing", Common::loadString(IDS_CMD_yxLocateDrawing), Commands::CommandFlags::Base, Interface::cmdLocateDrawing},
         {L"yxCreateIntersectionPoints", Common::loadString(IDS_CMD_yxCreateIntersectionPoints), Commands::CommandFlags::Base, Interface::cmdCreateIntersectionPoints},
         {L"yxImeAutoSwitch", Common::loadString(IDS_CMD_yxImeAutoSwitch), Commands::CommandFlags::Base, Interface::cmdImeAutoSwitch},
+        {L"yxMiddlerClickToOk", Common::loadString(IDS_CMD_yxMiddleClickToOk), Commands::CommandFlags::Base, Interface::cmdMiddleClickToOk},
         {L"yx", Common::loadString(IDS_CMD_yx), Commands::CommandFlags::Base, Interface::cmdYx},
         {L"yxTest", Common::loadString(IDS_CMD_yxTest), Commands::CommandFlags::Base, Interface::test},
         {L"yxUnload", Common::loadString(IDS_CMD_yxUnload), Commands::CommandFlags::Base, Interface::cmdUnloadApp},
@@ -71,7 +73,7 @@ void Interface::init()
     // 注册命令
     Commands::registerYxCmds(Commands::commandInfoList);
 
-    // 输入法语言自动切换自启动 
+    // 读取配置文件
     auto& manager = ConfigManager::getInstance();
     auto appPath = Common::getAppSubFolder();
     if (!appPath.has_value())
@@ -86,10 +88,19 @@ void Interface::init()
         AfxMessageBox(err.c_str(), MB_OK | MB_ICONERROR);
     }
     auto& config = manager.getConfig();
+
+    // 输入法语言自动切换自启动 
     if (config.imeSettings.bAutoStart)
     {
         ImeAutoSwitcher::start(config.imeSettings.iIntervalMs);
     }
+
+    // 中键绑定确定按钮自启动
+    if (config.middleClickManagerSettings.bAutoStart)
+    {
+        MiddleClickManager::getInstance().start();
+    }
+
     // 显示命令报表悬浮窗
     MainBar::showBar(Commands::commandInfoList);
 }
@@ -103,6 +114,8 @@ void Interface::unload()
 {
     // 关闭输入法自动切换
     ImeAutoSwitcher::stop();
+    // 关闭中键绑定确定按钮
+    MiddleClickManager::getInstance().stop();
     // 关闭命令菜单
     MainBar::terminateBar();
     // 卸载命令
@@ -1400,4 +1413,53 @@ void Interface::cmdImportCsvToMTextMatrix()
         auto& manager = ConfigManager::getInstance();
         std::wstring configFilename = manager.getConfigFilename();
         acutPrintf(Common::loadString(IDS_MSG_ConfigFilename_FMT), configFilename.c_str());
+    }
+
+    void Interface::cmdMiddleClickToOk()
+    {
+        CAcModuleResourceOverride resOverride;
+        CString title = Common::loadString(IDS_CMD_yxMiddleClickToOk);
+        GenericPairEditDlg dlg(title, Common::loadString(IDS_LBL_AutoStart), L"", true, true, true);
+
+        CString edit1Result;
+        auto& manager = ConfigManager::getInstance();
+        auto& config = manager.getConfig();
+        bool bAutoStart = config.middleClickManagerSettings.bAutoStart;
+        edit1Result.Format(L"%d", config.middleClickManagerSettings.bAutoStart);
+        dlg.modifyEditControl(edit1Result);
+
+        dlg.setValidatorAndParser([&](const CString& value1, const CString& _) -> CString
+            {
+                if (value1.IsEmpty())
+                {
+                    return Common::loadString(IDS_ERR_InvalidMiddleClickToOk);
+                }
+                if (value1.SpanIncluding(L"01") != value1)
+                {
+                    return Common::loadString(IDS_ERR_InvalidMiddleClickToOk);
+                }
+                edit1Result = value1;
+                return GenericPairEditDlg::ValidatorOk;
+            });
+
+        if (dlg.DoModal() != IDOK)
+        {
+            acutPrintf(L"\n%s", Common::loadString(IDS_MSG_CancelOperation));
+            return;
+        }
+
+        config.middleClickManagerSettings.bAutoStart = (edit1Result == L"1");
+        auto& middleClickManager = MiddleClickManager::getInstance();
+        middleClickManager.stop();
+        if (!manager.saveConfig())
+        {
+            std::wstring err = manager.getLastError();
+            AfxMessageBox(err.c_str(), MB_OK | MB_ICONERROR);
+            // 保存失败，还原状态
+            config.middleClickManagerSettings.bAutoStart = bAutoStart;
+        }
+        if (config.middleClickManagerSettings.bAutoStart)
+        {
+            middleClickManager.start();
+        }
     }

@@ -155,6 +155,11 @@
 #define IDS_ERR_GetAppSubFolder         239
 #define IDS_CMD_yxPrintConfigFilename   240
 #define IDS_MSG_ConfigFilename_FMT      241
+#define IDS_CMD_yxMiddleClickToOk       242
+#define IDS_ERR_InvalidMiddleClickToOk  243
+#define IDS_MSG_MiddleClickToOkStarted  244
+#define IDS_MSG_MiddleClickToOkStopped  245
+#define IDS_MSG_MiddleClickToOkDone     246
 
 // Next default values for new objects
 // 

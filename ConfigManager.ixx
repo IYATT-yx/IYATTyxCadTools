@@ -15,7 +15,7 @@ export module ConfigManager;
 // 设置项
 export namespace ConfigItems
 {
-	// 输入法自动切换设置
+	// 输入法语言自动切换设置
 	struct ImeSettings
 	{
 		bool bAutoStart = false;
@@ -23,11 +23,19 @@ export namespace ConfigItems
 		NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(ImeSettings, bAutoStart, iIntervalMs)
 	};
 
+	// 中键映射确定按钮设置
+	struct MiddleClickManagerSettings
+	{
+		bool bAutoStart = false;
+        NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(MiddleClickManagerSettings, bAutoStart)
+	};
+
 	// 全局配置
 	struct GlobalConfig
 	{
 		ImeSettings imeSettings;
-		NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(GlobalConfig, imeSettings)
+		MiddleClickManagerSettings middleClickManagerSettings;
+		NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(GlobalConfig, imeSettings, middleClickManagerSettings)
 	};
 };
 

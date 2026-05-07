@@ -156,6 +156,12 @@
     <ClCompile Include="ConfigManager.ixx">
       <Filter>头文件</Filter>
     </ClCompile>
+    <ClCompile Include="MiddleClickManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MiddleClickManager.ixx">
+      <Filter>头文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StdAfx.h">
