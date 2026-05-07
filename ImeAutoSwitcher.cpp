@@ -56,7 +56,7 @@ namespace ImeAutoSwitcher
                     SendInput(2, inputs, sizeof(INPUT));
 
                     CAcModuleResourceOverride resOverride;
-                    acutPrintf(L"\n%s\n", Common::loadString(IDS_ImeAutoSwitchPrompt));
+                    acutPrintf(Common::loadString(IDS_MSG_ImeAutoSwitchDone));
                 }
             }
             ImmReleaseContext(hWnd, hIMC);
@@ -110,7 +110,7 @@ namespace ImeAutoSwitcher
             if (g_hKeyboardHook)
             {
                 CAcModuleResourceOverride resOverride;
-                acutPrintf(Common::loadString(IDS_ImeAutoSwitchStartPrompt_FMT), g_intervalMs);
+                acutPrintf(Common::loadString(IDS_MSG_ImeAutoSwitchStarted_FMT), g_intervalMs);
             }
         }
     }
@@ -122,7 +122,7 @@ namespace ImeAutoSwitcher
             UnhookWindowsHookEx(g_hKeyboardHook);
             g_hKeyboardHook = nullptr;
             CAcModuleResourceOverride resOverride;
-            acutPrintf(L"\n%s", Common::loadString(IDS_ImeAutoSwitchStopPrompt));
+            acutPrintf(L"\n%s", Common::loadString(IDS_MSG_ImeAutoSwitchStopped));
         }
     }
 }

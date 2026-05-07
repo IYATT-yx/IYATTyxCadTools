@@ -215,9 +215,9 @@ END
 STRINGTABLE
 BEGIN
     IDS_ERR_InvalidInterval_FMT "切换间隔必须为不小于 %d 的整数"
-    IDS_ImeAutoSwitchPrompt "已自动切换输入法语言"
-    IDS_ImeAutoSwitchStartPrompt_FMT "\n启动输入法语言自动切换，切换间隔：%dms\n"
-    IDS_ImeAutoSwitchStopPrompt "\n停止输入法语言自动切换\n"
+    IDS_MSG_ImeAutoSwitchDone "\n已自动切换输入法语言\n"
+    IDS_MSG_ImeAutoSwitchStarted_FMT "\n启动输入法语言自动切换，切换间隔：%dms\n"
+    IDS_MSG_ImeAutoSwitchStopped "\n停止输入法语言自动切换\n"
     IDS_CMD_yxUnload        "关闭本插件"
     IDS_MSG_Unload_FMT      "\n已卸载 %s"
     IDS_CMD_yxCloneText     "将多行/单行文本内容复制给其它多行/单行文本"
@@ -342,9 +342,9 @@ BEGIN
     IDS_MSG_ConfigFilename_FMT "\n配置文件路径：%s"
     IDS_CMD_yxMiddleClickToOk "设置鼠标中键映射到确定按钮"
     IDS_ERR_InvalidMiddleClickToOk "必须输入1或0设置是否启用中键映射确定按钮"
-    IDS_MSG_MiddleClickToOkStarted "\n已启用鼠标中键映射确定按钮"
-    IDS_MSG_MiddleClickToOkStopped "\n已停止鼠标中键映射确定按钮"
-    IDS_MSG_MiddleClickToOkDone "\n检测到鼠标中键点击，已触发点击确定"
+    IDS_MSG_MiddleClickToOkStarted "\n已启用鼠标中键映射确定按钮\n"
+    IDS_MSG_MiddleClickToOkStopped "\n已停止鼠标中键映射确定按钮\n"
+    IDS_MSG_MiddleClickToOkDone "\n检测到鼠标中键点击，已触发点击确定\n"
 END
 
 #endif    // 中文(简体，中国) resources

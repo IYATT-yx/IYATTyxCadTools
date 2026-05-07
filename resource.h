@@ -57,9 +57,9 @@
 #define IDS_ERR_ImeAutoSwitchEmptySetting 142
 #define IDS_ERR_InvalidAutoStart        143
 #define IDS_ERR_InvalidInterval_FMT     144
-#define IDS_ImeAutoSwitchPrompt         145
-#define IDS_ImeAutoSwitchStartPrompt_FMT 146
-#define IDS_ImeAutoSwitchStopPrompt     147
+#define IDS_MSG_ImeAutoSwitchDone       145
+#define IDS_MSG_ImeAutoSwitchStarted_FMT 146
+#define IDS_MSG_ImeAutoSwitchStopped    147
 #define IDS_CMD_yxUnload                148
 #define IDS_MSG_Unload_FMT              149
 #define IDS_CMD_yxCloneText             150
