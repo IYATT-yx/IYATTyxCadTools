@@ -44,10 +44,7 @@ public:
 	ConfigManager(const ConfigManager&) = delete;
     ConfigManager& operator=(const ConfigManager&) = delete;
 
-	ConfigItems::GlobalConfig& getConfig()
-	{
-        return mConfig;
-	}
+	ConfigItems::GlobalConfig& getConfig();
 
 private:
 	ConfigManager() = default;

@@ -81,3 +81,8 @@ std::wstring ConfigManager::getConfigFilename()
 {
     return this->mConfigFilename;
 }
+
+ConfigItems::GlobalConfig& ConfigManager::getConfig()
+{
+    return mConfig;
+}
