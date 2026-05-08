@@ -167,8 +167,8 @@ BEGIN
     IDS_CMD_yx              "显示或隐藏命令菜单"
     IDS_CMD_yxTest          "开发用测试命令"
     IDS_CMD_yxSetByLayer    "设置实体样式为当前层样式"
-    IDS_CMD_yxDimensionFix  "固定标注尺寸"
-    IDS_CMD_yxDimensionResume "恢复实体驱动的标注尺寸"
+    IDS_CMD_yxDimensionSolidify "尺寸固化"
+    IDS_CMD_yxDimensionRelink "尺寸恢复关联"
 END
 
 STRINGTABLE

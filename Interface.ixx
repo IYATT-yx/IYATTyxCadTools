@@ -9,8 +9,8 @@ private:
 	static void cmdSetByLayer();
 	static void cmdYx();
 	static void info();
-	static void cmdDimensionFix();
-	static void cmdDimensionResume();
+	static void cmdDimensionSolidify();
+	static void cmdDimensionRelink();
 	static void cmdAddSurroundingCharsForDimension();
 	static void cmdRemoveSurroundingCharsForDimension();
 	static void cmdSetBasicBox();

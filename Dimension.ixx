@@ -47,12 +47,12 @@ export namespace Dimension
 	 * @brief 固定标注
 	 * @param objId 标注对象ID
 	 */
-	void dimensionFix(const AcDbObjectId& objId);
+	void dimensionSolidify(const AcDbObjectId& objId);
 	/**
 	 * @brief 取消固定标注
 	 * @param objId 标注对象ID
 	 */
-	void dimensionResume(const AcDbObjectId& objId);
+	void dimensionRelink(const AcDbObjectId& objId);
 	/**
 	 * @brief 添加标注前后字符
 	 * @param objId 标注对象ID

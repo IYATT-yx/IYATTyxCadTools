@@ -22,8 +22,8 @@
 #define IDC_LIST1                       109
 #define IDS_CMD_yxSetByLayer            109
 #define IDD_MAINBAR                     110
-#define IDS_CMD_yxDimensionFix          110
-#define IDS_CMD_yxDimensionResume       111
+#define IDS_CMD_yxDimensionSolidify     110
+#define IDS_CMD_yxDimensionRelink       111
 #define IDS_CMD_yxAddSurroundingCharsForDimension 112
 #define IDS_CMD_yxRemoveSurroundingCharsForDimension 113
 #define IDS_CMD_yxSetBasicBox           114

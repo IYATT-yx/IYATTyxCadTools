@@ -33,8 +33,8 @@ void Interface::init()
     {
         {L"yxSetByLayer", Common::loadString(IDS_CMD_yxSetByLayer), Commands::CommandFlags::PickRedraw, Interface::cmdSetByLayer},
         {L"yxChainSelection", Common::loadString(IDS_CMD_yxChainSelection), Commands::CommandFlags::PickRedraw, Interface::cmdChainSelection},
-        {L"yxDimensionFix", Common::loadString(IDS_CMD_yxDimensionFix), Commands::CommandFlags::PickRedraw, Interface::cmdDimensionFix},
-        {L"yxDimensionResume", Common::loadString(IDS_CMD_yxDimensionResume), Commands::CommandFlags::PickRedraw, Interface::cmdDimensionResume},
+        {L"yxDimensionSolidify", Common::loadString(IDS_CMD_yxDimensionSolidify), Commands::CommandFlags::PickRedraw, Interface::cmdDimensionSolidify},
+        {L"yxDimensionReslink", Common::loadString(IDS_CMD_yxDimensionRelink), Commands::CommandFlags::PickRedraw, Interface::cmdDimensionRelink},
         {L"yxDimensionTolerancePrecision", Common::loadString(IDS_CMD_yxDimensionTolerancePrecision), Commands::CommandFlags::PickRedraw, Interface::cmdDimensionTolerancePrecision},
         {L"yxAddSurroundingCharsForDimension", Common::loadString(IDS_CMD_yxAddSurroundingCharsForDimension), Commands::CommandFlags::PickRedraw, Interface::cmdAddSurroundingCharsForDimension},
         {L"yxRemoveSurroundingCharsForDimension", Common::loadString(IDS_CMD_yxRemoveSurroundingCharsForDimension), Commands::CommandFlags::PickRedraw, Interface::cmdRemoveSurroundingCharsForDimension},
@@ -162,16 +162,16 @@ void Interface::cmdSetByLayer()
     UniversalPicker::run(nullptr, EntityStyle::setByLayer, Common::loadString(IDS_CMD_yxSetByLayer));
 }
 
-void Interface::cmdDimensionFix()
+void Interface::cmdDimensionSolidify()
 {
     CAcModuleResourceOverride resOverride;
-    UniversalPicker::run(&Common::DimensionSubClasses, Dimension::dimensionFix, Common::loadString(IDS_CMD_yxDimensionFix));
+    UniversalPicker::run(&Common::DimensionSubClasses, Dimension::dimensionSolidify, Common::loadString(IDS_CMD_yxDimensionSolidify));
 }
 
-void Interface::cmdDimensionResume()
+void Interface::cmdDimensionRelink()
 {
     CAcModuleResourceOverride resOverride;
-    UniversalPicker::run(&Common::DimensionSubClasses, Dimension::dimensionResume, Common::loadString(IDS_CMD_yxDimensionResume));
+    UniversalPicker::run(&Common::DimensionSubClasses, Dimension::dimensionRelink, Common::loadString(IDS_CMD_yxDimensionRelink));
 }
 
 void Interface::cmdAddSurroundingCharsForDimension()

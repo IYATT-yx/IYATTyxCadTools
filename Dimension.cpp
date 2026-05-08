@@ -8,7 +8,7 @@ import std;
 
 namespace Dimension
 {
-	void dimensionFix(const AcDbObjectId& objId)
+	void dimensionSolidify(const AcDbObjectId& objId)
 	{
 		AcDbDimension* pDim = Common::getObject<AcDbDimension>(objId, AcDb::kForWrite);
 		if (pDim == nullptr)
@@ -58,7 +58,7 @@ namespace Dimension
 		}
 	}
 
-	void dimensionResume(const AcDbObjectId& objId)
+	void dimensionRelink(const AcDbObjectId& objId)
 	{
 		AcDbDimension* pDim = Common::getObject<AcDbDimension>(objId, AcDb::kForWrite);
 		if (pDim == nullptr)
