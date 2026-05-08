@@ -41,6 +41,6 @@ private:
 	static void cmdDimensionTolerancePrecision();
 	static void cmdCreateIntersectionPoints();
 	static void cmdPrintConfigFilename();
-	static void cmdMiddleClickToOk();
+	static void cmdDialogMiddleClickToOk();
 };
 

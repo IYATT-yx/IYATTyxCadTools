@@ -18,16 +18,16 @@ export namespace ConfigItems
 	// 输入法语言自动切换设置
 	struct ImeSettings
 	{
-		bool bAutoStart = false;
+		bool bEnabled = false;
 		unsigned long iIntervalMs = 200;
-		NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(ImeSettings, bAutoStart, iIntervalMs)
+		NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(ImeSettings, bEnabled, iIntervalMs)
 	};
 
 	// 中键映射确定按钮设置
 	struct MiddleClickManagerSettings
 	{
-		bool bAutoStart = false;
-        NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(MiddleClickManagerSettings, bAutoStart)
+		bool bDialogMiddleClickToOkEnabled = false;
+        NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(MiddleClickManagerSettings, bDialogMiddleClickToOkEnabled)
 	};
 
 	// 全局配置

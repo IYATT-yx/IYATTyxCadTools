@@ -15,7 +15,7 @@ import Common;
 MiddleClickManager* MiddleClickManager::mpInstance = nullptr;
 inline constexpr const wchar_t* kWinStandardDialogClassName = L"#32770";
 
-MiddleClickManager::MiddleClickManager() : mhMouseHook(nullptr)
+MiddleClickManager::MiddleClickManager() : mhDialogMiddleClickToOkHook(nullptr)
 {
 }
 
@@ -32,26 +32,26 @@ MiddleClickManager& MiddleClickManager::getInstance()
 
 void MiddleClickManager::start()
 {
-    if (this->mhMouseHook == nullptr)
+    if (this->mhDialogMiddleClickToOkHook == nullptr)
     {
-        this->mhMouseHook = SetWindowsHookEx(WH_MOUSE_LL, this->mouseProc, GetModuleHandle(nullptr), 0);
+        this->mhDialogMiddleClickToOkHook = SetWindowsHookEx(WH_MOUSE_LL, this->dialogMiddleClickToOkProc, GetModuleHandle(nullptr), 0);
         acutPrintf(Common::loadString(IDS_MSG_MiddleClickToOkStarted));
     }
 }
 
 void MiddleClickManager::stop()
 {
-    if (mhMouseHook != nullptr)
+    if (mhDialogMiddleClickToOkHook != nullptr)
     {
-        UnhookWindowsHookEx(this->mhMouseHook);
-        this->mhMouseHook = nullptr;
+        UnhookWindowsHookEx(this->mhDialogMiddleClickToOkHook);
+        this->mhDialogMiddleClickToOkHook = nullptr;
         acutPrintf(Common::loadString(IDS_MSG_MiddleClickToOkStopped));
     }
 }
 
-bool MiddleClickManager::isRunning() const
+bool MiddleClickManager::isDialogMiddleClickToOkRunning() const
 {
-    if (this->mhMouseHook != nullptr)
+    if (this->mhDialogMiddleClickToOkHook != nullptr)
     {
         return true;
     }
@@ -61,7 +61,7 @@ bool MiddleClickManager::isRunning() const
     }
 }
 
-LRESULT CALLBACK MiddleClickManager::mouseProc(int nCode, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK MiddleClickManager::dialogMiddleClickToOkProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
     if (nCode == HC_ACTION)
     {

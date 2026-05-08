@@ -59,7 +59,7 @@ void Interface::init()
         {L"yxLocateDrawing", Common::loadString(IDS_CMD_yxLocateDrawing), Commands::CommandFlags::Base, Interface::cmdLocateDrawing},
         {L"yxCreateIntersectionPoints", Common::loadString(IDS_CMD_yxCreateIntersectionPoints), Commands::CommandFlags::Base, Interface::cmdCreateIntersectionPoints},
         {L"yxImeAutoSwitch", Common::loadString(IDS_CMD_yxImeAutoSwitch), Commands::CommandFlags::Base, Interface::cmdImeAutoSwitch},
-        {L"yxMiddlerClickToOk", Common::loadString(IDS_CMD_yxMiddleClickToOk), Commands::CommandFlags::Base, Interface::cmdMiddleClickToOk},
+        {L"yxDialogMiddlerClickToOk", Common::loadString(IDS_CMD_yxDialogMiddleClickToOk), Commands::CommandFlags::Base, Interface::cmdDialogMiddleClickToOk},
         {L"yx", Common::loadString(IDS_CMD_yx), Commands::CommandFlags::Base, Interface::cmdYx},
         {L"yxTest", Common::loadString(IDS_CMD_yxTest), Commands::CommandFlags::Base, Interface::test},
         {L"yxUnload", Common::loadString(IDS_CMD_yxUnload), Commands::CommandFlags::Base, Interface::cmdUnloadApp},
@@ -89,14 +89,14 @@ void Interface::init()
     }
     auto& config = manager.getConfig();
 
-    // 输入法语言自动切换自启动 
-    if (config.imeSettings.bAutoStart)
+    // 输入法语言自动切换
+    if (config.imeSettings.bEnabled)
     {
         ImeAutoSwitcher::start(config.imeSettings.iIntervalMs);
     }
 
-    // 中键绑定确定按钮自启动
-    if (config.middleClickManagerSettings.bAutoStart)
+    // 对话框中键绑定确定按钮
+    if (config.middleClickManagerSettings.bDialogMiddleClickToOkEnabled)
     {
         MiddleClickManager::getInstance().start();
     }
@@ -530,14 +530,14 @@ void Interface::cmdImeAutoSwitch()
 {
     CAcModuleResourceOverride resOverride;
     CString title = Common::loadString(IDS_CMD_yxImeAutoSwitch);
-    GenericPairEditDlg dlg(title, Common::loadString(IDS_LBL_AutoStart), Common::loadString(IDS_LBL_Interval), false, true, true);
+    GenericPairEditDlg dlg(title, Common::loadString(IDS_LBL_Enabled), Common::loadString(IDS_LBL_Interval), false, true, true);
 
     CString edit1Result, edit2Result;
     auto& manager = ConfigManager::getInstance();
     auto& config = manager.getConfig();
-    bool bAutoStart = config.imeSettings.bAutoStart;
+    bool bEnabled = config.imeSettings.bEnabled;
     unsigned long iInterval = config.imeSettings.iIntervalMs;
-    edit1Result.Format(L"%d", config.imeSettings.bAutoStart);
+    edit1Result.Format(L"%d", config.imeSettings.bEnabled);
     edit2Result.Format(L"%d", config.imeSettings.iIntervalMs);
     dlg.modifyEditControl(edit1Result, edit2Result);
 
@@ -581,17 +581,17 @@ void Interface::cmdImeAutoSwitch()
         return;
     }
 
-    config.imeSettings.bAutoStart = (edit1Result == L"1");
+    config.imeSettings.bEnabled = (edit1Result == L"1");
     ImeAutoSwitcher::stop();
     if (!manager.saveConfig())
     {
         std::wstring err = manager.getLastError();
         AfxMessageBox(err.c_str(), MB_OK | MB_ICONERROR);
         // 保存失败，还原状态
-        config.imeSettings.bAutoStart = bAutoStart;
+        config.imeSettings.bEnabled = bEnabled;
         config.imeSettings.iIntervalMs = iInterval;
     }
-    if (config.imeSettings.bAutoStart)
+    if (config.imeSettings.bEnabled)
     {
         ImeAutoSwitcher::start(config.imeSettings.iIntervalMs);
     }
@@ -1415,17 +1415,17 @@ void Interface::cmdImportCsvToMTextMatrix()
         acutPrintf(Common::loadString(IDS_MSG_ConfigFilename_FMT), configFilename.c_str());
     }
 
-    void Interface::cmdMiddleClickToOk()
+    void Interface::cmdDialogMiddleClickToOk()
     {
         CAcModuleResourceOverride resOverride;
-        CString title = Common::loadString(IDS_CMD_yxMiddleClickToOk);
-        GenericPairEditDlg dlg(title, Common::loadString(IDS_LBL_AutoStart), L"", true, true, true);
+        CString title = Common::loadString(IDS_CMD_yxDialogMiddleClickToOk);
+        GenericPairEditDlg dlg(title, Common::loadString(IDS_LBL_Enabled), L"", true, true, true);
 
         CString edit1Result;
         auto& manager = ConfigManager::getInstance();
         auto& config = manager.getConfig();
-        bool bAutoStart = config.middleClickManagerSettings.bAutoStart;
-        edit1Result.Format(L"%d", config.middleClickManagerSettings.bAutoStart);
+        bool bDialogMiddleClickToOkEnabled = config.middleClickManagerSettings.bDialogMiddleClickToOkEnabled;
+        edit1Result.Format(L"%d", config.middleClickManagerSettings.bDialogMiddleClickToOkEnabled);
         dlg.modifyEditControl(edit1Result);
 
         dlg.setValidatorAndParser([&](const CString& value1, const CString& _) -> CString
@@ -1448,7 +1448,7 @@ void Interface::cmdImportCsvToMTextMatrix()
             return;
         }
 
-        config.middleClickManagerSettings.bAutoStart = (edit1Result == L"1");
+        config.middleClickManagerSettings.bDialogMiddleClickToOkEnabled = (edit1Result == L"1");
         auto& middleClickManager = MiddleClickManager::getInstance();
         middleClickManager.stop();
         if (!manager.saveConfig())
@@ -1456,9 +1456,9 @@ void Interface::cmdImportCsvToMTextMatrix()
             std::wstring err = manager.getLastError();
             AfxMessageBox(err.c_str(), MB_OK | MB_ICONERROR);
             // 保存失败，还原状态
-            config.middleClickManagerSettings.bAutoStart = bAutoStart;
+            config.middleClickManagerSettings.bDialogMiddleClickToOkEnabled = bDialogMiddleClickToOkEnabled;
         }
-        if (config.middleClickManagerSettings.bAutoStart)
+        if (config.middleClickManagerSettings.bDialogMiddleClickToOkEnabled)
         {
             middleClickManager.start();
         }

@@ -52,7 +52,7 @@
 #define IDS_LBL_BalloonNumberHeight     137
 #define IDS_MSG_Dimension_FMT           138
 #define IDS_MSG_BalloonNextNumber_FMT   139
-#define IDS_LBL_AutoStart               140
+#define IDS_LBL_Enabled                 140
 #define IDS_LBL_Interval                141
 #define IDS_ERR_ImeAutoSwitchEmptySetting 142
 #define IDS_ERR_InvalidAutoStart        143
@@ -155,7 +155,7 @@
 #define IDS_ERR_GetAppSubFolder         239
 #define IDS_CMD_yxPrintConfigFilename   240
 #define IDS_MSG_ConfigFilename_FMT      241
-#define IDS_CMD_yxMiddleClickToOk       242
+#define IDS_CMD_yxDialogMiddleClickToOk 242
 #define IDS_ERR_InvalidMiddleClickToOk  243
 #define IDS_MSG_MiddleClickToOkStarted  244
 #define IDS_MSG_MiddleClickToOkStopped  245

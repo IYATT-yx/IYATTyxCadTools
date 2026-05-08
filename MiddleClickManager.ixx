@@ -35,7 +35,7 @@ public:
      * @brief 查询当前运行状态
      * @return bool 是否正在监听
      */
-    bool isRunning() const;
+    bool isDialogMiddleClickToOkRunning() const;
 
 private:
     MiddleClickManager();
@@ -48,9 +48,9 @@ private:
     /**
      * @brief 低级鼠标钩子回调函数
      */
-    static LRESULT CALLBACK mouseProc(int nCode, WPARAM wParam, LPARAM lParam);
+    static LRESULT CALLBACK dialogMiddleClickToOkProc(int nCode, WPARAM wParam, LPARAM lParam);
 
 private:
-    HHOOK mhMouseHook;
+    HHOOK mhDialogMiddleClickToOkHook;
     static MiddleClickManager* mpInstance;
 };

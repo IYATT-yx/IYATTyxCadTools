@@ -206,7 +206,7 @@ BEGIN
     IDS_LBL_BalloonNumberHeight "气泡序号字高"
     IDS_MSG_Dimension_FMT   "\n尺寸：%s"
     IDS_MSG_BalloonNextNumber_FMT "\n选中的气泡号将被设置为：%d"
-    IDS_LBL_AutoStart       "自启动(1/0)"
+    IDS_LBL_Enabled         "启用1/0"
     IDS_LBL_Interval        "间隔(ms)"
     IDS_ERR_ImeAutoSwitchEmptySetting "必须输入自启动状态和切换间隔时间"
     IDS_ERR_InvalidAutoStart "自启动状态必须为 0 或 1，1表示自启动，0 表示不自启动"
@@ -340,7 +340,7 @@ STRINGTABLE
 BEGIN
     IDS_CMD_yxPrintConfigFilename "显示配置文件路径"
     IDS_MSG_ConfigFilename_FMT "\n配置文件路径：%s"
-    IDS_CMD_yxMiddleClickToOk "设置鼠标中键映射到确定按钮"
+    IDS_CMD_yxDialogMiddleClickToOk "设置对话框中鼠标中键映射到确定按钮"
     IDS_ERR_InvalidMiddleClickToOk "必须输入1或0设置是否启用中键映射确定按钮"
     IDS_MSG_MiddleClickToOkStarted "\n已启用鼠标中键映射确定按钮\n"
     IDS_MSG_MiddleClickToOkStopped "\n已停止鼠标中键映射确定按钮\n"
