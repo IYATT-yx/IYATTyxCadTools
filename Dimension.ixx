@@ -11,31 +11,30 @@ export namespace Dimension
 	struct DimensionData
 	{
 		bool status = false; // 读取成功状态
-		double measuredValue = 0; // 实测值
-		int measuredValuePrecision = 0; // 实测值精度
+		double measured = 0; // 实测值，读取时使用 dimensionValue 方法
+		int precision = 0; // 尺寸精度
 		AcString prefix = L""; // 前缀，如直径、半径等符号
         AcString suffix = L""; // 后缀，如角度符号
-		bool isAngle = false; // 是否为角度标注
-		AcString dimText= L""; // 标注原始文本
-		AcString plainText = L""; // 在标注原始文本基础上替换数字添加符号后的字符串
-		double tolUpper = 0; // 上偏差极限
-        double tolLower = 0; // 下偏差极限
-		int tolPrecision = 0; // 极限偏差精度
+		bool angle = false; // 是否为角度标注
+		AcString dimensionText= L""; // 文字替代原始内容
+		AcString text = L""; // 解析后的尺寸内容
+		double upperDeviation = 0; // 上偏差极限
+        double lowerDeviation = 0; // 下偏差极限
+		int tolerancePrecision = 0; // 公差精度
 
 		/**
-		 * @brief 获取角度值
-		 * @return 角度值。非角度值返回 -1。
+		 * @brief 获取尺寸值，自动处理角度
+		 * @return 尺寸值。
 		 */
-		constexpr double degreeValue()
+		constexpr double dimensionValue()
 		{
-			if (this->isAngle)
+			if (this->angle)
 			{
-				return Common::rad2deg(this->measuredValue);
+				return Common::rad2deg(this->measured);
 			}
 			else
 			{
-				AfxMessageBox(Common::loadString(IDS_ERR_NotAngle), MB_OK | MB_ICONWARNING);
-				return -1;
+				return this->measured;
 			}
 		}
 	};
@@ -99,5 +98,12 @@ export namespace Dimension
 	 * @param iTolPrec 公差精度，-1 表示不修改，0 至 8 的整数修改精度
 	 */
 	void setDimensionTolerancePreccision(const AcDbObjectId& id, const int& iDimPrec = -1, const int& iTolPrec = -1);
+
+	/**
+	 * @brief 检查标注的文字替代字符串中是否包含包裹在大括号内的有效公差控制字符
+	 * @param text 标注对象的文字替代内容
+	 * @return bool 如果检测到有效的公差格式则返回 true，否则返回 false
+	 */
+	bool isEnhancedToleranceApplied(const AcString& text);
 }
 

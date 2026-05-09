@@ -20,44 +20,46 @@ namespace Dimension
 		AcString measurementValueText; // 存储测量值文本（带符号、单位）
 
 		Dimension::readDim(objId, dimData);
-		if (dimData.isAngle)
+		if (dimData.angle)
 		{
 			Common::double2AcString(
-				Common::rad2deg(dimData.measuredValue),
+				Common::rad2deg(dimData.measured),
 				measurementValueText,
-				dimData.measuredValuePrecision
+				dimData.precision
 			);
 			measurementValueText += dimData.suffix;
 		}
 		else
 		{
 			Common::double2AcString(
-				dimData.measuredValue,
+				dimData.measured,
 				measurementValueText,
-				dimData.measuredValuePrecision
+				dimData.precision
 			);
 			measurementValueText = dimData.prefix + measurementValueText + dimData.suffix;
 		}
 
-		if (dimData.dimText.empty())
+		if (dimData.dimensionText.empty())
 		{
 			pDim->setDimensionText(measurementValueText);
 		}
 		else
 		{
-			if (dimData.dimText.find(Common::ACDB_DIM_TEXT_DEFAULT) == -1)
+			if (dimData.dimensionText.find(Common::measValuePlaceholder) == -1)
 			{
 				// 已经是固定文本，跳过处理
 				return;
 			}
 			else
 			{
-				dimData.dimText.replace(Common::ACDB_DIM_TEXT_DEFAULT, measurementValueText.constPtr());
-                pDim->setDimensionText(dimData.dimText.constPtr());
+				dimData.dimensionText.replace(Common::measValuePlaceholder, measurementValueText.constPtr());
+                pDim->setDimensionText(dimData.dimensionText.constPtr());
 			}
 		}
 	}
 
+	// 当前方案不能完全还原尺寸文本
+	// 除了公差的自定义内容会丢失
 	void dimensionRelink(const AcDbObjectId& objId)
 	{
 		AcDbDimension* pDim = Common::getObject<AcDbDimension>(objId, AcDb::kForWrite);
@@ -65,7 +67,47 @@ namespace Dimension
 		{
 			return;
 		}
-		pDim->setDimensionText(L"");
+
+		double upperDeviation = pDim->dimtp();
+		double lowerDeviation = pDim->dimtm() * -1;
+		Adesk::UInt16 colorIndex = Common::getEntityActualColorIndex(pDim);
+
+		AcString resultText;
+		if (upperDeviation == 0 && lowerDeviation == 0)
+		{
+			resultText = L"";
+		}
+		else
+		{
+			int tolerancePrecision = pDim->dimtdec();
+			AcString strUpperDeviation, strLowerDeviation;
+			AcString units = L"";
+			if (pDim->isKindOf(AcDb2LineAngularDimension::desc()))
+			{
+				units = L"%%D";
+			}
+			if (upperDeviation + lowerDeviation == 0)
+			{
+				
+				Common::double2AcString(fabs(upperDeviation), strUpperDeviation, tolerancePrecision);
+				resultText.format(L"%s{}{\\C%d;%%%%P%s%s}", Common::measValuePlaceholder, colorIndex, strUpperDeviation.constPtr(), units.constPtr());
+			}
+			else
+			{
+				Common::double2AcString(upperDeviation, strUpperDeviation, tolerancePrecision, true);
+				Common::double2AcString(lowerDeviation, strLowerDeviation, tolerancePrecision, true);
+				if (upperDeviation == 0)
+				{
+					strUpperDeviation = L" " + strUpperDeviation;
+				}
+				if (lowerDeviation == 0)
+				{
+                    strLowerDeviation = L" " + strLowerDeviation;
+				}
+				resultText.format(L"%s{}{\\H0.71x;\\C%d;\\S%s%s^%s%s;}", Common::measValuePlaceholder, colorIndex, strUpperDeviation.constPtr(), units.constPtr(), strLowerDeviation.constPtr(), units.constPtr());
+			}
+		}
+		pDim->setDimensionText(resultText.constPtr());
 	}
 
 	void addSurroundingCharsForDimension(const AcDbObjectId& objId, const wchar_t* left, const wchar_t* right, bool isLGdt, bool isRGdt)
@@ -87,7 +129,7 @@ namespace Dimension
 		AcString dimensionNewText;
 		if (dimensionText.empty())
 		{
-			dimensionNewText.format(L"%s%s%s", leftNew, Common::ACDB_DIM_TEXT_DEFAULT, rightNew);
+			dimensionNewText.format(L"%s%s%s", leftNew, Common::measValuePlaceholder, rightNew);
 		}
 		else
 		{
@@ -154,7 +196,7 @@ namespace Dimension
 				AcString newText = text.mid(nLeftLen, nMidLen);
 
 				// 如果结果为默认占位符或为空，则清空覆盖文字以恢复测量值显示
-				if (newText == Common::ACDB_DIM_TEXT_DEFAULT || newText.isEmpty())
+				if (newText == Common::measValuePlaceholder || newText.isEmpty())
 				{
 					pDim->setDimensionText(L"");
 				}
@@ -201,28 +243,38 @@ namespace Dimension
 
 	void readDim(const AcDbObjectId& id, DimensionData& data)
 	{
-		AcDbDimension* pDim = Common::getObject<AcDbDimension>(id, AcDb::kForRead);
+		AcDbDimension* pDim = Common::getObject<AcDbDimension>(id, AcDb::kForWrite);
 		if (pDim == nullptr)
 		{
             data.status = false;
 			return;
 		}
 
-		pDim->measurement(data.measuredValue);
-        pDim->dimensionText(data.dimText);
-		TextUtil::parseDimensionTolerance(data.dimText, data.tolUpper, data.tolLower);
+		pDim->measurement(data.measured);
+        pDim->dimensionText(data.dimensionText);
+
+		// AutoCAD Mechanical 通过增强尺寸标注设置的公差最终会生成控制字符
+		// 如果文字替代中没有检测到大括号包裹的 \S 或 %%P 控制字符，则认为没有设置公差
+		// 只是 CAD 内部设置了初始正向偏差和负向偏差为 0.1，需要将其置 0，避免后续错误处理。
+		if (!Dimension::isEnhancedToleranceApplied(data.dimensionText))
+		{
+			pDim->setDimtp(0);
+			pDim->setDimtm(0);
+		}
+		data.upperDeviation = pDim->dimtp(); // 上极限偏差 = 正向偏差
+		data.lowerDeviation = pDim->dimtm() * -1.0; // 下极限偏差 = -1 * 负向偏差
 
 		if (pDim->isKindOf(AcDb2LineAngularDimension::desc())) // 角度精度
 		{
-			data.measuredValuePrecision = pDim->dimadec();
-			data.isAngle = true;
+			data.precision = pDim->dimadec();
+			data.angle = true;
 			data.suffix = Common::SymbolCodes::Degree;
             TextUtil::resolveControlCodes(data.suffix);
 		}
 		else // 线性精度
 		{
-			data.measuredValuePrecision = pDim->dimdec();
-			data.isAngle = false;
+			data.precision = pDim->dimdec();
+			data.angle = false;
 			if (pDim->isKindOf(AcDbDiametricDimension::desc()))
 			{
                 data.prefix = Common::SymbolCodes::Diameter;
@@ -233,28 +285,24 @@ namespace Dimension
 			}
 			TextUtil::resolveControlCodes(data.prefix);
 		}
-		data.tolPrecision = pDim->dimtdec(); // 极限偏差精度
+		data.tolerancePrecision = pDim->dimtdec(); // 极限偏差精度
 		data.status = true;
 
-		// 纯文本标注内容
-		if (data.dimText.isEmpty())
+		// 解析后的尺寸内容
+		if (data.dimensionText.isEmpty())
 		{
-			data.plainText = Common::ACDB_DIM_TEXT_DEFAULT;
+			data.text = Common::measValuePlaceholder;
 		}
 		else
 		{
-			data.plainText = data.dimText;
+			data.text = data.dimensionText;
 		}
 		AcString newValue, strMeasurement;
-		double measuredValue = data.measuredValue;
-		if (data.isAngle)
-		{
-			measuredValue = data.degreeValue();
-		}
-		Common::double2AcString(measuredValue, strMeasurement, data.measuredValuePrecision);
+		double measured = data.dimensionValue();
+		Common::double2AcString(measured, strMeasurement, data.precision);
 		newValue.format(L"%s%s%s", data.prefix.constPtr(), strMeasurement.constPtr(), data.suffix.constPtr());
-        data.plainText.replace(Common::ACDB_DIM_TEXT_DEFAULT, newValue.constPtr());
-		TextUtil::resolveControlCodes(data.plainText);
+        data.text.replace(Common::measValuePlaceholder, newValue.constPtr());
+		TextUtil::resolveControlCodes(data.text);
 	}
 
 	void setDimensionTolerancePreccision(const AcDbObjectId& id, const int& iDimPrec, const int& iTolPrec)
@@ -315,5 +363,45 @@ namespace Dimension
 				pDim->setDimensionText(dimText.c_str());
 			}
 		}
+	}
+
+	bool isEnhancedToleranceApplied(const AcString& text)
+	{
+		if (text.isEmpty())
+		{
+			return false;
+		}
+
+		int nStartSearch = 0;
+
+		// 遍历所有可能存在的大括号对（处理嵌套或多段格式组）
+		while (true)
+		{
+			int nOpen = text.find(L"{", nStartSearch);
+			if (nOpen == -1)
+			{
+				break;
+			}
+
+			int nClose = text.find(L"}", nOpen);
+			if (nClose == -1)
+			{
+				break;
+			}
+
+			// 截取当前大括号对内部的子字符串
+			// mid 参数2为长度：nClose - nOpen + 1 包含括号本身
+			AcString sInner = text.mid(nOpen, nClose - nOpen + 1);
+
+			// 判定该格式组内是否存在堆叠符或正负号
+			if (sInner.findNoCase(L"\\S") != -1 || sInner.findNoCase(L"%%P") != -1)
+			{
+				return true;
+			}
+
+			// 更新搜索起点，继续寻找下一对大括号
+			nStartSearch = nClose + 1;
+		}
+		return false;
 	}
 }
