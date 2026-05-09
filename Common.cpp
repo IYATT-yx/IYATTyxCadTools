@@ -15,10 +15,13 @@ module Common;
 
 namespace Common
 {
-	void double2AcString(double doubleValue, AcString& AcStringValue, int precision)
+	void double2AcString(double doubleValue, AcString& AcStringValue, int precision, bool forcePlusSign)
 	{
-		//AcStringValue.format(L"%.*g", precision, doubleValue);
 		acdbRToS(doubleValue, AcStringValue, Common::UnitMode::Decimal, precision);
+		if (forcePlusSign && doubleValue > 0)
+		{
+			AcStringValue = L"+" + AcStringValue;
+		}
 	}
 
 	bool setCharMapFontToGDT()
@@ -303,5 +306,40 @@ namespace Common
 		{
 			return std::nullopt;
 		}
+	}
+
+	Adesk::UInt16 getEntityActualColorIndex(const AcDbEntity* pEntity)
+	{
+		// 默认回退颜色为 7 (AutoCAD 默认黑白)
+		Adesk::UInt16 colorIndex = 7;
+
+		if (pEntity == nullptr)
+		{
+			return colorIndex;
+		}
+
+		AcCmColor cmColor = pEntity->entityColor();
+		if (cmColor.isByLayer())
+		{
+			AcDbLayerTableRecord* pLayer = Common::getObject<AcDbLayerTableRecord>(pEntity->layerId(), AcDb::kForRead);
+			if (pLayer != nullptr)
+			{
+				colorIndex = pLayer->color().colorIndex();
+			}
+		}
+		else if (cmColor.isByBlock())
+		{
+		}
+		else
+		{
+			colorIndex = cmColor.colorIndex();
+		}
+
+		if (colorIndex == 0 || colorIndex >= 256)
+		{
+			colorIndex = 7;
+		}
+
+		return colorIndex;
 	}
 }

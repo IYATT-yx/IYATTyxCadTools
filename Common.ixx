@@ -63,8 +63,9 @@ export namespace Common
 	 * @param doubleValue 要转换的double值
 	 * @param AcStringValue 转换后的AcString字符串
 	 * @param precision 小数点精度，默认为3位
+	 * @param forcePlusSign 是否强制显示正号，默认为false
 	 */
-	void double2AcString(double doubleValue, AcString& AcStringValue, int precision = 3);
+	void double2AcString(double doubleValue, AcString& AcStringValue, int precision = 3, bool forcePlusSign = false);
 
 	/**
 	 * @brief 设置字符映射表的启动选中字体为 GDT
@@ -149,6 +150,15 @@ export namespace Common
 	 * @return std::optional<std::filesystem::path> 成功返回目录路径，失败返回 nullopt
 	 */
 	std::optional<std::filesystem::path> getAppSubFolder();
+
+	/**
+	 * @brief 获取数据库实体的实际显示颜色索引 (ACI)
+	 * * @details 该函数会解析实体的颜色属性。如果实体颜色为 ByLayer，则返回其所属图层的颜色；
+	 * 如果为 ByBlock 或其他特殊情况，则回退到 AutoCAD 默认颜色（索引 7）。
+	 * * @param pEntity 指向要查询的 AutoCAD 实体的指针
+	 * @return Adesk::UInt16 返回 1-255 之间的颜色索引值，默认返回 7 (黑/白)
+	 */
+	Adesk::UInt16 getEntityActualColorIndex(const AcDbEntity* pEntity);
 }
 
 // 常量
@@ -163,9 +173,9 @@ export namespace Common
 	// 符号代码
 	namespace SymbolCodes
 	{
-		constexpr const wchar_t* Diameter = L"%%c";
-		constexpr const wchar_t* PlusMinus = L"%%p";
-		constexpr const wchar_t* Degree = L"%%d";
+		constexpr const wchar_t* Diameter = L"%%C";
+		constexpr const wchar_t* PlusMinus = L"%%P";
+		constexpr const wchar_t* Degree = L"%%D";
 		constexpr const wchar_t* Radius = L"R";
 	}
 
@@ -182,8 +192,8 @@ export namespace Common
 		Fractional = 5 // 分数
 	};
 
-	// 标注的默认尺寸文本占位符
-	constexpr const wchar_t* ACDB_DIM_TEXT_DEFAULT = L"<>";
+	// 尺寸值的占位符
+	constexpr const wchar_t* measValuePlaceholder = L"<>";
 
 	// 启动 charmap 字符映射表使用的常量
 	namespace CharMap
