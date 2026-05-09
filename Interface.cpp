@@ -382,17 +382,13 @@ void Interface::cmdExtractAnnotations()
             {
                 // 名义值
                 AcString asMeasuredValue;
-                double dMeasuredValue = dimData.measuredValue;
-                if (dimData.isAngle)
-                {
-                    dMeasuredValue = dimData.degreeValue();
-                }
-                Common::double2AcString(dMeasuredValue, asMeasuredValue, dimData.measuredValuePrecision);
+                double dMeasuredValue = dimData.dimensionValue();
+                Common::double2AcString(dMeasuredValue, asMeasuredValue, dimData.precision);
                 
                 //acutPrintf(L"\n调试：%s %s %f %f ", dimData.prefix.constPtr(), dimData.suffix.constPtr(), dimData.tolUpper, dimData.tolLower);
                 // 公差
                 AcString asTol,asTolUpper, asTolLower;
-                if (dimData.tolUpper == 0 && dimData.tolLower == 0) // 无公差
+                if (dimData.upperDeviation == 0 && dimData.lowerDeviation == 0) // 无公差
                 {
                     asTol = L"";
                     asTolUpper = L"0";
@@ -400,28 +396,28 @@ void Interface::cmdExtractAnnotations()
                 }
                 else
                 {
-                    if (abs(dimData.tolUpper + dimData.tolLower) < 1e-6) // 等双向公差
+                    if (abs(dimData.upperDeviation + dimData.lowerDeviation) < 1e-6) // 对称偏差
                     {
-                        double dAbsTol = abs(dimData.tolUpper);
-                        asTol.format(L"%s%.*g", Common::SymbolCodes::PlusMinus, dimData.tolPrecision, dAbsTol);
-                        asTolUpper.format(L"%.*g", dimData.tolPrecision, dAbsTol);
-                        asTolLower.format(L"-%.*g", dimData.tolPrecision, dAbsTol);
+                        double dAbsTol = abs(dimData.upperDeviation);
+                        asTol.format(L"%s%.*f", Common::SymbolCodes::PlusMinus, dimData.tolerancePrecision, dAbsTol);
+                        asTolUpper.format(L"%.*f", dimData.tolerancePrecision, dAbsTol);
+                        asTolLower.format(L"-%.*f", dimData.tolerancePrecision, dAbsTol);
                     }
-                    else // 双向公差
+                    else // 极限偏差
                     {
                         
-                        Common::double2AcString(dimData.tolUpper, asTolUpper, dimData.tolPrecision);
-                        Common::double2AcString(dimData.tolLower, asTolLower, dimData.tolPrecision);
+                        Common::double2AcString(dimData.upperDeviation, asTolUpper, dimData.tolerancePrecision);
+                        Common::double2AcString(dimData.lowerDeviation, asTolLower, dimData.tolerancePrecision);
                         asTol.format(L"+%s/%s", asTolUpper.constPtr(), asTolLower.constPtr());
-                        asTolUpper.format(L"%.*g", dimData.tolPrecision, dimData.tolUpper);
-                        asTolLower.format(L"%.*g", dimData.tolPrecision, dimData.tolLower);
+                        asTolUpper.format(L"%.*f", dimData.tolerancePrecision, dimData.upperDeviation);
+                        asTolLower.format(L"%.*f", dimData.tolerancePrecision, dimData.lowerDeviation);
                     }
                 }
 
                 AcString asDimText = dimData.prefix + asMeasuredValue + asTol + dimData.suffix;
                 TextUtil::resolveControlCodes(asDimText);
                 acutPrintf(Common::loadString(IDS_MSG_Dimension_FMT), asDimText.constPtr());
-                std::vector<AcString> row = { dimData.plainText, asDimText, asMeasuredValue, asTolUpper, asTolLower }; // 完整尺寸内容、尺寸文本、名义值、上极限偏差、下极限偏差
+                std::vector<AcString> row = { dimData.text, asDimText, asMeasuredValue, asTolUpper, asTolLower }; // 完整尺寸内容、尺寸文本、名义值、上极限偏差、下极限偏差
                 csv.writeRow(row);
             }
             else if (gtData.status) // 几何公差
