@@ -223,7 +223,6 @@ BEGIN
     IDS_CMD_yxCloneText     "将多行/单行文本内容复制给其它多行/单行文本"
     IDS_PROMPT_CopySrcText  "请选择要复制的源文本对象"
     IDS_PROMPT_PasteDstText "请选择要粘贴到的文本对象"
-    IDS_ERR_NotAngle        "该标注不是角度，无法获取角度值。"
     IDS_CMD_yxIntersect     "将两条直线延伸或修剪至其交点"
     IDS_CMD_yxBalloonNumberOffset "气泡号编号偏置"
     IDS_LBL_BalloonNumberOffset "偏置值"
