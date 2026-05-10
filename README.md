@@ -8,6 +8,11 @@
 可以嵌入 CAD 菜单栏中  
 ![alt text](doc/image4.png)
 
+---
+
+2026/5/10  
+从 AutoCAD Mechanical 2026 转到 AutoCAD Mechanical 2027 开发。  
+
 ## 使用方法
 
 AutoCAD 处于打开图纸状态下，执行`APPLOAD`命令。  
@@ -29,18 +34,17 @@ AutoCAD 处于打开图纸状态下，执行`APPLOAD`命令。
 
 软件：  
 * Visual Studio Community 2026
-* AutoCAD Mechanical 2026  
+* AutoCAD Mechanical 2027  
   
 SDK：  
-* ObjectARX SDK 2026  
-* AutoCAD Mechanical SDK 2026  
+* ObjectARX SDK 2027  
+* AutoCAD Mechanical SDK 2027  
 
 编译标准：  
 * C++23  
 
-ObjectARX 环境配置参考：https://blog.iyatt.com/?p=21187  
-AutoCAD Mechanical SDK 环境配置参考：https://blog.iyatt.com/?p=23776  
-Visual Studio 2026 配置 Wizards 2026 参考：https://blog.iyatt.com/?p=24263  
+ObjectARX 环境配置参考：https://blog.iyatt.com/?p=24522  
+AutoCAD Mechanical SDK 环境配置参考：https://blog.iyatt.com/?p=24583  
 
 ### 项目开发策略
 

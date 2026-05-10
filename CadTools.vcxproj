@@ -148,8 +148,8 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="Autodesk.arx-2026.props" />
-    <Import Project="Autodesk.mechanical-2026.props" />
+    <Import Project="Autodesk.arx-2027.props" />
+    <Import Project="Autodesk.mechanical-2027.props" />
   </ImportGroup>
   <PropertyGroup Label="Configuration">
     <PlatformToolset Condition="'$(ArxSDKPlatform)'=='v145'">v145</PlatformToolset>

@@ -162,7 +162,7 @@ BEGIN
     IDS_LBL_CommandName     "命令名"
     IDS_LBL_CommandDescription "命令描述"
     IDS_CommandGroup        "IYATTyxCadToolsGlobalGroup"
-    IDS_VAL_LocaleProjectName "AutoCAD Mechanical 2026 思能工具箱"
+    IDS_VAL_LocaleProjectName "AutoCAD Mechanical 2027 思能工具箱"
     IDS_LBL_PrefixSymbol    "前缀符号"
     IDS_CMD_yx              "显示或隐藏命令菜单"
     IDS_CMD_yxTest          "开发用测试命令"

@@ -11,7 +11,7 @@
 
     <ItemDefinitionGroup>
         <Link>
-            <AdditionalDependencies>ac1st25.lib;acdb25.lib;acge25.lib;iso_stdio_wide_specifiers.lib;rxapi.lib;$(LIB_ACGE);$(LIB_AC1ST);$(LIB_ACDB);accore.lib;acad.lib;acgiapi.lib;acmsymbb_crx.lib;%(AdditionalDependencies)</AdditionalDependencies>
+            <AdditionalDependencies>iso_stdio_wide_specifiers.lib;rxapi.lib;$(LIB_ACGE);$(LIB_AC1ST);$(LIB_ACDB);accore.lib;acad.lib;acgiapi.lib;acmsymbb_crx.lib;%(AdditionalDependencies)</AdditionalDependencies>
         </Link>
     </ItemDefinitionGroup>
 </Project>
