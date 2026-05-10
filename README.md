@@ -1,5 +1,7 @@
 # CadTools
 
+2026/5/10  
+此版在 AutoCAD Mechanical 2026 开发测试，现在停止更新，转到 AutoCAD Mechanical 2027 继续开发。  
 
 2026/3/16  
 前年将 AutoCAD 用作工作时，我就简单研究了下 ObjectARX，本来想根据工作需要开发工具提升效率的，后面一直搁置了。最近几天又想起来，就开始动工了。  这个插件是为 AutoCAD Mechanical 版本开发的，其它版本的 AutoCAD 可能无法使用。  
