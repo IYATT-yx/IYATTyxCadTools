@@ -24,6 +24,7 @@ import LineUtil;
 import PointUtil;
 import ConfigManager;
 import MiddleClickManager;
+import AcadVarUtil;
 
 void Interface::init()
 {
@@ -303,9 +304,14 @@ void Interface::cmdInsertBalloonNumberBlockWithStartNumber()
     GenericPairEditDlg dlg(title, Common::loadString(IDS_LBL_StartNumber), Common::loadString(IDS_LBL_Tip), false, true, true);
     // 设置默认字高
     CString csTips;
-    double textsize = Common::getTEXTSIZE();
+    double TEXTSIZE;
+    if (!AcadVarUtil::getVar(AcadVarName::TEXTSIZE, TEXTSIZE))
+    {
+        AfxMessageBox(Common::loadString(IDS_ERR_GetAcadVar), MB_OK | MB_ICONERROR);
+        return;
+    }
     double scale = Annotative::getCurrentScaleValue();
-    csTips.Format(Common::loadString(IDS_TIP_yxInsertBalloonNumberBlockWithStartNumber_FMT), textsize, scale, textsize * scale);
+    csTips.Format(Common::loadString(IDS_TIP_yxInsertBalloonNumberBlockWithStartNumber_FMT), TEXTSIZE, scale, TEXTSIZE * scale);
     dlg.modifyEditControl(L"", csTips);
 
     int startNumber;
@@ -798,9 +804,14 @@ void Interface::cmdImportCsvToMTextMatrix()
 
     GenericPairEditDlg dlg(Common::loadString(IDS_CMD_yxImportCsvToMTextMatrix), Common::loadString(IDS_LBL_Parameter), Common::loadString(IDS_LBL_Tip), false, true, true);
     CString strTipMTextMatrixParameter;
-    double textsize = Common::getTEXTSIZE();
+    double TEXTSIZE;
+    if (!AcadVarUtil::getVar(AcadVarName::TEXTSIZE, TEXTSIZE))
+    {
+        AfxMessageBox(Common::loadString(IDS_ERR_GetAcadVar), MB_OK | MB_ICONERROR);
+        return;
+    }
     double scale = Annotative::getCurrentScaleValue();
-    strTipMTextMatrixParameter.Format(Common::loadString(IDS_TIP_MTextMatrixParameter), textsize, scale, textsize * scale);
+    strTipMTextMatrixParameter.Format(Common::loadString(IDS_TIP_MTextMatrixParameter), TEXTSIZE, scale, TEXTSIZE* scale);
     dlg.modifyEditControl(L"", strTipMTextMatrixParameter);
 
     std::vector<double> params;
@@ -840,7 +851,13 @@ void Interface::cmdImportCsvToMTextMatrix()
         // 字高默认使用 TEXTSIZE 变量值，列容差默认按字高的 3 倍，行容差默认按字高的 1 倍（考虑注释比例缩放值）
         CString strInitParameter;
         double scale = Annotative::getCurrentScaleValue();
-        strInitParameter.Format(L"%g %g", Common::getTEXTSIZE() * scale * 3, Common::getTEXTSIZE() * scale * 1);
+        double TEXTSIZE;
+        if (!AcadVarUtil::getVar(AcadVarName::TEXTSIZE, TEXTSIZE))
+        {
+            AfxMessageBox(Common::loadString(IDS_ERR_GetAcadVar), MB_OK | MB_ICONERROR);
+            return;
+        }
+        strInitParameter.Format(L"%g %g", TEXTSIZE * scale * 3, TEXTSIZE * scale * 1);
         dlg.modifyEditControl(strInitParameter, Common::loadString(IDS_TIP_SpatialTableExplorerParameter));
 
         std::vector<double> params;
