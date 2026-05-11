@@ -66,14 +66,6 @@ private:
     void writeFields(const std::vector<std::wstring>& fields);
 
     /**
-     * @brief 将宽字符串写入文件（UTF-8）
-     * @param ws 宽字符串
-     *
-     * 不写 BOM，使用 WideCharToMultiByte 转换
-     */
-    void writeUtf8(const std::wstring& ws);
-
-    /**
      * @brief 转义单个 CSV 字段
      * @param field 原始字段
      * @return 转义后的字段

@@ -10,6 +10,7 @@ module;
 
 module CsvModule;
 import std;
+import EncodingConverter;
 
 CsvWriter::CsvWriter(const CString& filePath, wchar_t delimiter)
     : mDelimiter(delimiter)
@@ -69,35 +70,13 @@ void CsvWriter::writeFields(const std::vector<std::wstring>& fields)
         line += escape(f);
         first = false;
     }
-
     line += L"\r\n";
-    writeUtf8(line);
-}
 
-void CsvWriter::writeUtf8(const std::wstring& ws)
-{
-    int size = WideCharToMultiByte(
-        CP_UTF8, 0,
-        ws.c_str(), -1,
-        nullptr, 0,
-        nullptr, nullptr
-    );
-
-    if (size <= 0)
+    std::string utf8Line = EncodingConverter::FromWstringToUtf8(line);
+    if (!utf8Line.empty())
     {
-        return;
+        this->mOfs.write(utf8Line.c_str(), utf8Line.size());
     }
-
-    std::string utf8(size - 1, 0); // 去掉末尾 NUL
-
-    WideCharToMultiByte(
-        CP_UTF8, 0,
-        ws.c_str(), -1,
-        utf8.data(), size,
-        nullptr, nullptr
-    );
-
-    mOfs.write(utf8.c_str(), utf8.size());
 }
 
 std::wstring CsvWriter::escape(const std::wstring& field)
