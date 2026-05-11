@@ -22,6 +22,13 @@
 //-----------------------------------------------------------------------------
 //----- MainBar.cpp : Implementation of MainBar
 //-----------------------------------------------------------------------------
+/**
+ * @file      MainBar.cpp
+ * @brief     主停靠控制条实现
+ * @author    IYATT-yx
+ * @copyright Copyright (c) 2026 IYATT-yx.
+ *            Licensed under the MIT License. See LICENSE file in the project root for full license information.
+ */
 #include "StdAfx.h"
 #include "resource.h"
 #include "MainBar.hpp"

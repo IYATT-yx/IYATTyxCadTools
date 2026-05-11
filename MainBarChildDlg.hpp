@@ -22,6 +22,13 @@
 //-----------------------------------------------------------------------------
 //----- MainBarChildDlg.h : Declaration of the MainBarChildDlg
 //-----------------------------------------------------------------------------
+/**
+ * @file      MainBarChildDlg.hpp
+ * @brief     主停靠控制条子对话框
+ * @author    IYATT-yx
+ * @copyright Copyright (c) 2026 IYATT-yx.
+ *            Licensed under the MIT License. See LICENSE file in the project root for full license information.
+ */
 #pragma once
 
 //-----------------------------------------------------------------------------

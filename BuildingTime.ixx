@@ -1,4 +1,11 @@
-﻿export module BuildingTime;
+﻿/**
+ * @file      BuildingTime.ixx
+ * @brief     编译时间模块。
+ * @author    IYATT-yx
+ * @copyright Copyright (c) 2026 IYATT-yx.
+ *            Licensed under the MIT License. See LICENSE file in the project root for full license information.
+ */
+export module BuildingTime;
 
 #define MONTH_TO_NUM(mmm) \
     ((mmm[0] == 'J' && mmm[1] == 'a') ? 1 : \
