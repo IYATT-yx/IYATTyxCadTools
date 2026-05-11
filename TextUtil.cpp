@@ -1,4 +1,11 @@
-﻿module;
+﻿/**
+ * @file      TextUtil.cpp
+ * @brief     文本模块实现。
+ * @author    IYATT-yx
+ * @copyright Copyright (c) 2026 IYATT-yx.
+ *            Licensed under the MIT License. See LICENSE file in the project root for full license information.
+ */
+module;
 #include "StdAfx.h"
 #include "resource.h"
 
@@ -8,6 +15,7 @@ import UniversalPicker;
 import Annotative;
 import CsvModule;
 import std;
+import AcadVarUtil;
 
 namespace TextUtil
 {
@@ -241,7 +249,13 @@ namespace TextUtil
 					pMText->setContents(cellText);
 					pMText->setAttachment(AcDbMText::kTopLeft);
 					pMText->setWidth(colWidth * s);
-					pMText->setTextHeight(Common::getTEXTSIZE() * s);
+					double TEXTSIZE;
+					if (!AcadVarUtil::getVar(AcadVarName::TEXTSIZE, TEXTSIZE))
+					{
+						AfxMessageBox(Common::loadString(IDS_ERR_GetAcadVar), MB_OK | MB_ICONERROR);
+						return;
+					}
+					pMText->setTextHeight(TEXTSIZE * s);
 					pMText->setLineSpacingFactor(dLineSpacingFactor);
 
 					AcGePoint3d currentPt;

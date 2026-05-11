@@ -1,4 +1,11 @@
-﻿module;
+﻿/**
+ * @file      BalloonNumber.cpp
+ * @brief     气泡号模块实现。
+ * @author    IYATT-yx
+ * @copyright Copyright (c) 2026 IYATT-yx.
+ *            Licensed under the MIT License. See LICENSE file in the project root for full license information.
+ */
+module;
 #include "StdAfx.h"
 #include "resource.h"
 
@@ -6,6 +13,7 @@ module BalloonNumber;
 import std;
 import Common;
 import Annotative;
+import AcadVarUtil;
 
 namespace BalloonNumber
 {
@@ -144,7 +152,13 @@ namespace BalloonNumber
             }
 
 			// 创建圆
-			AcDbCircle* pCircle = new AcDbCircle(AcGePoint3d::kOrigin, AcGeVector3d::kZAxis, Common::getTEXTSIZE());
+            double TEXTSIZE;
+            if (!AcadVarUtil::getVar(AcadVarName::TEXTSIZE, TEXTSIZE))
+            {
+                AfxMessageBox(Common::loadString(IDS_ERR_GetAcadVar), MB_OK | MB_ICONERROR);
+                return;
+            }
+			AcDbCircle* pCircle = new AcDbCircle(AcGePoint3d::kOrigin, AcGeVector3d::kZAxis, TEXTSIZE);
 			pNewBTR->appendAcDbEntity(pCircle);
             pCircle->setColorIndex(3);
 			pCircle->close();
@@ -153,7 +167,7 @@ namespace BalloonNumber
 			AcDbAttributeDefinition* pAttDef = new AcDbAttributeDefinition();
 			pAttDef->setTag(Common::BalloonNumberBlock::AttTag);
 			pAttDef->setPrompt(Common::BalloonNumberBlock::AttPrompt);
-			pAttDef->setHeight(Common::getTEXTSIZE());
+			pAttDef->setHeight(TEXTSIZE);
 			pAttDef->setHorizontalMode(AcDb::kTextCenter);
 			pAttDef->setVerticalMode(AcDb::kTextVertMid);
 			pAttDef->setAlignmentPoint(AcGePoint3d::kOrigin);
