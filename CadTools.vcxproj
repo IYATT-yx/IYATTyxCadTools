@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AcadVarUtil.ixx" />
     <ClCompile Include="acrxEntryPoint.cpp" />
     <ClCompile Include="Annotative.cpp" />
     <ClCompile Include="Annotative.ixx" />
