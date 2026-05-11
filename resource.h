@@ -65,6 +65,7 @@
 #define IDS_CMD_yxCloneText             150
 #define IDS_PROMPT_CopySrcText          151
 #define IDS_PROMPT_PasteDstText         152
+#define IDS_ERR_GetAcadVar              153
 #define IDS_CMD_yxIntersect             154
 #define IDS_CMD_yxBalloonNumberOffset   155
 #define IDS_LBL_BalloonNumberOffset     156
