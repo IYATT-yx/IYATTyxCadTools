@@ -15,12 +15,17 @@ module Common;
 
 namespace Common
 {
-	void double2AcString(double doubleValue, AcString& AcStringValue, int precision, bool forcePlusSign)
+	void double2AcString(double doubleValue, AcString& AcStringValue, int precision, bool forcePlusSign, bool addSpaceIfZero)
 	{
 		acdbRToS(doubleValue, AcStringValue, Common::UnitMode::Decimal, precision);
-		if (forcePlusSign && doubleValue > 0)
+
+		if (forcePlusSign && doubleValue > Common::Epsilon)
 		{
 			AcStringValue = L"+" + AcStringValue;
+		}
+		else if (addSpaceIfZero && std::abs(doubleValue) <= Common::Epsilon)
+		{
+			AcStringValue = L" " + AcStringValue;
 		}
 	}
 

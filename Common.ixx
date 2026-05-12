@@ -64,8 +64,9 @@ export namespace Common
 	 * @param AcStringValue 转换后的AcString字符串
 	 * @param precision 小数点精度，默认为3位
 	 * @param forcePlusSign 是否强制显示正号，默认为false
+	 * @param addSpaceIfZero 如果值为零，是否在前面添加一个空格，默认为false
 	 */
-	void double2AcString(double doubleValue, AcString& AcStringValue, int precision = 3, bool forcePlusSign = false);
+	void double2AcString(double doubleValue, AcString& AcStringValue, int precision = 3, bool forcePlusSign = false, bool addSpaceIfZero = false);
 
 	/**
 	 * @brief 设置字符映射表的启动选中字体为 GDT
