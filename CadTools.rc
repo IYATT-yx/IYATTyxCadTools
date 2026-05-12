@@ -345,6 +345,8 @@ BEGIN
     IDS_MSG_MiddleClickToOkStarted "\n已启用鼠标中键映射确定按钮\n"
     IDS_MSG_MiddleClickToOkStopped "\n已停止鼠标中键映射确定按钮\n"
     IDS_MSG_MiddleClickToOkDone "\n检测到鼠标中键点击，已触发点击确定\n"
+    IDS_MSG_OpBefore_FMT    "\n操作前尺寸文本: %s"
+    IDS_MSG_OpAfter_FMT     "\n操作后尺寸文本：%s"
 END
 
 #endif    // 中文(简体，中国) resources

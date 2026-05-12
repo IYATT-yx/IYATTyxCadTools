@@ -160,6 +160,8 @@
 #define IDS_MSG_MiddleClickToOkStarted  244
 #define IDS_MSG_MiddleClickToOkStopped  245
 #define IDS_MSG_MiddleClickToOkDone     246
+#define IDS_MSG_OpBefore_FMT            247
+#define IDS_MSG_OpAfter_FMT             248
 
 // Next default values for new objects
 // 

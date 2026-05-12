@@ -7,6 +7,7 @@
  */
 module;
 #include "stdafx.h"
+#include "resource.h"
 
 module Dimension;
 import Common;
@@ -27,6 +28,7 @@ namespace Dimension
 		AcString measurementValueText; // 存储测量值文本（带符号、单位）
 
 		Dimension::readDim(objId, dimData);
+		acutPrintf(Common::loadString(IDS_MSG_OpBefore_FMT), dimData.dimensionText.constPtr());
 		if (dimData.angle)
 		{
 			Common::double2AcString(
@@ -49,19 +51,20 @@ namespace Dimension
 		if (dimData.dimensionText.empty())
 		{
 			pDim->setDimensionText(measurementValueText);
+			acutPrintf(Common::loadString(IDS_MSG_OpAfter_FMT), measurementValueText.constPtr());
 		}
 		else
 		{
 			if (dimData.dimensionText.find(Common::measValuePlaceholder) == -1)
 			{
-				// 已经是固定文本，跳过处理
-				return;
+				// 已经是固定文本，无处理
 			}
 			else
 			{
 				dimData.dimensionText.replace(Common::measValuePlaceholder, measurementValueText.constPtr());
                 pDim->setDimensionText(dimData.dimensionText.constPtr());
 			}
+            acutPrintf(Common::loadString(IDS_MSG_OpAfter_FMT), dimData.dimensionText.constPtr());
 		}
 	}
 
@@ -77,8 +80,10 @@ namespace Dimension
 
 		double upperDeviation = pDim->dimtp();
 		double lowerDeviation = pDim->dimtm() * -1;
+		const wchar_t* dimensionText = pDim->dimensionText();
 		Adesk::UInt16 colorIndex = Common::getEntityActualColorIndex(pDim);
 
+		acutPrintf(Common::loadString(IDS_MSG_OpBefore_FMT), dimensionText);
 		AcString resultText;
 		if (upperDeviation == 0 && lowerDeviation == 0)
 		{
@@ -101,20 +106,13 @@ namespace Dimension
 			}
 			else
 			{
-				Common::double2AcString(upperDeviation, strUpperDeviation, tolerancePrecision, true);
-				Common::double2AcString(lowerDeviation, strLowerDeviation, tolerancePrecision, true);
-				if (upperDeviation == 0)
-				{
-					strUpperDeviation = L" " + strUpperDeviation;
-				}
-				if (lowerDeviation == 0)
-				{
-                    strLowerDeviation = L" " + strLowerDeviation;
-				}
+				Common::double2AcString(upperDeviation, strUpperDeviation, tolerancePrecision, true, true);
+				Common::double2AcString(lowerDeviation, strLowerDeviation, tolerancePrecision, true, true);
 				resultText.format(L"%s{}{\\H0.71x;\\C%d;\\S%s%s^%s%s;}", Common::measValuePlaceholder, colorIndex, strUpperDeviation.constPtr(), units.constPtr(), strLowerDeviation.constPtr(), units.constPtr());
 			}
 		}
 		pDim->setDimensionText(resultText.constPtr());
+		acutPrintf(Common::loadString(IDS_MSG_OpAfter_FMT), resultText.constPtr());
 	}
 
 	void addSurroundingCharsForDimension(const AcDbObjectId& objId, const wchar_t* left, const wchar_t* right, bool isLGdt, bool isRGdt)
@@ -339,33 +337,12 @@ namespace Dimension
 			if (std::regex_search(dimText, match, tolRegex))
 			{
 				AcString acStrUpper, acStrLower;
-
 				// 上偏差
-				Common::double2AcString(dUpper, acStrUpper, iTolPrec);
-				std::wstring newUpper = acStrUpper.constPtr();
-				if (dUpper > 0)
-				{
-					newUpper = L"+" + newUpper;
-				}
-				else if (fabs(dUpper) <= Common::Epsilon)
-				{
-					newUpper = L" " + newUpper;
-				}
-
+				Common::double2AcString(dUpper, acStrUpper, iTolPrec, true, true);
 				// 下偏差
-				Common::double2AcString(dLower, acStrLower, iTolPrec);
-				std::wstring newLower = acStrLower.constPtr();
-				if (dLower > 0)
-				{
-					newLower = L"+" + newLower;
-				}
-				else if(fabs(dLower) <= Common::Epsilon)
-				{
-                    newLower = L" " + newLower;
-				}
-
+				Common::double2AcString(dLower, acStrLower, iTolPrec, true, true);
 				// 构造新的堆叠字段并执行替换
-				std::wstring newStack = L"\\S" + newUpper + L"^" + newLower + L";";
+				std::wstring newStack = std::wstring(L"\\S") + acStrUpper.constPtr() + L"^" + acStrLower.constPtr() + L";";
 				dimText.replace(match.position(0), match.length(0), newStack);
 				pDim->setDimensionText(dimText.c_str());
 			}
