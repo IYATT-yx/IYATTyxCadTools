@@ -162,6 +162,7 @@
 #define IDS_MSG_MiddleClickToOkDone     246
 #define IDS_MSG_OpBefore_FMT            247
 #define IDS_MSG_OpAfter_FMT             248
+#define IDS_WARN_NotStandardDimensionText 249
 
 // Next default values for new objects
 // 

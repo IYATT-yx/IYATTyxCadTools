@@ -320,7 +320,8 @@ namespace Dimension
 
 		if (iDimPrec >= 0)
 		{
-			pDim->setDimdec(iDimPrec);
+			pDim->setDimdec(iDimPrec); // 线型尺寸
+			pDim->setDimadec(iDimPrec); // 角度尺寸
 		}
 		if (iTolPrec >= 0)
 		{
@@ -329,12 +330,11 @@ namespace Dimension
             double dLower = pDim->dimtm() * -1.0; // 注意内部符号是相反的，所以这里取相反数
 			std::wstring dimText = pDim->dimensionText();
 
-			// 定位文本替代里的 \S 公差字段
-			// 正则解释：匹配 \S 段落直至分号结束
-			std::wregex tolRegex(L"\\\\S([^\\^;]+)\\^([^;]+);");
+			std::wregex stackRegex(L"\\\\S([^\\^;]+)\\^([^;]+);");
+			std::wregex symRegex(L"%%P([0-9]+\\.?[0-9]*)", std::regex_constants::icase);
 			std::wsmatch match;
 
-			if (std::regex_search(dimText, match, tolRegex))
+			if (std::regex_search(dimText, match, stackRegex))
 			{
 				AcString acStrUpper, acStrLower;
 				// 上偏差
@@ -345,6 +345,21 @@ namespace Dimension
 				std::wstring newStack = std::wstring(L"\\S") + acStrUpper.constPtr() + L"^" + acStrLower.constPtr() + L";";
 				dimText.replace(match.position(0), match.length(0), newStack);
 				pDim->setDimensionText(dimText.c_str());
+			}
+			else if (std::regex_search(dimText, match, symRegex))
+			{
+				if (std::abs(dUpper + dLower) < Common::Epsilon)
+				{
+					AcString acStrSym;
+					Common::double2AcString(std::abs(dUpper), acStrSym, iTolPrec, false, false);
+					std::wstring newSym = std::wstring(L"%%P") + acStrSym.constPtr();
+					dimText.replace(match.position(0), match.length(0), newSym);
+					pDim->setDimensionText(dimText.c_str());
+				}
+				else
+				{
+					acutPrintf(Common::loadString(IDS_WARN_NotStandardDimensionText));
+				}
 			}
 		}
 	}
