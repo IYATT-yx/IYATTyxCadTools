@@ -393,7 +393,7 @@ namespace Dimension
 			AcString sInner = text.mid(nOpen, nClose - nOpen + 1);
 
 			// 判定该格式组内是否存在堆叠符或正负号
-			if (sInner.findNoCase(L"\\S") != -1 || sInner.findNoCase(L"%%P") != -1)
+			if (sInner.findNoCase(L"\\S") != -1 || sInner.findNoCase(L"%%P") != -1 || sInner.findNoCase(L"%%p") != -1)
 			{
 				return true;
 			}
