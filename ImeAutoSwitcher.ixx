@@ -13,11 +13,6 @@ export module ImeAutoSwitcher;
 
 export namespace ImeAutoSwitcher
 {
-    constexpr DWORD defaultIntervalMs = 200; // 默认 200 ms，同时插件实现中也用这个值作为最小值检查，不允许低于这个值。（防止系统卡顿）
-};
-
-export namespace ImeAutoSwitcher
-{
     /**
      * @brief 启动输入法自动切换
      * @param intervlMs 语言切换间隔时间，单位毫秒。

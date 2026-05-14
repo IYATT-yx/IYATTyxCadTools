@@ -15,12 +15,14 @@ module;
 
 module ImeAutoSwitcher;
 import Common;
+import ConfigManager;
 
 namespace ImeAutoSwitcher
 {
     HHOOK g_hKeyboardHook = nullptr;
     DWORD g_lastSwitchTime = 0;
-    DWORD g_intervalMs = ImeAutoSwitcher::defaultIntervalMs;
+    const ConfigItems::ImeSettings defaultConfig;
+    DWORD g_intervalMs = defaultConfig.iIntervalMs;
 
     bool isCommandRunning()
     {
