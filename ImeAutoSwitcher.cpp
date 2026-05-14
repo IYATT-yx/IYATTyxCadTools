@@ -25,7 +25,7 @@ namespace ImeAutoSwitcher
     bool isCommandRunning()
     {
         struct resbuf rb;
-        if (acedGetVar(ImeAutoSwitcher::cmdActive, &rb) == RTNORM)
+        if (acedGetVar(L"CMDACTIVE", &rb) == RTNORM)
         {
             return (rb.resval.rint > 0);
         }
@@ -45,16 +45,12 @@ namespace ImeAutoSwitcher
                 if ((dwConv & IME_CMODE_NATIVE) != 0 || dwConv != IME_CMODE_ALPHANUMERIC)
                 {
                     INPUT inputs[2] = {};
-
                     inputs[0].type = INPUT_KEYBOARD;
                     inputs[0].ki.wVk = VK_SHIFT;
-
                     inputs[1].type = INPUT_KEYBOARD;
                     inputs[1].ki.wVk = VK_SHIFT;
                     inputs[1].ki.dwFlags = KEYEVENTF_KEYUP;
-
                     SendInput(2, inputs, sizeof(INPUT));
-
                     CAcModuleResourceOverride resOverride;
                     acutPrintf(Common::loadString(IDS_MSG_ImeAutoSwitchDone));
                 }
