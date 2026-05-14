@@ -342,13 +342,18 @@ BEGIN
     IDS_MSG_ConfigFilename_FMT "\n配置文件路径：%s"
     IDS_CMD_yxDialogMiddleClickToOk "设置对话框中鼠标中键映射到确定按钮"
     IDS_ERR_InvalidMiddleClickToOk "必须输入1或0设置是否启用中键映射确定按钮"
-    IDS_MSG_MiddleClickToOkStarted "\n已启用对话框中鼠标中键映射确定按钮\n"
-    IDS_MSG_MiddleClickToOkStopped "\n已停止对话框中鼠标中键映射确定按钮\n"
-    IDS_MSG_MiddleClickToOkDone "\n检测到鼠标中键点击，已触发点击确定\n"
+    IDS_MSG_DialogMiddleClickToOkStarted "\n已启用对话框中鼠标中键映射确定按钮\n"
+    IDS_MSG_DialogMiddleClickToOkStopped "\n已停止对话框中鼠标中键映射确定按钮\n"
+    IDS_MSG_DialogMiddleClickToOkDone "\n检测到对话框中鼠标中键点击，已触发点击确定\n"
     IDS_MSG_OpBefore_FMT    "\n操作前尺寸文本: %s"
     IDS_MSG_OpAfter_FMT     "\n操作后尺寸文本：%s"
     IDS_WARN_NotStandardDimensionText 
                             "警告：尺寸文本中对称公差与对象存储的公差不一致，疑似手动输入，非增强尺寸标注生成。"
+    IDS_MSG_CmdMiddleClickToEnterStarted_FMT 
+                            "\n已启用命令中鼠标中键映射回车键，按下释放间隔阈值：%dms\n"
+    IDS_MSG_CmdMiddleClickToEnterStopped "\n已停用命令中鼠标中键映射回车键\n"
+    IDS_MSG_CmdMiddleClickToEnterDone "\n检测到命令状态鼠标中键点击，已触发回车按键\n"
+    IDS_CMD_yxCmdMiddleClickToEnter "设置命令执行状态下鼠标中键映射回车键"
 END
 
 #endif    // 中文(简体，中国) resources

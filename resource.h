@@ -158,11 +158,16 @@
 #define IDS_CMD_yxDialogMiddleClickToOk 242
 #define IDS_ERR_InvalidMiddleClickToOk  243
 #define IDS_MSG_MiddleClickToOkStarted  244
-#define IDS_MSG_MiddleClickToOkStopped  245
-#define IDS_MSG_MiddleClickToOkDone     246
+#define IDS_MSG_DialogMiddleClickToOkStarted 244
+#define IDS_MSG_DialogMiddleClickToOkStopped 245
+#define IDS_MSG_DialogMiddleClickToOkDone 246
 #define IDS_MSG_OpBefore_FMT            247
 #define IDS_MSG_OpAfter_FMT             248
 #define IDS_WARN_NotStandardDimensionText 249
+#define IDS_MSG_CmdMiddleClickToEnterStarted_FMT 250
+#define IDS_MSG_CmdMiddleClickToEnterStopped 251
+#define IDS_MSG_CmdMiddleClickToEnterDone 252
+#define IDS_CMD_yxCmdMiddleClickToEnter 253
 
 // Next default values for new objects
 // 
