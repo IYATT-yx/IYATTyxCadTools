@@ -67,9 +67,10 @@ export namespace Commands
 	void registerYxCmds(Commands::CommandInfoList& cil);
 
 	/**
-	 * @brief 执行命令，命令列表第一个元素自动加上“._” 开头
+	 * @brief 执行命令
 	 * @param cmdList 命令列表
+	 * @param usePrefix 是否使用 ._ 前缀
 	 * @param pDoc 文档指针
 	 */
-	void executeCommand(const Commands::CommandList& cmdList, AcApDocument* pDoc = nullptr);
+	void executeCommand(const Commands::CommandList& cmdList, bool usePrefix = true, AcApDocument* pDoc = nullptr);
 };

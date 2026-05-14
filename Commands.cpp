@@ -29,7 +29,7 @@ namespace Commands
 		}
 	}
 
-	void executeCommand(const Commands::CommandList& cmdList, AcApDocument* pDoc)
+	void executeCommand(const Commands::CommandList& cmdList, bool usePrefix, AcApDocument* pDoc)
 	{
         if (cmdList.empty())
         {
@@ -47,7 +47,14 @@ namespace Commands
         }
 
         AcString finalCmd;
-        finalCmd.format(L"._%s\n", cmdList[0]);
+        if (usePrefix)
+        {
+            finalCmd.format(L"._%s\n", cmdList[0]);
+        }
+        else
+        {
+            finalCmd.format(L"%s\n", cmdList[0]);
+        }
         for (size_t i = 1; i < cmdList.size(); ++i)
         {
             finalCmd.append(cmdList[i]);
