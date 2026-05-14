@@ -106,7 +106,7 @@ void Interface::init()
     // 对话框中键绑定确定按钮
     if (config.middleClickManagerSettings.bDialogMiddleClickToOkEnabled)
     {
-        MiddleClickManager::getInstance().start();
+        MiddleClickManager::getInstance().startDialogMiddleClickToOk();
     }
 
     // 显示命令报表悬浮窗
@@ -123,7 +123,7 @@ void Interface::unload()
     // 关闭输入法自动切换
     ImeAutoSwitcher::stop();
     // 关闭中键绑定确定按钮
-    MiddleClickManager::getInstance().stop();
+    MiddleClickManager::getInstance().stopDialogMiddleClickToOk();
     // 关闭命令菜单
     MainBar::terminateBar();
     // 卸载命令
@@ -1470,7 +1470,7 @@ void Interface::cmdImportCsvToMTextMatrix()
 
         config.middleClickManagerSettings.bDialogMiddleClickToOkEnabled = (edit1Result == L"1");
         auto& middleClickManager = MiddleClickManager::getInstance();
-        middleClickManager.stop();
+        middleClickManager.stopDialogMiddleClickToOk();
         if (!manager.saveConfig())
         {
             std::wstring err = manager.getLastError();
@@ -1480,6 +1480,6 @@ void Interface::cmdImportCsvToMTextMatrix()
         }
         if (config.middleClickManagerSettings.bDialogMiddleClickToOkEnabled)
         {
-            middleClickManager.start();
+            middleClickManager.startDialogMiddleClickToOk();
         }
     }
