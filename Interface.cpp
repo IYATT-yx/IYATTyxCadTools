@@ -67,7 +67,8 @@ void Interface::init()
         {L"yxLocateDrawing", Common::loadString(IDS_CMD_yxLocateDrawing), Commands::CommandFlags::Base, Interface::cmdLocateDrawing},
         {L"yxCreateIntersectionPoints", Common::loadString(IDS_CMD_yxCreateIntersectionPoints), Commands::CommandFlags::Base, Interface::cmdCreateIntersectionPoints},
         {L"yxImeAutoSwitch", Common::loadString(IDS_CMD_yxImeAutoSwitch), Commands::CommandFlags::Base, Interface::cmdImeAutoSwitch},
-        {L"yxDialogMiddlerClickToOk", Common::loadString(IDS_CMD_yxDialogMiddleClickToOk), Commands::CommandFlags::Base, Interface::cmdDialogMiddleClickToOk},
+        {L"yxDialogMiddleClickToOk", Common::loadString(IDS_CMD_yxDialogMiddleClickToOk), Commands::CommandFlags::Base, Interface::cmdDialogMiddleClickToOk},
+        {L"yxCmdMiddleClickToEnter", Common::loadString(IDS_CMD_yxCmdMiddleClickToEnter), Commands::CommandFlags::Base, Interface::cmdCmdMiddleClickToEnter},
         {L"yx", Common::loadString(IDS_CMD_yx), Commands::CommandFlags::Base, Interface::cmdYx},
         {L"yxTest", Common::loadString(IDS_CMD_yxTest), Commands::CommandFlags::Base, Interface::test},
         {L"yxUnload", Common::loadString(IDS_CMD_yxUnload), Commands::CommandFlags::Base, Interface::cmdUnloadApp},
@@ -107,6 +108,12 @@ void Interface::init()
     if (config.middleClickManagerSettings.bDialogMiddleClickToOkEnabled)
     {
         MiddleClickManager::getInstance().startDialogMiddleClickToOk();
+    }
+
+    // 命令中键绑定回车键
+    if (config.middleClickManagerSettings.bCmdMiddleClickToEnterEnabled)
+    {
+        MiddleClickManager::getInstance().startCmdMiddleClickToEnter(config.middleClickManagerSettings.bCmdMiddleClickToEnterEnabled);
     }
 
     // 显示命令报表悬浮窗
@@ -546,6 +553,7 @@ void Interface::cmdImeAutoSwitch()
     auto& config = manager.getConfig();
     bool bEnabled = config.imeSettings.bEnabled;
     unsigned long iInterval = config.imeSettings.iIntervalMs;
+    const ConfigItems::ImeSettings defaultConfig;
     edit1Result.Format(L"%d", config.imeSettings.bEnabled);
     edit2Result.Format(L"%d", config.imeSettings.iIntervalMs);
     dlg.modifyEditControl(edit1Result, edit2Result);
@@ -568,7 +576,7 @@ void Interface::cmdImeAutoSwitch()
                 {
                     throw std::exception();
                 }
-                if (config.imeSettings.iIntervalMs < ImeAutoSwitcher::defaultIntervalMs)
+                if (config.imeSettings.iIntervalMs < defaultConfig.iIntervalMs)
                 {
                     throw std::exception();
                 }
@@ -576,7 +584,7 @@ void Interface::cmdImeAutoSwitch()
             catch (...)
             {
                 CString csInvalidInterval;
-                csInvalidInterval.Format(Common::loadString(IDS_ERR_InvalidInterval_FMT), ImeAutoSwitcher::defaultIntervalMs);
+                csInvalidInterval.Format(Common::loadString(IDS_ERR_InvalidInterval_FMT), defaultConfig.iIntervalMs);
                 return csInvalidInterval;
             }
 
@@ -1481,5 +1489,77 @@ void Interface::cmdImportCsvToMTextMatrix()
         if (config.middleClickManagerSettings.bDialogMiddleClickToOkEnabled)
         {
             middleClickManager.startDialogMiddleClickToOk();
+        }
+    }
+
+    void Interface::cmdCmdMiddleClickToEnter()
+    {
+        CAcModuleResourceOverride resOverride;
+        CString title = Common::loadString(IDS_CMD_yxCmdMiddleClickToEnter);
+        GenericPairEditDlg dlg(title, Common::loadString(IDS_LBL_Enabled), Common::loadString(IDS_LBL_Interval), false, true, true);
+
+        CString edit1Result, edit2Result;
+        auto& manager = ConfigManager::getInstance();
+        auto& config = manager.getConfig();
+        bool bEnabled = config.middleClickManagerSettings.bCmdMiddleClickToEnterEnabled;
+        unsigned long dCmdMiddleClickDownUpInterval = config.middleClickManagerSettings.dCmdMiddleClickDownUpInterval;
+        edit1Result.Format(L"%d", bEnabled);
+        edit2Result.Format(L"%d", dCmdMiddleClickDownUpInterval);
+        const ConfigItems::MiddleClickManagerSettings defaultConfig;
+        dlg.modifyEditControl(edit1Result, edit2Result);
+
+        dlg.setValidatorAndParser([&](const CString& value1, const CString& value2) -> CString
+            {
+                if (value1.IsEmpty() || value2.IsEmpty())
+                {
+                    return Common::loadString(IDS_ERR_ImeAutoSwitchEmptySetting);
+                }
+                if (value1.SpanIncluding(L"01") != value1)
+                {
+                    return Common::loadString(IDS_ERR_InvalidAutoStart);
+                }
+                try
+                {
+                    size_t pos;
+                    config.imeSettings.iIntervalMs = std::stoi(value2.GetString(), &pos);
+                    if (pos != value2.GetLength())
+                    {
+                        throw std::exception();
+                    }
+                    if (config.imeSettings.iIntervalMs < defaultConfig.dCmdMiddleClickDownUpInterval)
+                    {
+                        throw std::exception();
+                    }
+                }
+                catch (...)
+                {
+                    CString csInvalidInterval;
+                    csInvalidInterval.Format(Common::loadString(IDS_ERR_InvalidInterval_FMT), defaultConfig.dCmdMiddleClickDownUpInterval);
+                    return csInvalidInterval;
+                }
+
+                edit1Result = value1;
+                return GenericPairEditDlg::ValidatorOk;
+            });
+
+        if (dlg.DoModal() != IDOK)
+        {
+            acutPrintf(L"\n%s", Common::loadString(IDS_MSG_CancelOperation));
+            return;
+        }
+
+        config.middleClickManagerSettings.bCmdMiddleClickToEnterEnabled = (edit1Result == L"1");
+        MiddleClickManager::getInstance().stopCmdMiddleClickToEnter();
+        if (!manager.saveConfig())
+        {
+            std::wstring err = manager.getLastError();
+            AfxMessageBox(err.c_str(), MB_OK | MB_ICONERROR);
+            // 保存失败，还原状态
+            config.middleClickManagerSettings.bCmdMiddleClickToEnterEnabled = bEnabled;
+            config.middleClickManagerSettings.dCmdMiddleClickDownUpInterval = dCmdMiddleClickDownUpInterval;
+        }
+        if (config.middleClickManagerSettings.bCmdMiddleClickToEnterEnabled)
+        {
+            MiddleClickManager::getInstance().startCmdMiddleClickToEnter(dCmdMiddleClickDownUpInterval);
         }
     }

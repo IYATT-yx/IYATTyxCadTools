@@ -49,5 +49,6 @@ private:
 	static void cmdCreateIntersectionPoints();
 	static void cmdPrintConfigFilename();
 	static void cmdDialogMiddleClickToOk();
+	static void cmdCmdMiddleClickToEnter();
 };
 

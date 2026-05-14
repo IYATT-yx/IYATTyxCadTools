@@ -27,7 +27,9 @@ export namespace ConfigItems
 	struct MiddleClickManagerSettings
 	{
 		bool bDialogMiddleClickToOkEnabled = false;
-        NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(MiddleClickManagerSettings, bDialogMiddleClickToOkEnabled)
+		bool bCmdMiddleClickToEnterEnabled = false;
+		unsigned long dCmdMiddleClickDownUpInterval = 200;
+        NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(MiddleClickManagerSettings, bDialogMiddleClickToOkEnabled, bCmdMiddleClickToEnterEnabled, dCmdMiddleClickDownUpInterval)
 	};
 
 	// 全局配置
