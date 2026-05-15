@@ -15,14 +15,13 @@ import Commands;
 
 inline constexpr const wchar_t* kWinStandardDialogClassName = L"#32770";
 
-MiddleClickManager::MiddleClickManager() : mhDialogMiddleClickToOkHook(nullptr)
+MiddleClickManager::MiddleClickManager() : mhUnifiedMiddleClickHook(nullptr)
 {
 }
 
 MiddleClickManager::~MiddleClickManager()
 {
-    this->stopDialogMiddleClickToOk();
-    this->stopCmdMiddleClickToEnter();
+    this->stopUnifiedMiddleClickProc();
 }
 
 MiddleClickManager& MiddleClickManager::getInstance()
@@ -31,122 +30,99 @@ MiddleClickManager& MiddleClickManager::getInstance()
     return instance;
 }
 
-void MiddleClickManager::startDialogMiddleClickToOk()
+void MiddleClickManager::startUnifiedMiddleClickProc(ConfigItems::MiddleClickManagerSettings& settings)
 {
-    if (this->mhDialogMiddleClickToOkHook == nullptr)
+    if (this->mhUnifiedMiddleClickHook == nullptr)
     {
-        this->mhDialogMiddleClickToOkHook = SetWindowsHookEx(WH_MOUSE_LL, this->dialogMiddleClickToOkProc, GetModuleHandle(nullptr), 0);
-        acutPrintf(Common::loadString(IDS_MSG_DialogMiddleClickToOkStarted));
+        this->mbEnabledDialogOk = settings.bDialogMiddleClickToOkEnabled;
+        this->mbEnabledCmdEnter = settings.bCmdMiddleClickToEnterEnabled;
+        this->mdCmdMiddleClickDownUpInterval = settings.dCmdMiddleClickDownUpInterval;
+        this->mhUnifiedMiddleClickHook = SetWindowsHookEx(WH_MOUSE_LL, this->unifiedMiddleClickProc, GetModuleHandle(nullptr), 0);
+        if (this->mbEnabledDialogOk)
+        {
+            acutPrintf(Common::loadString(IDS_MSG_DialogMiddleClickToOkStarted));
+        }
+        if (this->mbEnabledCmdEnter)
+        {
+            acutPrintf(Common::loadString(IDS_MSG_CmdMiddleClickToEnterStarted_FMT), this->mdCmdMiddleClickDownUpInterval);
+        }
     }
 }
 
-void MiddleClickManager::stopDialogMiddleClickToOk()
+void MiddleClickManager::stopUnifiedMiddleClickProc()
 {
-    if (this->mhDialogMiddleClickToOkHook != nullptr)
+    if (this->mhUnifiedMiddleClickHook != nullptr)
     {
-        UnhookWindowsHookEx(this->mhDialogMiddleClickToOkHook);
-        this->mhDialogMiddleClickToOkHook = nullptr;
+        UnhookWindowsHookEx(this->mhUnifiedMiddleClickHook);
+        this->mhUnifiedMiddleClickHook = nullptr;
         acutPrintf(Common::loadString(IDS_MSG_DialogMiddleClickToOkStopped));
-    }
-}
-
-void MiddleClickManager::startCmdMiddleClickToEnter(DWORD dCmdMiddleClickDownUpInterval)
-{
-    if (this->mhCmdMiddleClickToEnterHook == nullptr)
-    {
-        this->mhCmdMiddleClickToEnterHook = SetWindowsHookEx(WH_MOUSE_LL, this->cmdMiddleClickToEnterProc, GetModuleHandle(nullptr), 0);
-        this->mdCmdMiddleClickDownUpInterval = dCmdMiddleClickDownUpInterval;
-        acutPrintf(Common::loadString(IDS_MSG_CmdMiddleClickToEnterStarted_FMT), dCmdMiddleClickDownUpInterval);
-    }
-}
-
-void MiddleClickManager::stopCmdMiddleClickToEnter()
-{
-    if (this->mhCmdMiddleClickToEnterHook != nullptr)
-    {
-        UnhookWindowsHookEx(this->mhCmdMiddleClickToEnterHook);
-        this->mhCmdMiddleClickToEnterHook = nullptr;
         acutPrintf(Common::loadString(IDS_MSG_CmdMiddleClickToEnterStopped));
     }
 }
 
-bool MiddleClickManager::isDialogMiddleClickToOkRunning() const
-{
-    if (this->mhDialogMiddleClickToOkHook != nullptr)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-LRESULT CALLBACK MiddleClickManager::dialogMiddleClickToOkProc(int nCode, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK MiddleClickManager::unifiedMiddleClickProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
     if (nCode == HC_ACTION)
     {
+        auto& instance = MiddleClickManager::getInstance();
+        static bool bWasDialogHandled = false;
+        static DWORD dwMouseDownTime = 0;
+
         if (wParam == WM_MBUTTONDOWN)
         {
-            // 探测当前前台窗口
-            HWND hWndActive = GetForegroundWindow();
+            bWasDialogHandled = false;
+            dwMouseDownTime = GetTickCount();
 
-            if (hWndActive != nullptr)
+            if (instance.mbEnabledDialogOk)
             {
-                wchar_t szClassName[256] = { 0 };
-                GetClassName(hWndActive, szClassName, 256);
-
-                // 判断是否为标准对话框类名
-                if (wcscmp(szClassName, kWinStandardDialogClassName) == 0)
+                HWND hWndActive = GetForegroundWindow();
+                if (hWndActive != nullptr)
                 {
-                    // 尝试获取该对话框的确认按钮 (IDOK = 1)
-                    HWND hOkButton = GetDlgItem(hWndActive, IDOK);
+                    wchar_t szClassName[256] = { 0 };
+                    GetClassName(hWndActive, szClassName, 256);
 
-                    if (hOkButton != nullptr)
+                    if (wcscmp(szClassName, kWinStandardDialogClassName) == 0)
                     {
-                        // 投递点击消息给对话框
-                        PostMessage(hWndActive, WM_COMMAND, MAKEWPARAM(IDOK, BN_CLICKED), (LPARAM)hOkButton);
-                        CAcModuleResourceOverride resOverride;
-                        acutPrintf(Common::loadString(IDS_MSG_DialogMiddleClickToOkDone));
-                        // 返回 1 表示拦截此消息，不继续分发（防止 CAD 触发平移操作）
-                        return 1;
+                        HWND hOkButton = GetDlgItem(hWndActive, IDOK);
+                        if (hOkButton != nullptr)
+                        {
+                            PostMessage(hWndActive, WM_COMMAND, MAKEWPARAM(IDOK, BN_CLICKED), (LPARAM)hOkButton);
+                            bWasDialogHandled = true; // 记录本次点击已分配给对话框
+                            return 1; // 拦截按下消息
+                        }
                     }
                 }
             }
         }
-    }
-    return CallNextHookEx(nullptr, nCode, wParam, lParam);
-}
-
-LRESULT CALLBACK MiddleClickManager::cmdMiddleClickToEnterProc(int nCode, WPARAM wParam, LPARAM lParam)
-{
-    if (nCode == HC_ACTION)
-    {
-        static DWORD dwMouseDownTime = 0;
-        if (wParam == WM_MBUTTONDOWN)
-        {
-            dwMouseDownTime = GetTickCount();
-        }
 
         if (wParam == WM_MBUTTONUP)
         {
-            DWORD dwDuration = GetTickCount() - dwMouseDownTime;
-
-            struct resbuf rb = { 0 };
-            int cmdActive = 0;
-
-            if (acedGetVar(L"CMDACTIVE", &rb) == RTNORM)
+            // 如果按下时已被对话框逻辑消耗，抬起时必须拦截，防止污染命令行逻辑
+            if (bWasDialogHandled)
             {
-                cmdActive = rb.resval.rint;
+                bWasDialogHandled = false;
+                return 1;
             }
 
-            if (cmdActive > 0 && dwDuration < MiddleClickManager::getInstance().mdCmdMiddleClickDownUpInterval)
+            if (instance.mbEnabledCmdEnter)
             {
-                // 发送一个空命令（回车）
-                static Commands::CommandList space = { L"" };
-                Commands::executeCommand(space, false);
-                CAcModuleResourceOverride resOverride;
-                acutPrintf(Common::loadString(IDS_MSG_CmdMiddleClickToEnterDone));
+                DWORD dwDuration = GetTickCount() - dwMouseDownTime;
+                struct resbuf rb = { 0 };
+                int cmdActive = 0;
+
+                if (acedGetVar(L"CMDACTIVE", &rb) == RTNORM)
+                {
+                    cmdActive = rb.resval.rint;
+                }
+
+                if (cmdActive > 0 && dwDuration < instance.mdCmdMiddleClickDownUpInterval)
+                {
+                    static Commands::CommandList space = { L"" };
+                    Commands::executeCommand(space, false);
+
+                    CAcModuleResourceOverride resOverride;
+                    acutPrintf(Common::loadString(IDS_MSG_CmdMiddleClickToEnterDone));
+                }
             }
         }
     }

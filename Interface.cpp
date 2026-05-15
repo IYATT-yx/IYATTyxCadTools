@@ -104,17 +104,8 @@ void Interface::init()
         ImeAutoSwitcher::start(config.imeSettings.iIntervalMs);
     }
 
-    // 对话框中键绑定确定按钮
-    if (config.middleClickManagerSettings.bDialogMiddleClickToOkEnabled)
-    {
-        MiddleClickManager::getInstance().startDialogMiddleClickToOk();
-    }
-
-    // 命令中键绑定回车键
-    if (config.middleClickManagerSettings.bCmdMiddleClickToEnterEnabled)
-    {
-        MiddleClickManager::getInstance().startCmdMiddleClickToEnter(config.middleClickManagerSettings.dCmdMiddleClickDownUpInterval);
-    }
+    // 中键处理
+    MiddleClickManager::getInstance().startUnifiedMiddleClickProc(config.middleClickManagerSettings);
 
     // 显示命令报表悬浮窗
     MainBar::showBar(Commands::commandInfoList);
@@ -129,8 +120,8 @@ void Interface::unload()
 {
     // 关闭输入法自动切换
     ImeAutoSwitcher::stop();
-    // 关闭中键绑定确定按钮
-    MiddleClickManager::getInstance().stopDialogMiddleClickToOk();
+    // 关闭中键处理
+    MiddleClickManager::getInstance().stopUnifiedMiddleClickProc();
     // 关闭命令菜单
     MainBar::terminateBar();
     // 卸载命令
@@ -1478,7 +1469,7 @@ void Interface::cmdImportCsvToMTextMatrix()
 
         config.middleClickManagerSettings.bDialogMiddleClickToOkEnabled = (edit1Result == L"1");
         auto& middleClickManager = MiddleClickManager::getInstance();
-        middleClickManager.stopDialogMiddleClickToOk();
+        middleClickManager.stopUnifiedMiddleClickProc();
         if (!manager.saveConfig())
         {
             std::wstring err = manager.getLastError();
@@ -1486,10 +1477,7 @@ void Interface::cmdImportCsvToMTextMatrix()
             // 保存失败，还原状态
             config.middleClickManagerSettings.bDialogMiddleClickToOkEnabled = bDialogMiddleClickToOkEnabled;
         }
-        if (config.middleClickManagerSettings.bDialogMiddleClickToOkEnabled)
-        {
-            middleClickManager.startDialogMiddleClickToOk();
-        }
+        middleClickManager.startUnifiedMiddleClickProc(config.middleClickManagerSettings);
     }
 
     void Interface::cmdCmdMiddleClickToEnter()
@@ -1521,12 +1509,12 @@ void Interface::cmdImportCsvToMTextMatrix()
                 try
                 {
                     size_t pos;
-                    config.imeSettings.iIntervalMs = std::stoi(value2.GetString(), &pos);
+                    config.middleClickManagerSettings.dCmdMiddleClickDownUpInterval = std::stoi(value2.GetString(), &pos);
                     if (pos != value2.GetLength())
                     {
                         throw std::exception();
                     }
-                    if (config.imeSettings.iIntervalMs < defaultConfig.dCmdMiddleClickDownUpInterval)
+                    if (config.middleClickManagerSettings.dCmdMiddleClickDownUpInterval < defaultConfig.dCmdMiddleClickDownUpInterval)
                     {
                         throw std::exception();
                     }
@@ -1549,7 +1537,7 @@ void Interface::cmdImportCsvToMTextMatrix()
         }
 
         config.middleClickManagerSettings.bCmdMiddleClickToEnterEnabled = (edit1Result == L"1");
-        MiddleClickManager::getInstance().stopCmdMiddleClickToEnter();
+        MiddleClickManager::getInstance().stopUnifiedMiddleClickProc();
         if (!manager.saveConfig())
         {
             std::wstring err = manager.getLastError();
@@ -1558,8 +1546,5 @@ void Interface::cmdImportCsvToMTextMatrix()
             config.middleClickManagerSettings.bCmdMiddleClickToEnterEnabled = bEnabled;
             config.middleClickManagerSettings.dCmdMiddleClickDownUpInterval = dCmdMiddleClickDownUpInterval;
         }
-        if (config.middleClickManagerSettings.bCmdMiddleClickToEnterEnabled)
-        {
-            MiddleClickManager::getInstance().startCmdMiddleClickToEnter(dCmdMiddleClickDownUpInterval);
-        }
+        MiddleClickManager::getInstance().startUnifiedMiddleClickProc(config.middleClickManagerSettings);
     }
