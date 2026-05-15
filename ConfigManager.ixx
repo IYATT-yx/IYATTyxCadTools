@@ -28,7 +28,7 @@ export namespace ConfigItems
 	{
 		bool bDialogMiddleClickToOkEnabled = false;
 		bool bCmdMiddleClickToEnterEnabled = false;
-		unsigned long dCmdMiddleClickDownUpInterval = 500;
+		unsigned long dCmdMiddleClickDownUpInterval = 200;
         NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(MiddleClickManagerSettings, bDialogMiddleClickToOkEnabled, bCmdMiddleClickToEnterEnabled, dCmdMiddleClickDownUpInterval)
 	};
 
