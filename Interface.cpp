@@ -113,7 +113,7 @@ void Interface::init()
     // 命令中键绑定回车键
     if (config.middleClickManagerSettings.bCmdMiddleClickToEnterEnabled)
     {
-        MiddleClickManager::getInstance().startCmdMiddleClickToEnter(config.middleClickManagerSettings.bCmdMiddleClickToEnterEnabled);
+        MiddleClickManager::getInstance().startCmdMiddleClickToEnter(config.middleClickManagerSettings.dCmdMiddleClickDownUpInterval);
     }
 
     // 显示命令报表悬浮窗
