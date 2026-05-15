@@ -13,7 +13,6 @@ module MiddleClickManager;
 import Common;
 import Commands;
 
-MiddleClickManager* MiddleClickManager::mpInstance = nullptr;
 inline constexpr const wchar_t* kWinStandardDialogClassName = L"#32770";
 
 MiddleClickManager::MiddleClickManager() : mhDialogMiddleClickToOkHook(nullptr)

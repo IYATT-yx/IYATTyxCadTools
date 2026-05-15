@@ -57,5 +57,4 @@ private:
     HHOOK mhCmdMiddleClickToEnterHook;
     DWORD mdwLastMButtonDownTime = 0;
     DWORD mdCmdMiddleClickDownUpInterval;
-    static MiddleClickManager* mpInstance;
 };
