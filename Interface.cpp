@@ -918,7 +918,7 @@ void Interface::cmdImportCsvToMTextMatrix()
             },
             title,
             UniversalPicker::SelectMode::Batch,
-            false,
+            true,
             UniversalPicker::SortMode::None,
             true
         );
