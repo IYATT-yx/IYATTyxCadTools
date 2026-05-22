@@ -165,6 +165,12 @@
     <ClCompile Include="AcadVarUtil.ixx">
       <Filter>头文件</Filter>
     </ClCompile>
+    <ClCompile Include="Translator.ixx">
+      <Filter>头文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Translator.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StdAfx.h">
@@ -199,5 +205,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
+    <None Include="vcpkg.json" />
   </ItemGroup>
 </Project>
