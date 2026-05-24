@@ -16,6 +16,7 @@ module;
 module ImeAutoSwitcher;
 import Common;
 import ConfigManager;
+import Translator;
 
 namespace ImeAutoSwitcher
 {
@@ -54,7 +55,7 @@ namespace ImeAutoSwitcher
                     inputs[1].ki.dwFlags = KEYEVENTF_KEYUP;
                     SendInput(2, inputs, sizeof(INPUT));
                     CAcModuleResourceOverride resOverride;
-                    acutPrintf(Common::loadString(IDS_MSG_ImeAutoSwitchDone));
+                    acutPrintf(_(L"\n已自动切换输入法语言\n"));
                 }
             }
             ImmReleaseContext(hWnd, hIMC);
@@ -108,7 +109,7 @@ namespace ImeAutoSwitcher
             if (g_hKeyboardHook)
             {
                 CAcModuleResourceOverride resOverride;
-                acutPrintf(Common::loadString(IDS_MSG_ImeAutoSwitchStarted_FMT), g_intervalMs);
+                acutPrintf(_(L"\n启动输入法语言自动切换，切换间隔：%dms\n"), g_intervalMs);
             }
         }
     }
@@ -120,7 +121,7 @@ namespace ImeAutoSwitcher
             UnhookWindowsHookEx(g_hKeyboardHook);
             g_hKeyboardHook = nullptr;
             CAcModuleResourceOverride resOverride;
-            acutPrintf(L"\n%s", Common::loadString(IDS_MSG_ImeAutoSwitchStopped));
+            acutPrintf(_(L"\n停止输入法语言自动切换\n"));
         }
     }
 }

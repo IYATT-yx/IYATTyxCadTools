@@ -36,6 +36,7 @@
 
 import Commands;
 import Common;
+import Translator;
 
 //-----------------------------------------------------------------------------
 #ifdef _DEBUG
@@ -122,9 +123,9 @@ BOOL MainBarChildDlg::OnInitDialog()
 	//{
  //       this->commandListControl.InsertColumn(0, columnName, LVCFMT_LEFT, 100);
 	//}
-	this->commandListControl.InsertColumn(0, Common::loadString(IDS_LBL_CommandDescription), LVCFMT_LEFT, 100);
-	this->commandListControl.InsertColumn(0, Common::loadString(IDS_LBL_CommandName), LVCFMT_LEFT, 100);
-	this->commandListControl.InsertColumn(0, Common::loadString(IDS_LBL_ShortCommandName), LVCFMT_LEFT, 80);
+	this->commandListControl.InsertColumn(0, _(L"命令描述"), LVCFMT_LEFT, 100);
+	this->commandListControl.InsertColumn(0, _(L"命令名"), LVCFMT_LEFT, 100);
+	this->commandListControl.InsertColumn(0, _(L"精简命令名"), LVCFMT_LEFT, 80);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 异常: OCX 属性页应返回 FALSE

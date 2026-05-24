@@ -12,6 +12,7 @@ module;
 
 module Image;
 import Common;
+import Translator;
 
 namespace Image
 {
@@ -123,11 +124,11 @@ namespace Image
         {
             if (_wremove(imgFilename.constPtr()) != 0)
             {
-                acutPrintf(L"%s%s", Common::loadString(IDS_ERR_DeleteFailed), imgFilename.constPtr());
+                acutPrintf(_(L"\n[失败] 无法删除文件，请检查文件是否被其它程序占用。路径：%s"), imgFilename.constPtr());
             }
             else
             {
-                acutPrintf(L"%s%s", Common::loadString(IDS_MSG_DeleteSuccess), imgFilename.constPtr());
+                acutPrintf(_(L"\n[成功] 删除文件成功。路径：%s"), imgFilename.constPtr());
             }
         }
     }

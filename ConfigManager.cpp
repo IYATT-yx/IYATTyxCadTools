@@ -13,6 +13,7 @@ module ConfigManager;
 import IYATTyxJsonWrapper;
 import std;
 import Common;
+import Translator;
 
 bool ConfigManager::loadConfig(const std::wstring& filename)
 {
@@ -32,7 +33,7 @@ bool ConfigManager::loadConfig(const std::wstring& filename)
     catch (const std::exception& e)
     {
         std::string what = e.what();
-        this->mLastError = Common::loadString(IDS_ERR_StructMapFailed).GetString() + std::wstring(what.begin(), what.end());
+        this->mLastError = _(L"结构映射失败：") + std::wstring(what.begin(), what.end());
         return false;
     }
 
@@ -43,7 +44,7 @@ bool ConfigManager::saveConfig()
 {
     if (this->mConfigFilename.empty())
     {
-        this->mLastError = Common::loadString(IDS_ERR_PathEmpty);
+        this->mLastError = _(L"未设置路径");
         return false;
     }
 
@@ -53,7 +54,7 @@ bool ConfigManager::saveConfig()
         std::wstring saveErr;
         if (!IYATTyxJsonWrapper::saveJson(this->mConfigFilename, j, saveErr))
         {
-            this->mLastError = Common::loadString(IDS_ERR_DiskSaveFailed).GetString() + saveErr;
+            this->mLastError = _(L"硬盘持久化失败：") + saveErr;
             return false;
         }
         return true;
@@ -61,7 +62,7 @@ bool ConfigManager::saveConfig()
     catch (const std::exception& e)
     {
         std::string what = e.what();
-        this->mLastError = Common::loadString(IDS_ERR_SerializeFailed).GetString() + std::wstring(what.begin(), what.end());
+        this->mLastError = _(L"序列化失败：") + std::wstring(what.begin(), what.end());
         return false;
     }
 }

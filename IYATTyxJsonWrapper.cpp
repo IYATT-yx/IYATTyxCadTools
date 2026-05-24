@@ -11,6 +11,7 @@ module;
 module IYATTyxJsonWrapper;
 import EncodingConverter;
 import Common;
+import Translator;
 
 namespace IYATTyxJsonWrapper
 {
@@ -24,7 +25,7 @@ namespace IYATTyxJsonWrapper
             std::ofstream newFile(utf8Filename);
             if (!newFile.is_open())
             {
-                errorMsg = Common::loadString(IDS_ERR_CannotCreateFile);
+                errorMsg = _(L"无法创建或打开文件，请检查目录权限。");
                 return IYATTyxJsonWrapper::json::object();
             }
             newFile << "{}";
@@ -34,7 +35,7 @@ namespace IYATTyxJsonWrapper
 
         if (!file.is_open())
         {
-            errorMsg = Common::loadString(IDS_ERR_ReopenFailed);
+            errorMsg = _(L"文件创建后重开失败。");
             return IYATTyxJsonWrapper::json::object();
         }
 
@@ -45,12 +46,12 @@ namespace IYATTyxJsonWrapper
         catch (const std::exception& e)
         {
             std::string rawErr = e.what();
-            errorMsg = Common::loadString(IDS_ERR_JsonParseEx).GetString() + std::wstring(rawErr.begin(), rawErr.end());
+            errorMsg = _(L"JSON 解析异常:") + std::wstring(rawErr.begin(), rawErr.end());
             return IYATTyxJsonWrapper::json::object();
         }
         catch (...)
         {
-            errorMsg = Common::loadString(IDS_ERR_UnknownEx);
+            errorMsg = _(L"发生未知解析异常。");
             return IYATTyxJsonWrapper::json::object();
         }
     }
@@ -63,7 +64,7 @@ namespace IYATTyxJsonWrapper
 
         if (!file.is_open())
         {
-            errorMsg = Common::loadString(IDS_ERR_SaveOpenFailed);
+            errorMsg = _(L"保存时无法打开写入流。");
             return false;
         }
 
@@ -76,7 +77,7 @@ namespace IYATTyxJsonWrapper
         catch (const std::exception& e)
         {
             std::string rawErr = e.what();
-            errorMsg = Common::loadString(IDS_ERR_FileWriteEx).GetString() + std::wstring(rawErr.begin(), rawErr.end());
+            errorMsg = _(L"保存时无法打开写入流。") + std::wstring(rawErr.begin(), rawErr.end());
             file.close();
         }
         return false;

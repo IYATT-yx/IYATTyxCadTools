@@ -37,6 +37,7 @@
 #include "adui.h"
 
 import Common;
+import Translator;
 
 //-----------------------------------------------------------------------------
 IMPLEMENT_DYNAMIC (MainBar, CAcUiDockControlBar)
@@ -180,7 +181,7 @@ void MainBar::showBar(Commands::CommandInfoList& commandInfoList)
 		CAcModuleResourceOverride resOverride;
 		CWnd* pAcadWnd = acedGetAcadFrame();
 
-		if (!gpMainBar->Create(pAcadWnd, Common::loadString(IDS_VAL_LocaleProjectName)))
+		if (!gpMainBar->Create(pAcadWnd, Common::getLocalProjectName()))
 		{
 			delete gpMainBar;
 			gpMainBar = nullptr;

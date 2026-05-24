@@ -16,6 +16,7 @@ import Annotative;
 import CsvModule;
 import std;
 import AcadVarUtil;
+import Translator;
 
 namespace TextUtil
 {
@@ -215,7 +216,7 @@ namespace TextUtil
 	{
 		if (dLineSpacingFactor < 0.25 || dLineSpacingFactor > 4.0)
 		{
-			AfxMessageBox(Common::loadString(IDS_ERR_LineSpacingFactorOutOfRange),MB_OK | MB_ICONERROR);
+			AfxMessageBox(_(L"行距比例不可小于0.25，且不可大于4.0。"), MB_OK | MB_ICONERROR);
 			return;
 		}
 
@@ -229,7 +230,7 @@ namespace TextUtil
 		if (s < 0)
 		{
 			s = 1.0;
-			acutPrintf(Common::loadString(IDS_ERR_GetCurrentScaleValue_FMT), s);
+			acutPrintf(_(L"\n获取注释比例缩放系数失败，已重置为：%g"), s);
 		}
 
 		for (size_t row = 0; row < matrixData.size(); ++row)
@@ -252,7 +253,7 @@ namespace TextUtil
 					double TEXTSIZE;
 					if (!AcadVarUtil::getVar(AcadVarName::TEXTSIZE, TEXTSIZE))
 					{
-						AfxMessageBox(Common::loadString(IDS_ERR_GetAcadVar), MB_OK | MB_ICONERROR);
+						AfxMessageBox(_(L"获取变量失败！"), MB_OK | MB_ICONERROR);
 						return;
 					}
 					pMText->setTextHeight(TEXTSIZE * s);

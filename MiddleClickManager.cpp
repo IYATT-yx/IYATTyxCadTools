@@ -12,6 +12,7 @@ module;
 module MiddleClickManager;
 import Common;
 import Commands;
+import Translator;
 
 inline constexpr const wchar_t* kWinStandardDialogClassName = L"#32770";
 
@@ -40,11 +41,11 @@ void MiddleClickManager::startUnifiedMiddleClickProc(ConfigItems::MiddleClickMan
         this->mhUnifiedMiddleClickHook = SetWindowsHookEx(WH_MOUSE_LL, this->unifiedMiddleClickProc, GetModuleHandle(nullptr), 0);
         if (this->mbEnabledDialogOk)
         {
-            acutPrintf(Common::loadString(IDS_MSG_DialogMiddleClickToOkStarted));
+            acutPrintf(_(L"\n已启用对话框中鼠标中键映射确定按钮\n"));
         }
         if (this->mbEnabledCmdEnter)
         {
-            acutPrintf(Common::loadString(IDS_MSG_CmdMiddleClickToEnterStarted_FMT), this->mdCmdMiddleClickDownUpInterval);
+            acutPrintf(_(L"\n已启用命令中鼠标中键映射回车键，按下释放间隔阈值：%dms\n"), this->mdCmdMiddleClickDownUpInterval);
         }
     }
 }
@@ -55,8 +56,8 @@ void MiddleClickManager::stopUnifiedMiddleClickProc()
     {
         UnhookWindowsHookEx(this->mhUnifiedMiddleClickHook);
         this->mhUnifiedMiddleClickHook = nullptr;
-        acutPrintf(Common::loadString(IDS_MSG_DialogMiddleClickToOkStopped));
-        acutPrintf(Common::loadString(IDS_MSG_CmdMiddleClickToEnterStopped));
+        acutPrintf(_(L"\n已停止对话框中鼠标中键映射确定按钮\n"));
+        acutPrintf(_(L"\n已停用命令中鼠标中键映射回车键\n"));
     }
 }
 
@@ -121,7 +122,7 @@ LRESULT CALLBACK MiddleClickManager::unifiedMiddleClickProc(int nCode, WPARAM wP
                     Commands::executeCommand(space, false);
 
                     CAcModuleResourceOverride resOverride;
-                    acutPrintf(Common::loadString(IDS_MSG_CmdMiddleClickToEnterDone));
+                    acutPrintf(_(L"\n检测到命令状态鼠标中键点击，已触发回车按键\n"));
                 }
             }
         }

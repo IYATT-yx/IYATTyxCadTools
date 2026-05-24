@@ -32,49 +32,62 @@ import PointUtil;
 import ConfigManager;
 import MiddleClickManager;
 import AcadVarUtil;
+import Translator;
 
 void Interface::init()
 {
     CAcModuleResourceOverride resOverride;
+    std::filesystem::path appName(acedGetAppName());
+    std::filesystem::path appDir = appName.parent_path();
+    std::filesystem::path localesDir = appDir / L"locales";
+    CString msg;
+    msg.Format(L"\n%s", localesDir.wstring().c_str());
+    auto& translator = Translator::getInstance();
+    if (!translator.initialize(localesDir, L"en_US"))
+    {
+        AfxMessageBox(L"Initialize translator failed", MB_OK | MB_ICONERROR);
+        return;
+    }
+
     // 命令列表
     Commands::commandInfoList =
     {
-        {L"yxSetByLayer", Common::loadString(IDS_CMD_yxSetByLayer), Commands::CommandFlags::PickRedraw, Interface::cmdSetByLayer},
-        {L"yxChainSelection", Common::loadString(IDS_CMD_yxChainSelection), Commands::CommandFlags::PickRedraw, Interface::cmdChainSelection},
-        {L"yxDimensionSolidify", Common::loadString(IDS_CMD_yxDimensionSolidify), Commands::CommandFlags::PickRedraw, Interface::cmdDimensionSolidify},
-        {L"yxDimensionReslink", Common::loadString(IDS_CMD_yxDimensionRelink), Commands::CommandFlags::PickRedraw, Interface::cmdDimensionRelink},
-        {L"yxDimensionTolerancePrecision", Common::loadString(IDS_CMD_yxDimensionTolerancePrecision), Commands::CommandFlags::PickRedraw, Interface::cmdDimensionTolerancePrecision},
-        {L"yxAddSurroundingCharsForDimension", Common::loadString(IDS_CMD_yxAddSurroundingCharsForDimension), Commands::CommandFlags::PickRedraw, Interface::cmdAddSurroundingCharsForDimension},
-        {L"yxRemoveSurroundingCharsForDimension", Common::loadString(IDS_CMD_yxRemoveSurroundingCharsForDimension), Commands::CommandFlags::PickRedraw, Interface::cmdRemoveSurroundingCharsForDimension},
-        {L"yxSetBasicBox", Common::loadString(IDS_CMD_yxSetBasicBox), Commands::CommandFlags::PickRedraw, Interface::cmdSetBasicBox},
-        {L"yxUnsetBasicBox", Common::loadString(IDS_CMD_yxUnsetBasicBox), Commands::CommandFlags::PickRedraw, Interface::cmdUnsetBasicBox},
-        {L"yxSetRefDim", Common::loadString(IDS_CMD_yxSetRefDim), Commands::CommandFlags::PickRedraw, Interface::cmdSetRefDim},
-        {L"yxUnsetRefDim", Common::loadString(IDS_CMD_yxUnsetRefDim), Commands::CommandFlags::PickRedraw, Interface::cmdUnsetRefDim},
-        {L"yxInsertBalloonNumberBlockWithStartNumber", Common::loadString(IDS_CMD_yxInsertBalloonNumberBlockWithStartNumber), Commands::CommandFlags::Base, Interface::cmdInsertBalloonNumberBlockWithStartNumber},
-        {L"yxUpdateBalloonNumberBlock", Common::loadString(IDS_CMD_yxUpdateBalloonNumberBlock), Commands::CommandFlags::PickRedraw, Interface::cmdUpdateBalloonNumberBlock},
-        {L"yxBalloonNumberOffset", Common::loadString(IDS_CMD_yxBalloonNumberOffset), Commands::CommandFlags::PickRedraw, Interface::cmdBalloonNumberOffset},
-        {L"yxBalloonNumberFilter", Common::loadString(IDS_CMD_yxBalloonNumberFilter), Commands::CommandFlags::PickRedraw, Interface::cmdBalloonNumberFilter},
-        {L"yxCheckBalloonNumberMaxMin", Common::loadString(IDS_CMD_yxCheckBalloonNumberMaxMin), Commands::CommandFlags::PickRedraw, Interface::cmdCheckBalloonNumberMaxMin},
-        {L"yxCheckDuplicateBalloonNumbers", Common::loadString(IDS_CMD_yxCheckDuplicateBalloonNumbers), Commands::CommandFlags::PickRedraw, Interface::cmdCheckDuplicateBalloonNumbers},
-        {L"yxCheckBalloonNumberBreakpoints", Common::loadString(IDS_CMD_yxCheckBalloonNumberBreakpoints), Commands::CommandFlags::PickRedraw, Interface::cmdCheckBalloonNumberBreakpoints},
-        {L"yxExtractAnnotations", Common::loadString(IDS_CMD_yxExtractAnnotations), Commands::CommandFlags::Base, Interface::cmdExtractAnnotations},
-        {L"yxCloneText", Common::loadString(IDS_CMD_yxCloneText), Commands::CommandFlags::Base, Interface::cmdCloneText},
-        {L"yxIntersect", Common::loadString(IDS_CMD_yxIntersect), Commands::CommandFlags::Base, Interface::cmdIntersect},
-        {L"yxImportCsvToMTextMatrix", Common::loadString(IDS_CMD_yxImportCsvToMTextMatrix), Commands::CommandFlags::PickRedraw, Interface::cmdImportCsvToMTextMatrix},
-        {L"yxSpatialTableExplorer", Common::loadString(IDS_CMD_yxSpatialTableExplorer), Commands::CommandFlags::PickRedraw, Interface::cmdSpatialTableExplorer},
-        {L"yxPasteClipImage", Common::loadString(IDS_CMD_yxPasteClipImage), Commands::CommandFlags::PickRedraw, Interface::cmdPasteClipImage},
-        {L"yxForceRemoveImage", Common::loadString(IDS_CMD_yxForceRemoveImage), Commands::CommandFlags::PickRedraw, cmdForceRemoveImage},
-        {L"yxLocateDrawing", Common::loadString(IDS_CMD_yxLocateDrawing), Commands::CommandFlags::Base, Interface::cmdLocateDrawing},
-        {L"yxCreateIntersectionPoints", Common::loadString(IDS_CMD_yxCreateIntersectionPoints), Commands::CommandFlags::Base, Interface::cmdCreateIntersectionPoints},
-        {L"yxImeAutoSwitch", Common::loadString(IDS_CMD_yxImeAutoSwitch), Commands::CommandFlags::Base, Interface::cmdImeAutoSwitch},
-        {L"yxDialogMiddleClickToOk", Common::loadString(IDS_CMD_yxDialogMiddleClickToOk), Commands::CommandFlags::Base, Interface::cmdDialogMiddleClickToOk},
-        {L"yxCmdMiddleClickToEnter", Common::loadString(IDS_CMD_yxCmdMiddleClickToEnter), Commands::CommandFlags::Base, Interface::cmdCmdMiddleClickToEnter},
-        {L"yx", Common::loadString(IDS_CMD_yx), Commands::CommandFlags::Base, Interface::cmdYx},
-        {L"yxTest", Common::loadString(IDS_CMD_yxTest), Commands::CommandFlags::Base, Interface::test},
-        {L"yxUnload", Common::loadString(IDS_CMD_yxUnload), Commands::CommandFlags::Base, Interface::cmdUnloadApp},
-        {L"yxPrintClassHierarchy", Common::loadString(IDS_CMD_yxPrintClassHierarchy), Commands::CommandFlags::Base, Interface::cmdPrintClassHierarchy},
-        {L"yxLocateSelf", Common::loadString(IDS_CMD_yxLocateSelf), Commands::CommandFlags::Base, Interface::cmdLocateSelf},
-        {L"yxPrintConfigFilename", Common::loadString(IDS_CMD_yxPrintConfigFilename), Commands::CommandFlags::Base, cmdPrintConfigFilename}
+        {L"yxSetByLayer", _(L"设置实体样式为当前层样式"), Commands::CommandFlags::PickRedraw, Interface::cmdSetByLayer},
+        {L"yxChainSelection", _(L"选中实体后自动链式选择"), Commands::CommandFlags::PickRedraw, Interface::cmdChainSelection},
+        {L"yxDimensionSolidify", _(L"尺寸固化"), Commands::CommandFlags::PickRedraw, Interface::cmdDimensionSolidify},
+        {L"yxDimensionReslink", _(L"尺寸恢复关联"), Commands::CommandFlags::PickRedraw, Interface::cmdDimensionRelink},
+        {L"yxDimensionTolerancePrecision", _(L"设置尺寸标注的主单位精度和公差精度"), Commands::CommandFlags::PickRedraw, Interface::cmdDimensionTolerancePrecision},
+        {L"yxAddSurroundingCharsForDimension", _(L"为标注添加前后缀"), Commands::CommandFlags::PickRedraw, Interface::cmdAddSurroundingCharsForDimension},
+        {L"yxRemoveSurroundingCharsForDimension", _(L"为标注移除前后缀"), Commands::CommandFlags::PickRedraw, Interface::cmdRemoveSurroundingCharsForDimension},
+        {L"yxSetBasicBox", _(L"设置理论尺寸框"), Commands::CommandFlags::PickRedraw, Interface::cmdSetBasicBox},
+        {L"yxUnsetBasicBox", _(L"取消理论尺寸框"), Commands::CommandFlags::PickRedraw, Interface::cmdUnsetBasicBox},
+        {L"yxSetRefDim", _(L"设置参考尺寸括号"), Commands::CommandFlags::PickRedraw, Interface::cmdSetRefDim},
+        {L"yxUnsetRefDim", _(L"取消参考尺寸括号"), Commands::CommandFlags::PickRedraw, Interface::cmdUnsetRefDim},
+        {L"yxInsertBalloonNumberBlockWithStartNumber", _(L"插入带起始编号的气泡号"), Commands::CommandFlags::Base, Interface::cmdInsertBalloonNumberBlockWithStartNumber},
+        {L"yxUpdateBalloonNumberBlock", _(L"更新气泡号"), Commands::CommandFlags::PickRedraw, Interface::cmdUpdateBalloonNumberBlock},
+        {L"yxBalloonNumberOffset", _(L"气泡号偏置"), Commands::CommandFlags::PickRedraw, Interface::cmdBalloonNumberOffset},
+        {L"yxBalloonNumberFilter", _(L"气泡号筛选"), Commands::CommandFlags::PickRedraw, Interface::cmdBalloonNumberFilter},
+        {L"yxCheckBalloonNumberMaxMin", _(L"查找气泡号最大和最小序号"), Commands::CommandFlags::PickRedraw, Interface::cmdCheckBalloonNumberMaxMin},
+        {L"yxCheckDuplicateBalloonNumbers", _(L"检查重复气泡号"), Commands::CommandFlags::PickRedraw, Interface::cmdCheckDuplicateBalloonNumbers},
+        {L"yxCheckBalloonNumberBreakpoints", _(L"检查气泡号断点"), Commands::CommandFlags::PickRedraw, Interface::cmdCheckBalloonNumberBreakpoints},
+        {L"yxExtractAnnotations", _(L"提取标注到CSV文件"), Commands::CommandFlags::Base, Interface::cmdExtractAnnotations},
+        {L"yxCloneText", _(L"将多行/单行文本内容复制给其它多行/单行文本"), Commands::CommandFlags::Base, Interface::cmdCloneText},
+        {L"yxIntersect", _(L"将两条直线延伸或修剪至其交点"), Commands::CommandFlags::Base, Interface::cmdIntersect},
+        {L"yxImportCsvToMTextMatrix", _(L"从 CSV 文件导入数据生成多行文本矩阵"), Commands::CommandFlags::PickRedraw, Interface::cmdImportCsvToMTextMatrix},
+        {L"yxSpatialTableExplorer", _(L"将多行/单行文本按空间位置表格化导出到 CSV 文件"), Commands::CommandFlags::PickRedraw, Interface::cmdSpatialTableExplorer},
+        {L"yxPasteClipImage", _(L"将剪贴板中的截图/图像数据保存到文件并插入图纸中"), Commands::CommandFlags::PickRedraw, Interface::cmdPasteClipImage},
+        {L"yxForceRemoveImage", _(L"删除光栅图像及图片文件（无法撤销恢复）"), Commands::CommandFlags::PickRedraw, cmdForceRemoveImage},
+        {L"yxLocateDrawing", _(L"在文件资源管理器中打开当前图纸"), Commands::CommandFlags::Base, Interface::cmdLocateDrawing},
+        {L"yxCreateIntersectionPoints", _(L"创建两条线(及延长线)的交点。可使用PTYPE设置点样式。"), Commands::CommandFlags::Base, Interface::cmdCreateIntersectionPoints},
+        {L"yxImeAutoSwitch", _(L"设置输入法自动切换"), Commands::CommandFlags::Base, Interface::cmdImeAutoSwitch},
+        {L"yxDialogMiddleClickToOk", _(L"设置对话框中鼠标中键映射到确定按钮"), Commands::CommandFlags::Base, Interface::cmdDialogMiddleClickToOk},
+        {L"yxCmdMiddleClickToEnter", _(L"设置命令执行状态下鼠标中键映射回车键"), Commands::CommandFlags::Base, Interface::cmdCmdMiddleClickToEnter},
+        {L"yx", _(L"显示或隐藏命令菜单"), Commands::CommandFlags::Base, Interface::cmdYx},
+        {L"yxTest", _(L"开发用测试命令"), Commands::CommandFlags::Base, Interface::test},
+        {L"yxUnload", _(L"关闭本插件"), Commands::CommandFlags::Base, Interface::cmdUnloadApp},
+        {L"yxPrintClassHierarchy", _(L"打印类层次结构"), Commands::CommandFlags::Base, Interface::cmdPrintClassHierarchy},
+        {L"yxLocateSelf", _(L"在文件资源管理器中打开本工具文件"), Commands::CommandFlags::Base, Interface::cmdLocateSelf},
+        {L"yxPrintConfigFilename", _(L"显示配置文件路径"), Commands::CommandFlags::Base, cmdPrintConfigFilename}
     };
 
     Interface::info();
@@ -87,7 +100,7 @@ void Interface::init()
     auto appPath = Common::getAppSubFolder();
     if (!appPath.has_value())
     {
-        AfxMessageBox(Common::loadString(IDS_ERR_GetAppSubFolder), MB_OK | MB_ICONERROR);
+        AfxMessageBox(_(L"获取程序数据目录失败"), MB_OK | MB_ICONERROR);
         return;
     }
     std::filesystem::path configPathObj = appPath.value() / Common::Config::configName;
@@ -126,10 +139,8 @@ void Interface::unload()
     MainBar::terminateBar();
     // 卸载命令
     CAcModuleResourceOverride resOverride;
-    CString cmdGroup;
-    cmdGroup.LoadStringW(IDS_CommandGroup);
-	acedRegCmds->removeGroup(cmdGroup);
-    acutPrintf(Common::loadString(IDS_MSG_Unload_FMT), Common::loadString(IDS_VAL_LocaleProjectName));
+	acedRegCmds->removeGroup(Common::cmdGroup);
+    acutPrintf(_(L"\n已卸载 %s"), Common::getLocalProjectName());
 }
 
 void Interface::cmdUnloadApp()
@@ -147,12 +158,12 @@ void Interface::cmdUnloadApp()
 void Interface::info()
 {
     CAcModuleResourceOverride resOverride;
-    acutPrintf(L"\n%s %s_%s | %s | %s | %s\n",
-        Common::loadString(IDS_VAL_LocaleProjectName),
+    acutPrintf(L"\n%s %s_%s | %s: IYATT-yx | %s: MIT | %s: https://github.com/IYATT-yx/IYATTyxCadTools\n",
+        Common::getLocalProjectName(),
         BuildingTime::WDATE, BuildingTime::WTIME,
-        Common::loadString(IDS_VAL_Author),
-        Common::loadString(IDS_VAL_LICENSE),
-        Common::loadString(IDS_VAL_ProjectUrl)
+        _(L"作者"),
+        _(L"开源协议"),
+        _(L"项目地址")
         );
 }
 
@@ -165,26 +176,25 @@ void Interface::cmdYx()
 void Interface::cmdSetByLayer()
 {
     CAcModuleResourceOverride resOverride;
-    UniversalPicker::run(nullptr, EntityStyle::setByLayer, Common::loadString(IDS_CMD_yxSetByLayer));
+    UniversalPicker::run(nullptr, EntityStyle::setByLayer, _(L"设置实体样式为当前层样式"));
 }
 
 void Interface::cmdDimensionSolidify()
 {
     CAcModuleResourceOverride resOverride;
-    UniversalPicker::run(&Common::DimensionSubClasses, Dimension::dimensionSolidify, Common::loadString(IDS_CMD_yxDimensionSolidify));
+    UniversalPicker::run(&Common::DimensionSubClasses, Dimension::dimensionSolidify, _(L"尺寸固化"));
 }
 
 void Interface::cmdDimensionRelink()
 {
     CAcModuleResourceOverride resOverride;
-    UniversalPicker::run(&Common::DimensionSubClasses, Dimension::dimensionRelink, Common::loadString(IDS_CMD_yxDimensionRelink));
+    UniversalPicker::run(&Common::DimensionSubClasses, Dimension::dimensionRelink, _(L"尺寸恢复关联"));
 }
 
 void Interface::cmdAddSurroundingCharsForDimension()
 {
     CAcModuleResourceOverride resOverride;
-    CString title = Common::loadString(IDS_CMD_yxAddSurroundingCharsForDimension);
-    GenericPairEditDlg dlg(title, Common::loadString(IDS_LBL_PrefixSymbol), Common::loadString(IDS_LBL_SuffixSymbol));
+    GenericPairEditDlg dlg(_(L"为标注添加前后缀"), _(L"前缀符号"), _(L"后缀符号"));
 
     CString left, right;
     dlg.setValidatorAndParser([&](const CString& value1, const CString& value2) -> CString
@@ -195,7 +205,7 @@ void Interface::cmdAddSurroundingCharsForDimension()
         });
     if (dlg.DoModal() != IDOK)
     {
-        acutPrintf(L"\n%s", Common::loadString(IDS_MSG_CancelOperation));
+        acutPrintf(_(L"取消操作"));
         return;
     }
 
@@ -207,7 +217,7 @@ void Interface::cmdAddSurroundingCharsForDimension()
         {
             Dimension::addSurroundingCharsForDimension(objId, left, right, isLGdt, isRGdt);
         },
-        title,
+        _(L"为标注添加前后缀"),
         UniversalPicker::SelectMode::Immediate
     );
 }
@@ -215,8 +225,7 @@ void Interface::cmdAddSurroundingCharsForDimension()
 void Interface::cmdRemoveSurroundingCharsForDimension()
 {
     CAcModuleResourceOverride resOverride;
-    CString title = Common::loadString(IDS_CMD_yxRemoveSurroundingCharsForDimension);
-    GenericPairEditDlg dlg(title, Common::loadString(IDS_LBL_PrefixSymbol), Common::loadString(IDS_LBL_SuffixSymbol));
+    GenericPairEditDlg dlg(_(L"为标注移除前后缀"), _(L"前缀符号"), _(L"后缀符号"));
 
     CString left, right;
     dlg.setValidatorAndParser([&](const CString& value1, const CString& value2) -> CString
@@ -227,7 +236,7 @@ void Interface::cmdRemoveSurroundingCharsForDimension()
         });
     if (dlg.DoModal() != IDOK)
     {
-        acutPrintf(L"\n%s", Common::loadString(IDS_MSG_CancelOperation));
+        acutPrintf(_(L"取消操作"));
         return;
     }
 
@@ -239,7 +248,7 @@ void Interface::cmdRemoveSurroundingCharsForDimension()
         {
             Dimension::removeSurroundingCharsForDimension(objId, left, right, isLGdt, isRGdt);
         },
-        title,
+        _(L"为标注移除前后缀"),
         UniversalPicker::SelectMode::Immediate
     );
 }
@@ -253,7 +262,7 @@ void Interface::cmdSetBasicBox()
         {
             Dimension::setAndUnsetBasicBox(objId, true);
         },
-        Common::loadString(IDS_CMD_yxSetBasicBox),
+        _(L"设置理论尺寸框"),
         UniversalPicker::SelectMode::Immediate
     );
 }
@@ -267,7 +276,7 @@ void Interface::cmdUnsetBasicBox()
         {
             Dimension::setAndUnsetBasicBox(objId, false);
         },
-        Common::loadString(IDS_CMD_yxUnsetBasicBox),
+        _(L"取消理论尺寸框"),
         UniversalPicker::SelectMode::Immediate
     );
 }
@@ -281,7 +290,7 @@ void Interface::cmdSetRefDim()
         {
             Dimension::setAndUnsetRefDim(objId, true);
         },
-        Common::loadString(IDS_CMD_yxSetRefDim),
+        _(L"设置参考尺寸括号"),
         UniversalPicker::SelectMode::Immediate
     );
 }
@@ -295,7 +304,7 @@ void Interface::cmdUnsetRefDim()
         {
             Dimension::setAndUnsetRefDim(objId, false);
         },
-        Common::loadString(IDS_CMD_yxUnsetRefDim),
+        _(L"取消理论尺寸括号"),
         UniversalPicker::SelectMode::Immediate
     );
 }
@@ -303,24 +312,24 @@ void Interface::cmdUnsetRefDim()
 void Interface::cmdInsertBalloonNumberBlockWithStartNumber()
 {
     CAcModuleResourceOverride resOverride;
-    CString title = Common::loadString(IDS_CMD_yxInsertBalloonNumberBlockWithStartNumber);
+    CString title = _(L"插入带起始编号的气泡号");
     acutPrintf(L"\n%s\n", title);
 
-    GenericPairEditDlg dlg(title, Common::loadString(IDS_LBL_StartNumber), Common::loadString(IDS_LBL_Tip), false, true, true);
+    GenericPairEditDlg dlg(title, _(L"开始序号"), _(L"使用提示"), false, true, true);
     // 设置默认字高
     CString csTips;
     double TEXTSIZE;
     if (!AcadVarUtil::getVar(AcadVarName::TEXTSIZE, TEXTSIZE))
     {
-        AfxMessageBox(Common::loadString(IDS_ERR_GetAcadVar), MB_OK | MB_ICONERROR);
+        AfxMessageBox(_(L"获取变量失败！"), MB_OK | MB_ICONERROR);
         return;
     }
     double scale = Annotative::getCurrentScaleValue();
-    csTips.Format(Common::loadString(IDS_TIP_yxInsertBalloonNumberBlockWithStartNumber_FMT), TEXTSIZE, scale, TEXTSIZE * scale);
+    csTips.Format(_(L"显示序号高度 = TEXTSIZE变量值%g × 注释比例缩放值%g = %g"), TEXTSIZE, scale, TEXTSIZE * scale);
     dlg.modifyEditControl(L"", csTips);
 
     int startNumber;
-    dlg.setValidatorAndParser([&](const CString& strVal, const CString& _) -> CString
+    dlg.setValidatorAndParser([&](const CString& strVal, const CString& _2) -> CString
         {
             try
             {
@@ -337,14 +346,14 @@ void Interface::cmdInsertBalloonNumberBlockWithStartNumber()
             }
             catch (...)
             {
-                return Common::loadString(IDS_ERR_InvalidStartNumber);
+                return _(L"开始序号必须为不小于 0 的整数");
             }
             return GenericPairEditDlg::ValidatorOk;
         });
 
     if (dlg.DoModal() != IDOK)
     {
-        acutPrintf(L"\n%s", Common::loadString(IDS_MSG_CancelOperation));
+        acutPrintf(_(L"取消操作"));
         return;
     }
 
@@ -355,25 +364,25 @@ void Interface::cmdInsertBalloonNumberBlockWithStartNumber()
 void Interface::cmdPrintClassHierarchy()
 {
     CAcModuleResourceOverride resOverride;
-    UniversalPicker::run(nullptr, Common::printClassHierarchy, Common::loadString(IDS_CMD_yxPrintClassHierarchy), UniversalPicker::SelectMode::Immediate, true);
+    UniversalPicker::run(nullptr, Common::printClassHierarchy, _(L"打印类层次结构"), UniversalPicker::SelectMode::Immediate, true);
 }
 
 void Interface::cmdExtractAnnotations()
 {
     CAcModuleResourceOverride resOverride;
     FileDialog::FileDialogFilterBuilder fileFilterBuilder;
-    CString strFileFilter = fileFilterBuilder.addFilter(Common::loadString(IDS_FILTER_CsvFiles), { L"*.csv" }).build();
-    CString filePath = FileDialog::ShowSaveFileDialog(Common::loadString(IDS_TITLE_SaveCsv), Common::loadString(IDS_FILE_DefaultSaveDataCsv), L"csv", strFileFilter);
+    CString strFileFilter = fileFilterBuilder.addFilter(_(L"CSV 文件"), { L"*.csv" }).build();
+    CString filePath = FileDialog::ShowSaveFileDialog(_(L"保存 CSV 文件到"), _(L"数据文件.csv"), L"csv", strFileFilter);
     if (filePath.IsEmpty())
     {
-        acutPrintf(L"\n%s", Common::loadString(IDS_MSG_CancelOperation));
+        acutPrintf(_(L"取消操作"));
         return;
     }
 
     CsvWriter csv(filePath);
     if (!csv.isValid())
     {
-        AfxMessageBox(Common::loadString(IDS_ERR_FileOpenFailed), MB_OK | MB_ICONERROR);
+        AfxMessageBox(_(L"文件路径打开失败，请检查是否被占用或路径无效"), MB_OK | MB_ICONERROR);
         return;
     }
 
@@ -427,7 +436,7 @@ void Interface::cmdExtractAnnotations()
 
                 AcString asDimText = dimData.prefix + asMeasuredValue + asTol + dimData.suffix;
                 TextUtil::resolveControlCodes(asDimText);
-                acutPrintf(Common::loadString(IDS_MSG_Dimension_FMT), asDimText.constPtr());
+                acutPrintf(_(L"\n尺寸：%s"), asDimText.constPtr());
                 std::vector<AcString> row = { dimData.text, asDimText, asMeasuredValue, asTolUpper, asTolLower }; // 完整尺寸内容、尺寸文本、名义值、上极限偏差、下极限偏差
                 csv.writeRow(row);
             }
@@ -444,7 +453,7 @@ void Interface::cmdExtractAnnotations()
                         AcString secondary = row.secondary;
                         AcString tertiary = row.tertiary;
                         AcString strRow = row.toString();
-                        acutPrintf(Common::loadString(IDS_MSG_GDT), strRow.constPtr());
+                        acutPrintf(_(L"\n几何公差：%s"), strRow.constPtr());
                         std::vector<AcString> asvRow = { strRow, name, value, primary, secondary, tertiary };
                         csv.writeRow(asvRow);
                     }
@@ -456,18 +465,18 @@ void Interface::cmdExtractAnnotations()
             }
             else if (TextUtil::readMText(objId, asMText))
             {
-                acutPrintf(Common::loadString(IDS_MSG_MText_FMT), asMText.constPtr());
+                acutPrintf(_(L"\n多行文本：%s"), asMText.constPtr());
                 std::vector<AcString> rows = { asMText };
                 csv.writeRow(rows);
             }
             else if (TextUtil::readDText(objId, asDText))
             {
-                acutPrintf(Common::loadString(IDS_MSG_DText_FMT), asDText.constPtr());
+                acutPrintf(_(L"\n单行文本：%s"), asDText.constPtr());
                 std::vector<AcString> rows = { asDText };
                 csv.writeRow(rows);
             }
         },
-        Common::loadString(IDS_CMD_yxExtractAnnotations),
+        _(L"提取标注到CSV文件"),
         UniversalPicker::SelectMode::Immediate,
         false,
         UniversalPicker::SortMode::RD,
@@ -478,13 +487,13 @@ void Interface::cmdExtractAnnotations()
 void Interface::cmdUpdateBalloonNumberBlock()
 {
     CAcModuleResourceOverride resOverride;
-    CString title = Common::loadString(IDS_CMD_yxUpdateBalloonNumberBlock);
+    CString title = _(L"更新气泡号");
     acutPrintf(L"\n%s\n", title);
 
-    GenericPairEditDlg dlg(title, Common::loadString(IDS_LBL_StartNumber), Common::loadString(IDS_LBL_BalloonNumberHeight), true, true, true);
+    GenericPairEditDlg dlg(title, _(L"开始序号"), _(L"气泡序号字高"), true, true, true);
 
     int startNumber;
-    dlg.setValidatorAndParser([&](const CString& strValue, const CString& _) -> CString
+    dlg.setValidatorAndParser([&](const CString& strValue, const CString& _2) -> CString
     {
             try
             {
@@ -501,20 +510,20 @@ void Interface::cmdUpdateBalloonNumberBlock()
             }
             catch (...)
             {
-                return Common::loadString(IDS_ERR_InvalidStartNumber);
+                return _(L"开始序号必须为不小于 0 的整数");
             }
             return GenericPairEditDlg::ValidatorOk;
     });
 
     if (dlg.DoModal() != IDOK)
     {
-        acutPrintf(L"\n%s", Common::loadString(IDS_MSG_CancelOperation));
+        acutPrintf(_(L"取消操作"));
         return;
     }
 
     UniversalPicker::AcRxClassVector arcv = { AcDbBlockReference::desc() };
 
-    acutPrintf(Common::loadString(IDS_MSG_BalloonNextNumber_FMT), startNumber);
+    acutPrintf(_(L"\n选中的气泡号将被设置为：%d"), startNumber);
     UniversalPicker::run(
         &arcv,
         [&](const AcDbObjectId& id)
@@ -522,7 +531,7 @@ void Interface::cmdUpdateBalloonNumberBlock()
             if (BalloonNumber::updateBalloonNumberBlock(id, startNumber))
             {
                 ++startNumber;
-                acutPrintf(Common::loadString(IDS_MSG_BalloonNextNumber_FMT), startNumber);
+                acutPrintf(_(L"\n选中的气泡号将被设置为：%d"), startNumber);
             }
         },
         nullptr,
@@ -536,8 +545,8 @@ void Interface::cmdUpdateBalloonNumberBlock()
 void Interface::cmdImeAutoSwitch()
 {
     CAcModuleResourceOverride resOverride;
-    CString title = Common::loadString(IDS_CMD_yxImeAutoSwitch);
-    GenericPairEditDlg dlg(title, Common::loadString(IDS_LBL_Enabled), Common::loadString(IDS_LBL_Interval), false, true, true);
+    CString title = _(L"设置输入法自动切换");
+    GenericPairEditDlg dlg(title, _(L"启用1/0"), _(L"启用1/0"), false, true, true);
 
     CString edit1Result, edit2Result;
     auto& manager = ConfigManager::getInstance();
@@ -553,11 +562,11 @@ void Interface::cmdImeAutoSwitch()
         {
             if (value1.IsEmpty() || value2.IsEmpty())
             {
-                return Common::loadString(IDS_ERR_ImeAutoSwitchEmptySetting);
+                return _(L"必须输入自启动状态和切换间隔时间");
             }
             if (value1.SpanIncluding(L"01") != value1)
             {
-                return Common::loadString(IDS_ERR_InvalidAutoStart);
+                return _(L"自启动状态必须为 0 或 1，1表示自启动，0 表示不自启动");
             }
             try
             {
@@ -575,7 +584,7 @@ void Interface::cmdImeAutoSwitch()
             catch (...)
             {
                 CString csInvalidInterval;
-                csInvalidInterval.Format(Common::loadString(IDS_ERR_InvalidInterval_FMT), defaultConfig.iIntervalMs);
+                csInvalidInterval.Format(_(L"切换间隔必须为不小于 %d 的整数"), defaultConfig.iIntervalMs);
                 return csInvalidInterval;
             }
 
@@ -585,7 +594,7 @@ void Interface::cmdImeAutoSwitch()
 
     if (dlg.DoModal() != IDOK)
     {
-        acutPrintf(L"\n%s", Common::loadString(IDS_MSG_CancelOperation));
+        acutPrintf(_(L"取消操作"));
         return;
     }
 
@@ -609,22 +618,22 @@ void Interface::cmdCloneText()
 {
     CAcModuleResourceOverride resOverride;
     AcString asSrcTextContent;
-    acutPrintf(L"\n%s", Common::loadString(IDS_PROMPT_CopySrcText));
+    acutPrintf(_(L"\n请选择要复制的源文本对象"));
     if (!TextUtil::getSelectedTextRawContent(asSrcTextContent) || asSrcTextContent.isEmpty())
     {
-        acutPrintf(L"\n%s", Common::loadString(IDS_MSG_CancelOperation));
+        acutPrintf(_(L"取消操作"));
         return;
     }
     acutPrintf(L"\n读取到：%s\n", asSrcTextContent.constPtr());
 
-    acutPrintf(L"\n%s", Common::loadString(IDS_PROMPT_PasteDstText));
+    acutPrintf(_(L"请选择要粘贴到的文本对象"));
     UniversalPicker::run(
         &TextUtil::textClassList,
         [&asSrcTextContent](const AcDbObjectId& id)
         {
             TextUtil::updateTextEntityContent(id, asSrcTextContent);
         },
-        Common::loadString(IDS_CMD_yxCloneText),
+        _(L"将多行/单行文本内容复制给其它多行/单行文本"),
         UniversalPicker::SelectMode::Immediate,
         false,
         UniversalPicker::SortMode::None,
@@ -647,16 +656,16 @@ void Interface::cmdIntersect()
 void Interface::cmdBalloonNumberOffset()
 {
     CAcModuleResourceOverride resOverride;
-    CString title = Common::loadString(IDS_CMD_yxBalloonNumberOffset);
-    GenericPairEditDlg dlg(title, Common::loadString(IDS_LBL_BalloonNumberOffset), Common::loadString(IDS_LBL_Tip), false, true, true);
-    dlg.modifyEditControl(L"", Common::loadString(IDS_TIP_BalloonNumberOffset));
+    CString title = _(L"气泡号偏置");
+    GenericPairEditDlg dlg(title, _(L"偏置值"), _(L"使用提示"), false, true, true);
+    dlg.modifyEditControl(L"", _(L"新编号=旧编号+偏置值，若计算出新编号<0，则新编号=0"));
 
     int offset;
-    dlg.setValidatorAndParser([&](const CString& strValue, const CString& _) -> CString
+    dlg.setValidatorAndParser([&](const CString& strValue, const CString& _2) -> CString
         {
             if (strValue.IsEmpty())
             {
-                return Common::loadString(IDS_ERR_EmptyBalloonNumberOffset);
+                return _(L"偏置值不可为空");
             }
             try
             {
@@ -669,14 +678,14 @@ void Interface::cmdBalloonNumberOffset()
             }
             catch (...)
             {
-                return Common::loadString(IDS_ERR_InvalidInteger);
+                return _(L"偏置值必须为整数");
             }
             return GenericPairEditDlg::ValidatorOk;
         });
 
     if (dlg.DoModal() != IDOK)
     {
-        acutPrintf(L"\n%s", Common::loadString(IDS_MSG_CancelOperation));
+        acutPrintf(_(L"取消操作"));
         return;
     }
 
@@ -698,16 +707,16 @@ void Interface::cmdBalloonNumberOffset()
 void Interface::cmdBalloonNumberFilter()
 {
     CAcModuleResourceOverride resOverride;
-    CString title = Common::loadString(IDS_CMD_yxBalloonNumberFilter);
-    GenericPairEditDlg dlg(title, Common::loadString(IDS_LBL_BalloonNumberFilterCondition), Common::loadString(IDS_LBL_Tip), false, true, false);
-    dlg.modifyEditControl(L"", Common::loadString(IDS_TIP_BalloonNumberFilter));
+    CString title = _(L"气泡号筛选");
+    GenericPairEditDlg dlg(title, _(L"筛选条件"), _(L"使用提示"), false, true, false);
+    dlg.modifyEditControl(L"", _(L"格式：符号+值，如：>>10筛选大于10。大于：>>或》》，小于：<<或《《，等于：==，不等于：<>或《》，>=或》=，小于等于：<=或《=。等于和不等于判断允许非整数。"));
 
     CString edit1Result;
-    dlg.setValidatorAndParser([&](const CString& strValue, const CString& _) -> CString
+    dlg.setValidatorAndParser([&](const CString& strValue, const CString& _2) -> CString
         {
             if (strValue.GetLength() < 3)
             {
-                return Common::loadString(IDS_ERR_BalloonNumberFilterEmptyCriteria);
+                return _(L"筛选条件不能为空。");
             }
 
             // 验证输入合法性
@@ -732,7 +741,7 @@ void Interface::cmdBalloonNumberFilter()
                 it = std::find(opNeedNumeric.begin(), opNeedNumeric.end(), strInputOpType);
                 if (it == opNeedNumeric.end())
                 {
-                    return Common::loadString(IDS_ERR_BalloonNumberFilterInvalidOperatorType);
+                    return _(L"输入的符号不合法。");
                 }
 
                 try
@@ -746,7 +755,7 @@ void Interface::cmdBalloonNumberFilter()
                 }
                 catch (...)
                 {
-                    return Common::loadString(IDS_ERR_BalloonNumberFilterNeedInterger);
+                    return _(L"非等于或不等于判定时，判定值必须为整数。");
                 }
             }
             edit1Result = strValue;
@@ -755,7 +764,7 @@ void Interface::cmdBalloonNumberFilter()
 
     if (dlg.DoModal() != IDOK)
     {
-        acutPrintf(L"\n%s", Common::loadString(IDS_MSG_CancelOperation));
+        acutPrintf(_(L"取消操作"));
         return;
     }
 
@@ -785,11 +794,11 @@ void Interface::cmdBalloonNumberFilter()
     if (matchedIds.length() > 0)
     {
         UniversalPicker::setSelection(matchedIds);
-        acutPrintf(Common::loadString(IDS_MSG_BalloonNumberFilterMatchCount_FMT), matchedIds.length());
+        acutPrintf(_(L"\n筛选完成：%d 个匹配项。"), matchedIds.length());
     }
     else
     {
-        acutPrintf(Common::loadString(IDS_MSG_BalloonNumberFilterNoMatch));
+        acutPrintf(_(L"\n未发现符合条件的气泡号。"));
     }
 }
 
@@ -797,27 +806,27 @@ void Interface::cmdImportCsvToMTextMatrix()
 {
     CAcModuleResourceOverride resOverride;
     FileDialog::FileDialogFilterBuilder fileFilterBuilter;
-    CString strFileFilter = fileFilterBuilter.addFilter(Common::loadString(IDS_FILTER_CsvFiles), { L"*.csv" }).build();
-    CString strFilePath = FileDialog::ShowOpenFileDialog(Common::loadString(IDS_TITLE_ImportCsv), L"csv", strFileFilter);
+    CString strFileFilter = fileFilterBuilter.addFilter(_(L"CSV 文件"), { L"*.csv" }).build();
+    CString strFilePath = FileDialog::ShowOpenFileDialog(_(L"选择要导入的文件"), L"csv", strFileFilter);
     if (strFilePath.IsEmpty())
     {
-        acutPrintf(L"\n%s", Common::loadString(IDS_MSG_CancelOperation));
+        acutPrintf(_(L"取消操作"));
         return;
     }
 
     CsvModule::AcStringMatrix matrixData;
     CsvModule::readCsvToAcStringMatrix(strFilePath, matrixData);
 
-    GenericPairEditDlg dlg(Common::loadString(IDS_CMD_yxImportCsvToMTextMatrix), Common::loadString(IDS_LBL_Parameter), Common::loadString(IDS_LBL_Tip), false, true, true);
+    GenericPairEditDlg dlg(_(L"从 CSV 文件导入数据生成多行文本矩阵"), _(L"参数"), _(L"使用提示"), false, true, true);
     CString strTipMTextMatrixParameter;
     double TEXTSIZE;
     if (!AcadVarUtil::getVar(AcadVarName::TEXTSIZE, TEXTSIZE))
     {
-        AfxMessageBox(Common::loadString(IDS_ERR_GetAcadVar), MB_OK | MB_ICONERROR);
+        AfxMessageBox(_(L"获取变量失败！"), MB_OK | MB_ICONERROR);
         return;
     }
     double scale = Annotative::getCurrentScaleValue();
-    strTipMTextMatrixParameter.Format(Common::loadString(IDS_TIP_MTextMatrixParameter), TEXTSIZE, scale, TEXTSIZE* scale);
+    strTipMTextMatrixParameter.Format(_(L"输入3个不小于0的数，使用空格分隔，分别为：列宽、列步长、行步长。显示文字高度 = TEXTSIZE变量值%g × 注释比例缩放值%g = %g"), TEXTSIZE, scale, TEXTSIZE * scale);
     dlg.modifyEditControl(L"", strTipMTextMatrixParameter);
 
     std::vector<double> params;
@@ -833,14 +842,14 @@ void Interface::cmdImportCsvToMTextMatrix()
 
     if (dlg.DoModal() != IDOK)
     {
-        acutPrintf(L"\n%s", Common::loadString(IDS_MSG_CancelOperation));
+        acutPrintf(_(L"取消操作"));
         return;
     }
 
     ads_point pt{};
-    if (acedGetPoint(nullptr, Common::loadString(IDS_PROMPT_GetPoint), pt) != RTNORM)
+    if (acedGetPoint(nullptr, _(L"请选择位置"), pt) != RTNORM)
     {
-        acutPrintf(L"\n%s", Common::loadString(IDS_MSG_CancelOperation));
+        acutPrintf(_(L"取消操作"));
         return;
     }
 
@@ -850,8 +859,8 @@ void Interface::cmdImportCsvToMTextMatrix()
     void Interface::cmdSpatialTableExplorer()
     {
         CAcModuleResourceOverride resOverride;
-        CString title = Common::loadString(IDS_CMD_yxSpatialTableExplorer);
-        GenericPairEditDlg dlg(title, Common::loadString(IDS_LBL_Parameter), Common::loadString(IDS_LBL_Tip), false, true, true);
+        CString title = _(L"将多行/单行文本按空间位置表格化导出到 CSV 文件");
+        GenericPairEditDlg dlg(title, _(L"参数"), _(L"使用提示"), false, true, true);
 
         // 默认列容差和行容差
         // 字高默认使用 TEXTSIZE 变量值，列容差默认按字高的 3 倍，行容差默认按字高的 1 倍（考虑注释比例缩放值）
@@ -860,19 +869,19 @@ void Interface::cmdImportCsvToMTextMatrix()
         double TEXTSIZE;
         if (!AcadVarUtil::getVar(AcadVarName::TEXTSIZE, TEXTSIZE))
         {
-            AfxMessageBox(Common::loadString(IDS_ERR_GetAcadVar), MB_OK | MB_ICONERROR);
+            AfxMessageBox(_(L"获取变量失败！"), MB_OK | MB_ICONERROR);
             return;
         }
         strInitParameter.Format(L"%g %g", TEXTSIZE * scale * 3, TEXTSIZE * scale * 1);
-        dlg.modifyEditControl(strInitParameter, Common::loadString(IDS_TIP_SpatialTableExplorerParameter));
+        dlg.modifyEditControl(strInitParameter, _(L"输入2个不小于0的数，使用空格分隔，分别为：列容差、行容差。文本距离超过容差视为不同列或行。"));
 
         std::vector<double> params;
-        dlg.setValidatorAndParser([&](const CString& edit1, const CString& _) -> CString
+        dlg.setValidatorAndParser([&](const CString& edit1, const CString& _2) -> CString
             {
                 const int paramsNumber = 2;
                 if (!Common::parse(edit1, paramsNumber, [](double v) { return v > 0; }, params))
                 {
-                    return Common::loadString(IDS_TIP_SpatialTableExplorerParameter);
+                    return _(L"输入2个不小于0的数，使用空格分隔，分别为：列容差、行容差。文本距离超过容差视为不同列或行。");
                 }
                 return GenericPairEditDlg::ValidatorOk;
             });
@@ -880,22 +889,22 @@ void Interface::cmdImportCsvToMTextMatrix()
     
         if (dlg.DoModal() != IDOK)
         {
-            acutPrintf(L"\n%s", Common::loadString(IDS_MSG_CancelOperation));
+            acutPrintf(_(L"取消操作"));
             return;
         }
 
         FileDialog::FileDialogFilterBuilder fileFilterBuilter;
-        CString strFileFilter = fileFilterBuilter.addFilter(Common::loadString(IDS_FILTER_CsvFiles), { L"*.csv" }).build();
-        CString strFilePath = FileDialog::ShowSaveFileDialog(Common::loadString(IDS_TITLE_SaveCsv), Common::loadString(IDS_FILE_DefaultSaveDataCsv), L"csv", strFileFilter);
+        CString strFileFilter = fileFilterBuilter.addFilter(_(L"CSV 文件"), { L"*.csv" }).build();
+        CString strFilePath = FileDialog::ShowSaveFileDialog(_(L"保存 CSV 文件到"), _(L"数据文件.csv"), L"csv", strFileFilter);
         if (strFilePath.IsEmpty())
         {
-            acutPrintf(L"\n%s", Common::loadString(IDS_MSG_CancelOperation));
+            acutPrintf(_(L"取消操作"));
             return;
         }
         CsvWriter writer(strFilePath);
         if (!writer.isValid())
         {
-            AfxMessageBox(Common::loadString(IDS_ERR_FileOpenFailed), MB_OK | MB_ICONERROR);
+            AfxMessageBox(_(L"文件路径打开失败，请检查是否被占用或路径无效"), MB_OK | MB_ICONERROR);
             return;
         }
 
@@ -908,11 +917,11 @@ void Interface::cmdImportCsvToMTextMatrix()
                 data.id = id;
                 if (TextUtil::readMText(id, data.text, false, &data.pos))
                 {
-                    acutPrintf(Common::loadString(IDS_MSG_MTextPos_FMT), data.pos.x, data.pos.y, data.pos.z, data.text.constPtr());
+                    acutPrintf(_(L"\n(%g,%g,%g)多行文本：%s"), data.pos.x, data.pos.y, data.pos.z, data.text.constPtr());
                 }
                 else if (TextUtil::readDText(id, data.text, false, &data.pos))
                 {
-                    acutPrintf(Common::loadString(IDS_MSG_DTextPos_FMT), data.text.constPtr());
+                    acutPrintf(_(L"\n(%g,%g,%g)单行文本：%s"), data.text.constPtr());
                 }
                 elements.push_back(data);
             },
@@ -937,7 +946,7 @@ void Interface::cmdImportCsvToMTextMatrix()
             }
         }
 
-        acutPrintf(Common::loadString(IDS_MSG_FileLocation_FMT), strFilePath);
+        acutPrintf(_(L"\n文件位置：%s"), strFilePath);
     }
 
     void Interface::cmdCheckBalloonNumberMaxMin()
@@ -983,7 +992,7 @@ void Interface::cmdImportCsvToMTextMatrix()
                 }
 
             },
-            Common::loadString(IDS_CMD_yxCheckBalloonNumberMaxMin),
+            _(L"查找气泡号最大和最小序号"),
             UniversalPicker::SelectMode::Batch,
             true,
             UniversalPicker::SortMode::None,
@@ -1002,11 +1011,11 @@ void Interface::cmdImportCsvToMTextMatrix()
         if (resultIds.length() > 0)
         {
             UniversalPicker::setSelection(resultIds);
-            acutPrintf(Common::loadString(IDS_MSG_PrintBalloonNumberMaxAndMin_FMT), max, min);
+            acutPrintf(_(L"\n最大气泡号：%d，最小气泡号：%d"), max, min);
         }
         else
         {
-            acutPrintf(Common::loadString(IDS_MSG_EmptyBalloonNumber));
+            acutPrintf(_(L"\n未发现有效数字格式的气泡号"));
         }
     }
 
@@ -1015,28 +1024,28 @@ void Interface::cmdImportCsvToMTextMatrix()
         CAcModuleResourceOverride resOverride;
         if (!Image::clipboardHasImage())
         {
-            AfxMessageBox(Common::loadString(IDS_WARN_PasteClipNoImage), MB_OK | MB_ICONWARNING);
+            AfxMessageBox(_(L"剪贴板中没有检测到图像数据。"), MB_OK | MB_ICONWARNING);
             return;
         }
 
         FileDialog::FileDialogFilterBuilder filterBuilder;
-        CString fileFilter = filterBuilder.addFilter(Common::loadString(IDS_FILTER_PngFiles), { L"*.png" }).build();
+        CString fileFilter = filterBuilder.addFilter(_(L"PNG 图片"), { L"*.png" }).build();
         CString defaultFilename;
-        defaultFilename.Format(Common::loadString(IDS_FILE_Png), Common::getTimestamp());
-        CString filename = FileDialog::ShowSaveFileDialog(Common::loadString(IDS_TITLE_SaveImage), defaultFilename, L"png", fileFilter, Common::getCurrPath(true));
+        defaultFilename.Format(_(L"图片%s.png"), Common::getTimestamp());
+        CString filename = FileDialog::ShowSaveFileDialog(_(L"选择图片保存路径"), defaultFilename, L"png", fileFilter, Common::getCurrPath(true));
         if (filename.IsEmpty())
         {
-            acutPrintf(Common::loadString(IDS_MSG_CancelOperation));
+            acutPrintf(_(L"取消操作"));
             return;
         }
         if (!Image::saveClipboardBitmapToFile(filename))
         {
-            AfxMessageBox(Common::loadString(IDS_ERR_SaveClipboardBitmapToFileFail), MB_OK | MB_ICONERROR);
+            AfxMessageBox(_(L"保存剪贴板图像数据到文件失败"), MB_OK | MB_ICONERROR);
             return;
         }
         if (!Image::copyFileToClipboard(filename))
         {
-            AfxMessageBox(Common::loadString(IDS_ERR_CopyFileToClipboardFail), MB_OK | MB_ICONERROR);
+            AfxMessageBox(_(L"复制文件到剪贴板失败"), MB_OK | MB_ICONERROR);
             return;
         }
         const wchar_t* appName = acedGetAppName();
@@ -1052,7 +1061,7 @@ void Interface::cmdImportCsvToMTextMatrix()
         CString drawingPath = Common::getCurrPath();
         if (drawingPath.IsEmpty())
         {
-            AfxMessageBox(Common::loadString(IDS_ERR_DrawingNoSave), MB_OK | MB_ICONERROR);
+            AfxMessageBox(_(L"图纸未保存"), MB_OK | MB_ICONERROR);
             return;
         }
 
@@ -1079,7 +1088,7 @@ void Interface::cmdImportCsvToMTextMatrix()
                     }
                 }
             },
-            Common::loadString(IDS_CMD_yxCheckDuplicateBalloonNumbers),
+            _(L"检查重复气泡号"),
             UniversalPicker::SelectMode::Batch,
             true,
             UniversalPicker::SortMode::None,
@@ -1105,11 +1114,11 @@ void Interface::cmdImportCsvToMTextMatrix()
         if (duplicateIds.length() > 0)
         {
             UniversalPicker::setSelection(duplicateIds);
-            acutPrintf(L"\n%s: %s", Common::loadString(IDS_MSG_DuplicateBalloonNumberFound), reportMsg.constPtr());
+            acutPrintf(_(L"\n发现重复: %s"), reportMsg.constPtr());
         }
         else
         {
-            acutPrintf(L"\n%s",Common::loadString(IDS_MSG_NoDuplicateBalloonNumberFound));
+            acutPrintf(_(L"未发现重复"));
         }
     }
 
@@ -1145,7 +1154,7 @@ void Interface::cmdImportCsvToMTextMatrix()
                     }
                 }
             },
-            Common::loadString(IDS_CMD_yxCheckBalloonNumberBreakpoints),
+            _(L"检查气泡号断点"),
             UniversalPicker::SelectMode::Batch,
             true,
             UniversalPicker::SortMode::None,
@@ -1196,11 +1205,11 @@ void Interface::cmdImportCsvToMTextMatrix()
         // 结果呈现
         if (reportMsg.empty() == false)
         {
-            acutPrintf(L"\n%s: %s", Common::loadString(IDS_MSG_BalloonBreakpointsFound), reportMsg.constPtr());
+            acutPrintf(_(L"\n缺失的气泡编号: %s"), reportMsg.constPtr());
         }
         else
         {
-            acutPrintf(L"\n%s", Common::loadString(IDS_MSG_NoBalloonBreakpointsFound));
+            acutPrintf(_(L"\n气泡编号连续，未发现断点"));
         }
     }
 
@@ -1211,7 +1220,7 @@ void Interface::cmdImportCsvToMTextMatrix()
         UniversalPicker::run(
             &arcv,
             Image::forceRemoveImageAndFile,
-            Common::loadString(IDS_CMD_yxForceRemoveImage),
+            _(L"删除光栅图像及图片文件（无法撤销恢复）"),
             UniversalPicker::SelectMode::Immediate,
             false,
             UniversalPicker::SortMode::None,
@@ -1286,11 +1295,11 @@ void Interface::cmdImportCsvToMTextMatrix()
                 if (resultIds.length() > 0)
                 {
                     UniversalPicker::setSelection(resultIds);
-                    acutPrintf(Common::loadString(IDS_MSG_ChainSelectionSuccess_FMT), resultIds.length());
+                    acutPrintf(_(L"\n自动链式选择成功：共选中 %d 条线条实体。"), resultIds.length());
                     bBreak = true;
                 }
             },
-            Common::loadString(IDS_CMD_yxChainSelection),
+            _(L"选中实体后自动链式选择"),
             UniversalPicker::SelectMode::Immediate,
             true
         );
@@ -1302,9 +1311,8 @@ void Interface::cmdImportCsvToMTextMatrix()
     void Interface::cmdDimensionTolerancePrecision()
     {
         CAcModuleResourceOverride resOverride;
-        CString title = Common::loadString(IDS_CMD_yxDimensionTolerancePrecision);
 
-        GenericPairEditDlg dlg(title, Common::loadString(IDS_LBL_DimensionPrecision), Common::loadString(IDS_LBL_TolerancePrecision), false, true, true);
+        GenericPairEditDlg dlg(_(L"设置尺寸标注的主单位精度和公差精度"), _(L"主单位精度"), _(L"公差精度"), false, true, true);
         // 设置 -1 表示不修改精度 
         CString strDimPrec = L"-1";
         CString strTolPrec = L"-1";
@@ -1347,14 +1355,14 @@ void Interface::cmdImportCsvToMTextMatrix()
                 }
                 catch (...)
                 {
-                    return Common::loadString(IDS_ERR_InvalidDimensionTolerancePreccision);
+                    return _(L"精度值只能是 0 至 8 的整数，输入 -1 时不修改精度。");
                 }
                 return GenericPairEditDlg::ValidatorOk;
             });
 
         if (dlg.DoModal() != IDOK)
         {
-            acutPrintf(L"\n%s", Common::loadString(IDS_MSG_CancelOperation));
+            acutPrintf(_(L"取消操作"));
             return;
         }
 
@@ -1364,7 +1372,7 @@ void Interface::cmdImportCsvToMTextMatrix()
             {
                 Dimension::setDimensionTolerancePreccision(id, iDimPrec, iTolPrec);
             },
-            title,
+            _(L"设置尺寸标注的主单位精度和公差精度"),
             UniversalPicker::SelectMode::Immediate,
             false,
             UniversalPicker::SortMode::None,
@@ -1393,7 +1401,7 @@ void Interface::cmdImportCsvToMTextMatrix()
 
         CAcModuleResourceOverride resOverride;
         AcDbObjectId lastId = AcDbObjectId::kNull;
-        acutPrintf(Common::loadString(IDS_MSG_PickFirstCurve));
+        acutPrintf(_(L"\n请选择第一条线："));
         UniversalPicker::run(
             &arcv,
             [&](const AcDbObjectId& id)
@@ -1401,7 +1409,7 @@ void Interface::cmdImportCsvToMTextMatrix()
                 if (lastId == AcDbObjectId::kNull)
                 {
                     lastId = id;
-                    acutPrintf(Common::loadString(IDS_MSG_PickSecondCurve));
+                    acutPrintf(_(L"\n请选择第二条线："));
                 }
                 else if (lastId != id)
                 {
@@ -1409,18 +1417,18 @@ void Interface::cmdImportCsvToMTextMatrix()
                     if (LineUtil::calculateLineIntersection(lastId, id, intersectionPoints))
                     {
                         PointUtil::drawPoints(intersectionPoints);
-                        acutPrintf(Common::loadString(IDS_MSG_IntersectionPointsCount_FMT), intersectionPoints.length());
+                        acutPrintf(_(L"\n成功创建 %d 个交点"), intersectionPoints.length());
                     }
                     else
                     {
-                        acutPrintf(Common::loadString(IDS_MSG_NoIntersectionPoints));
+                        acutPrintf(_(L"\n未发现交点"));
                     }
                     lastId = AcDbObjectId::kNull;
-                    acutPrintf(Common::loadString(IDS_MSG_PickFirstCurve));
+                    acutPrintf(_(L"\n请选择第一条线："));
                 }
 
             },
-            Common::loadString(IDS_CMD_yxCreateIntersectionPoints),
+            _(L"创建两条线(及延长线)的交点。可使用PTYPE设置点样式。"),
             UniversalPicker::SelectMode::Immediate,
             true
         );
@@ -1431,14 +1439,14 @@ void Interface::cmdImportCsvToMTextMatrix()
         CAcModuleResourceOverride resOverride;
         auto& manager = ConfigManager::getInstance();
         std::wstring configFilename = manager.getConfigFilename();
-        acutPrintf(Common::loadString(IDS_MSG_ConfigFilename_FMT), configFilename.c_str());
+        acutPrintf(_(L"\n配置文件路径：%s"), configFilename.c_str());
     }
 
     void Interface::cmdDialogMiddleClickToOk()
     {
         CAcModuleResourceOverride resOverride;
-        CString title = Common::loadString(IDS_CMD_yxDialogMiddleClickToOk);
-        GenericPairEditDlg dlg(title, Common::loadString(IDS_LBL_Enabled), L"", true, true, true);
+        CString title = _(L"设置对话框中鼠标中键映射到确定按钮");
+        GenericPairEditDlg dlg(title, _(L"启用1/0"), L"", true, true, true);
 
         CString edit1Result;
         auto& manager = ConfigManager::getInstance();
@@ -1447,15 +1455,15 @@ void Interface::cmdImportCsvToMTextMatrix()
         edit1Result.Format(L"%d", config.middleClickManagerSettings.bDialogMiddleClickToOkEnabled);
         dlg.modifyEditControl(edit1Result);
 
-        dlg.setValidatorAndParser([&](const CString& value1, const CString& _) -> CString
+        dlg.setValidatorAndParser([&](const CString& value1, const CString& _2) -> CString
             {
                 if (value1.IsEmpty())
                 {
-                    return Common::loadString(IDS_ERR_InvalidMiddleClickToOk);
+                    return _(L"必须输入1或0设置是否启用中键映射确定按钮");
                 }
                 if (value1.SpanIncluding(L"01") != value1)
                 {
-                    return Common::loadString(IDS_ERR_InvalidMiddleClickToOk);
+                    return _(L"必须输入1或0设置是否启用中键映射确定按钮");
                 }
                 edit1Result = value1;
                 return GenericPairEditDlg::ValidatorOk;
@@ -1463,7 +1471,7 @@ void Interface::cmdImportCsvToMTextMatrix()
 
         if (dlg.DoModal() != IDOK)
         {
-            acutPrintf(L"\n%s", Common::loadString(IDS_MSG_CancelOperation));
+            acutPrintf(_(L"取消操作"));
             return;
         }
 
@@ -1483,8 +1491,8 @@ void Interface::cmdImportCsvToMTextMatrix()
     void Interface::cmdCmdMiddleClickToEnter()
     {
         CAcModuleResourceOverride resOverride;
-        CString title = Common::loadString(IDS_CMD_yxCmdMiddleClickToEnter);
-        GenericPairEditDlg dlg(title, Common::loadString(IDS_LBL_Enabled), Common::loadString(IDS_LBL_Interval), false, true, true);
+        CString title = _(L"设置命令执行状态下鼠标中键映射回车键");
+        GenericPairEditDlg dlg(title, _(L"启用1/0"), _(L"间隔(ms)"), false, true, true);
 
         CString edit1Result, edit2Result;
         auto& manager = ConfigManager::getInstance();
@@ -1500,11 +1508,11 @@ void Interface::cmdImportCsvToMTextMatrix()
             {
                 if (value1.IsEmpty() || value2.IsEmpty())
                 {
-                    return Common::loadString(IDS_ERR_ImeAutoSwitchEmptySetting);
+                    return _(L"必须输入自启动状态和切换间隔时间");
                 }
                 if (value1.SpanIncluding(L"01") != value1)
                 {
-                    return Common::loadString(IDS_ERR_InvalidAutoStart);
+                    return _(L"自启动状态必须为 0 或 1，1表示自启动，0 表示不自启动");
                 }
                 try
                 {
@@ -1522,7 +1530,7 @@ void Interface::cmdImportCsvToMTextMatrix()
                 catch (...)
                 {
                     CString csInvalidInterval;
-                    csInvalidInterval.Format(Common::loadString(IDS_ERR_InvalidInterval_FMT), defaultConfig.dCmdMiddleClickDownUpInterval);
+                    csInvalidInterval.Format(_(L"切换间隔必须为不小于 %d 的整数"), defaultConfig.dCmdMiddleClickDownUpInterval);
                     return csInvalidInterval;
                 }
 
@@ -1532,7 +1540,7 @@ void Interface::cmdImportCsvToMTextMatrix()
 
         if (dlg.DoModal() != IDOK)
         {
-            acutPrintf(L"\n%s", Common::loadString(IDS_MSG_CancelOperation));
+            acutPrintf(_(L"取消操作"));
             return;
         }
 

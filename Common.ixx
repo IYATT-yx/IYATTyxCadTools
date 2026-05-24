@@ -13,6 +13,7 @@ export module Common;
 export import :Inline;
 
 import UniversalPicker;
+import Translator;
 
 // 定义在 Common-Inline.ixx
 export namespace Common
@@ -159,6 +160,14 @@ export namespace Common
 // 常量
 export namespace Common
 {
+	inline const wchar_t* getLocalProjectName()
+	{
+		static const std::wstring name = _(L"AutoCAD Mechanical 2027 思能工具箱");
+		return name.c_str();
+	}
+
+	constexpr const wchar_t* cmdGroup = L"IYATTyxCadToolsGlobalGroup";
+
 	// 配置
 	namespace Config
 	{

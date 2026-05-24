@@ -17,15 +17,13 @@ namespace Commands
 	void registerYxCmds(Commands::CommandInfoList& cil)
 	{
 		CAcModuleResourceOverride resOverride;
-		CString cmdGroup;
-		cmdGroup.LoadStringW(IDS_CommandGroup);
 		for (Commands::CommandInfo commandInfo : cil)
 		{
 			// 注册命令全名
-			acedRegCmds->addCommand(cmdGroup, commandInfo.commandName.constPtr(), commandInfo.commandName.constPtr(), commandInfo.flags, commandInfo.proc);
+			acedRegCmds->addCommand(Common::cmdGroup, commandInfo.commandName.constPtr(), commandInfo.commandName.constPtr(), commandInfo.flags, commandInfo.proc);
 			// 注册命令简称
 			AcString shortCommandName = commandInfo.getShortCommandName();
-			acedRegCmds->addCommand(cmdGroup, shortCommandName.constPtr(), shortCommandName.constPtr(), commandInfo.flags, commandInfo.proc);
+			acedRegCmds->addCommand(Common::cmdGroup, shortCommandName.constPtr(), shortCommandName.constPtr(), commandInfo.flags, commandInfo.proc);
 		}
 	}
 

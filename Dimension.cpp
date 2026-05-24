@@ -13,6 +13,7 @@ module Dimension;
 import Common;
 import TextUtil;
 import std;
+import Translator;
 
 namespace Dimension
 {
@@ -28,7 +29,7 @@ namespace Dimension
 		AcString measurementValueText; // 存储测量值文本（带符号、单位）
 
 		Dimension::readDim(objId, dimData);
-		acutPrintf(Common::loadString(IDS_MSG_OpBefore_FMT), dimData.dimensionText.constPtr());
+		acutPrintf(_(L"\n操作前尺寸文本: %s"), dimData.dimensionText.constPtr());
 		if (dimData.angle)
 		{
 			Common::double2AcString(
@@ -51,7 +52,7 @@ namespace Dimension
 		if (dimData.dimensionText.empty())
 		{
 			pDim->setDimensionText(measurementValueText);
-			acutPrintf(Common::loadString(IDS_MSG_OpAfter_FMT), measurementValueText.constPtr());
+			acutPrintf(_(L"\n操作后尺寸文本：%s"), measurementValueText.constPtr());
 		}
 		else
 		{
@@ -64,7 +65,7 @@ namespace Dimension
 				dimData.dimensionText.replace(Common::measValuePlaceholder, measurementValueText.constPtr());
                 pDim->setDimensionText(dimData.dimensionText.constPtr());
 			}
-            acutPrintf(Common::loadString(IDS_MSG_OpAfter_FMT), dimData.dimensionText.constPtr());
+            acutPrintf(_(L"\n操作后尺寸文本：%s"), dimData.dimensionText.constPtr());
 		}
 	}
 
@@ -83,7 +84,7 @@ namespace Dimension
 		const wchar_t* dimensionText = pDim->dimensionText();
 		Adesk::UInt16 colorIndex = Common::getEntityActualColorIndex(pDim);
 
-		acutPrintf(Common::loadString(IDS_MSG_OpBefore_FMT), dimensionText);
+		acutPrintf(_(L"\n操作前尺寸文本: %s"), dimensionText);
 		AcString resultText;
 		if (upperDeviation == 0 && lowerDeviation == 0)
 		{
@@ -112,7 +113,7 @@ namespace Dimension
 			}
 		}
 		pDim->setDimensionText(resultText.constPtr());
-		acutPrintf(Common::loadString(IDS_MSG_OpAfter_FMT), resultText.constPtr());
+		acutPrintf(_(L"\n操作后尺寸文本：%s"), resultText.constPtr());
 	}
 
 	void addSurroundingCharsForDimension(const AcDbObjectId& objId, const wchar_t* left, const wchar_t* right, bool isLGdt, bool isRGdt)
@@ -358,7 +359,7 @@ namespace Dimension
 				}
 				else
 				{
-					acutPrintf(Common::loadString(IDS_WARN_NotStandardDimensionText));
+					acutPrintf(_(L"警告：尺寸文本中对称公差与对象存储的公差不一致，疑似手动输入，非增强尺寸标注生成。"));
 				}
 			}
 		}

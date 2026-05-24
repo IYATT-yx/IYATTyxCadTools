@@ -11,6 +11,7 @@ module;
 
 module FileDialog;
 import Common;
+import Translator;
 
 namespace FileDialog
 {
@@ -71,7 +72,7 @@ namespace FileDialog
 				{
 					// 如果 API 失败（某些极端受限环境），弹出未知错误
 					CString strErr;
-					strErr.Format(Common::loadString(IDS_ERR_Unknown_FMT), hr);
+					strErr.Format(_(L"未知错误，错误代码：%d"), hr);
 					AfxMessageBox(strErr, MB_OK | MB_ICONERROR);
 				}
 
@@ -84,15 +85,15 @@ namespace FileDialog
 			CString strErr;
 			if (hr == HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) || hr == HRESULT_FROM_WIN32(ERROR_PATH_NOT_FOUND))
 			{
-				strErr = Common::loadString(IDS_ERR_FileNotFound);
+				strErr = _(L"文件未找到，可能已被移动或删除");
 			}
 			else if (hr == E_ACCESSDENIED)
 			{
-				strErr = Common::loadString(IDS_ERR_AccessDenied);
+				strErr = _(L"拒绝访问，权限不足");
 			}
 			else
 			{
-				strErr.Format(Common::loadString(IDS_ERR_Unknown_FMT), hr);
+				strErr.Format(_(L"未知错误，错误代码：%d"), hr);
 			}
 			AfxMessageBox(strErr, MB_OK | MB_ICONERROR);
 		}

@@ -14,6 +14,7 @@ import std;
 import Common;
 import Annotative;
 import AcadVarUtil;
+import Translator;
 
 namespace BalloonNumber
 {
@@ -155,7 +156,7 @@ namespace BalloonNumber
             double TEXTSIZE;
             if (!AcadVarUtil::getVar(AcadVarName::TEXTSIZE, TEXTSIZE))
             {
-                AfxMessageBox(Common::loadString(IDS_ERR_GetAcadVar), MB_OK | MB_ICONERROR);
+                AfxMessageBox(_(L"获取变量失败！"), MB_OK | MB_ICONERROR);
                 return;
             }
 			AcDbCircle* pCircle = new AcDbCircle(AcGePoint3d::kOrigin, AcGeVector3d::kZAxis, TEXTSIZE);
@@ -393,7 +394,7 @@ namespace BalloonNumber
             return;
         }
 
-        acutPrintf(Common::loadString(IDS_MSG_OffsetResultInfo_FMT), currVal.constPtr());
+        acutPrintf(_(L"\n读取到气泡号编号：%s"), currVal.constPtr());
         try
         {
             std::wstring wstr(currVal.constPtr());
@@ -408,14 +409,14 @@ namespace BalloonNumber
             if (newVal < 0)
             {
                 newVal = 0;
-                acutPrintf(L"\n%s", Common::loadString(IDS_WARN_OffsetLessZero));
+                acutPrintf(_(L"\n偏置后气泡号编号小于 0，已重置为 0"));
             }
-            acutPrintf(Common::loadString(IDS_MSG_OffsetTargetInfo_FMT), newVal);
+            acutPrintf(_(L"\n偏置后气泡号编号：%d"), newVal);
             BalloonNumber::updateBalloonNumberBlock(id, newVal);
         }
         catch (...)
         {
-            acutPrintf(L"\n%s", Common::loadString(IDS_ERR_BalloonNumberOffsetFail));
+            acutPrintf(_(L"\n偏置气泡号失败，气泡号值可能不是数字"));
         }
     }
 

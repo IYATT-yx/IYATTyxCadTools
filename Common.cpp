@@ -12,6 +12,7 @@ module;
 #include <iomanip>
 
 module Common;
+import Translator;
 
 namespace Common
 {
@@ -88,13 +89,13 @@ namespace Common
 
 			if ((INT_PTR)inst <= 32)
 			{
-				AfxMessageBox(Common::loadString(IDS_ERR_StartCharMapFailed), MB_OK | MB_ICONERROR);
+				AfxMessageBox(_(L"启动字符映射表失败"), MB_OK | MB_ICONERROR);
 				return;
 			}
 		}
 		else
 		{
-			AfxMessageBox(Common::loadString(IDS_ERR_SetCharMapFontGDTFailed), MB_OK | MB_ICONERROR);
+			AfxMessageBox(_(L"设置字符映射表字体为 GDT 失败"), MB_OK | MB_ICONERROR);
 		}
 	}
 
@@ -147,7 +148,7 @@ namespace Common
 			pTempClass = pTempClass->myParent();
 		}
 
-		acutPrintf(Common::loadString(IDS_MSG_HierarchyHeader));
+		acutPrintf(_(L"\n--- 继承链 ---"));
 
 		// 从最高层级向当前层级打印
 		for (int i = hierarchy.length() - 1; i >= 0; --i)
@@ -161,7 +162,7 @@ namespace Common
 			// 标记对象自身的最终类名
 			if (i == 0)
 			{
-				acutPrintf(Common::loadString(IDS_MSG_CurrentClassNameMark));
+				acutPrintf(_(L"<-- [当前类名]"));
 			}
 		}
 
