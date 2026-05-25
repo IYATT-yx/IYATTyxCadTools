@@ -10,6 +10,7 @@ module;
 
 export module IYATTyxJsonWrapper;
 import std;
+import EncodingConverter;
 
 export namespace IYATTyxJsonWrapper
 {
@@ -43,3 +44,50 @@ export namespace IYATTyxJsonWrapper
     */
 	bool saveJson(const std::wstring& filename, const IYATTyxJsonWrapper::json& json, std::wstring& errorMsg);
 };
+
+export namespace std
+{
+    /**
+    * @brief 将宽字符串（std::wstring）序列化为 JSON 字符串。
+    * @details 自定义 nlohmann::json 的扩展实现。通过调用 EncodingConverter 将 UTF-16 编码的
+    * 宽字符串转换为 UTF-8 编码的窄字符串，从而保证物理 JSON 文件采用标准的 UTF-8 存储。
+    * @param[out] j    输出的 json 实例。
+    * @param[in]  wstr 输入的宽字符串。
+    */
+    inline void to_json(nlohmann::json& j, const std::wstring& wstr)
+    {
+        if (wstr.empty())
+        {
+            j = "";
+            return;
+        }
+
+        j = EncodingConverter::FromWstringToUtf8(wstr);
+    }
+
+    /**
+    * @brief 从 JSON 字符串反序列化为宽字符串（std::wstring）。
+    * @details 自定义 nlohmann::json 的扩展实现。当捕获到物理文件中的 UTF-8 窄字符串时，
+    * 通过 EncodingConverter 自动还原为内存专用的 UTF-16 宽字符串。
+    * 若 JSON 节点类型不匹配或为空，则安全自愈为 wstring 默认值。
+    * @param[in]  j    输入的 json 实例。
+    * @param[out] wstr 输出的宽字符串目标引用。
+    */
+    inline void from_json(const nlohmann::json& j, std::wstring& wstr)
+    {
+        if (!j.is_string())
+        {
+            wstr = L"";
+            return;
+        }
+
+        std::string str = j.get<std::string>();
+        if (str.empty())
+        {
+            wstr = L"";
+            return;
+        }
+
+        wstr = EncodingConverter::FromUtf8ToWstring(str);
+    }
+}
