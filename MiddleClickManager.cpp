@@ -38,7 +38,18 @@ void MiddleClickManager::startUnifiedMiddleClickProc(ConfigItems::MiddleClickMan
         this->mbEnabledDialogOk = settings.bDialogMiddleClickToOkEnabled;
         this->mbEnabledCmdEnter = settings.bCmdMiddleClickToEnterEnabled;
         this->mdCmdMiddleClickDownUpInterval = settings.dCmdMiddleClickDownUpInterval;
-        this->mhUnifiedMiddleClickHook = SetWindowsHookEx(WH_MOUSE_LL, this->unifiedMiddleClickProc, GetModuleHandle(nullptr), 0);
+        HMODULE hCurrentModule = nullptr;
+        const wchar_t* pszAppPath = ::acedGetAppName();
+
+        if (pszAppPath != nullptr)
+        {
+            {
+                std::filesystem::path fullPath(pszAppPath);
+                std::wstring moduleName = fullPath.filename().wstring();
+                hCurrentModule = ::GetModuleHandleW(moduleName.c_str());
+            }
+        }
+        this->mhUnifiedMiddleClickHook = SetWindowsHookEx(WH_MOUSE_LL, this->unifiedMiddleClickProc, hCurrentModule, 0);
         if (this->mbEnabledDialogOk)
         {
             acutPrintf(_(L"\n已启用对话框中鼠标中键映射确定按钮\n"));
