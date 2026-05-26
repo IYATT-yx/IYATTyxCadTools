@@ -9,7 +9,6 @@
  */
 module;
 #include "stdafx.h"
-#include "resource.h"
 #include <imm.h>
 #pragma comment(lib, "imm32.lib")
 

@@ -7,7 +7,6 @@
  */
 module;
 #include "stdafx.h"
-#include "resource.h"
 
 module FileDialog;
 import Common;

@@ -7,7 +7,6 @@
  */
 module;
 #include "StdAfx.h"
-#include "resource.h"
 
 module BalloonNumber;
 import std;
