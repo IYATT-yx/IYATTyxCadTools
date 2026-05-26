@@ -23,14 +23,6 @@ bool Translator::initialize(const std::filesystem::path& localesPath, const std:
 	this->mTranslationMap.clear();
 	this->mLoadedDomains.clear(); // 顺便清空已加载的域记录，允许重新载入
 
-	if (!std::filesystem::exists(localesPath))
-	{
-		{
-			this->mStatus = false;
-			return false;
-		}
-	}
-
 	this->mStatus = true;
 	return true;
 }
@@ -153,9 +145,7 @@ std::unordered_map<std::wstring, std::wstring>Translator::loadMoFile(const std::
 
 	if (!std::filesystem::exists(path))
 	{
-		{
-			throw std::runtime_error("MO file not found: " + path.string());
-		}
+		return localMap;
 	}
 
 	std::ifstream file(path, std::ios::binary);
