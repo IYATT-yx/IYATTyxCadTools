@@ -8,7 +8,7 @@
  *            Licensed under the MIT License. See LICENSE file in the project root for full license information.
  */
 module;
-#include "thirdparty/nlohmann/json.hpp"
+#include "nlohmann/json.hpp"
 
 export module ConfigManager;
 
@@ -32,12 +32,20 @@ export namespace ConfigItems
         NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(MiddleClickManagerSettings, bDialogMiddleClickToOkEnabled, bCmdMiddleClickToEnterEnabled, dCmdMiddleClickDownUpInterval)
 	};
 
+	// 语言设置
+	struct LanguageSettings
+	{
+        std::wstring languageCode = L"zh_CN";
+        NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(LanguageSettings, languageCode)
+	};
+
 	// 全局配置
 	struct GlobalConfig
 	{
 		ImeSettings imeSettings;
 		MiddleClickManagerSettings middleClickManagerSettings;
-		NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(GlobalConfig, imeSettings, middleClickManagerSettings)
+        LanguageSettings languageSettings;
+		NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(GlobalConfig, imeSettings, middleClickManagerSettings, languageSettings)
 	};
 };
 
