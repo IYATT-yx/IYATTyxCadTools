@@ -9,7 +9,6 @@ module;
 #include "stdafx.h"
 #include "GenericPairEditDlg.hpp"
 #include "MainBar.hpp"
-#include "resource.h"
 
 module Interface;
 
@@ -33,17 +32,32 @@ import ConfigManager;
 import MiddleClickManager;
 import AcadVarUtil;
 import Translator;
+import EncodingConverter;
 
 void Interface::init()
 {
-    CAcModuleResourceOverride resOverride;
+    // 读取配置文件
+    auto& manager = ConfigManager::getInstance();
+    auto appPath = Common::getAppSubFolder();
+    if (!appPath.has_value())
+    {
+        AfxMessageBox(_(L"获取程序数据目录失败"), MB_OK | MB_ICONERROR);
+        return;
+    }
+    std::filesystem::path configPathObj = appPath.value() / Common::Config::configName;
+    if (!manager.loadConfig(configPathObj.wstring()))
+    {
+        std::wstring err = manager.getLastError();
+        AfxMessageBox(err.c_str(), MB_OK | MB_ICONERROR);
+    }
+    auto& config = manager.getConfig();
+
+    // 初始化翻译器
     std::filesystem::path appName(acedGetAppName());
     std::filesystem::path appDir = appName.parent_path();
     std::filesystem::path localesDir = appDir / L"locales";
-    CString msg;
-    msg.Format(L"\n%s", localesDir.wstring().c_str());
     auto& translator = Translator::getInstance();
-    if (!translator.initialize(localesDir, L"en_US"))
+    if (!translator.initialize(localesDir, config.languageSettings.languageCode))
     {
         AfxMessageBox(L"Initialize translator failed", MB_OK | MB_ICONERROR);
         return;
@@ -77,39 +91,25 @@ void Interface::init()
         {L"yxSpatialTableExplorer", _(L"将多行/单行文本按空间位置表格化导出到 CSV 文件"), Commands::CommandFlags::PickRedraw, Interface::cmdSpatialTableExplorer},
         {L"yxPasteClipImage", _(L"将剪贴板中的截图/图像数据保存到文件并插入图纸中"), Commands::CommandFlags::PickRedraw, Interface::cmdPasteClipImage},
         {L"yxForceRemoveImage", _(L"删除光栅图像及图片文件（无法撤销恢复）"), Commands::CommandFlags::PickRedraw, cmdForceRemoveImage},
-        {L"yxLocateDrawing", _(L"在文件资源管理器中打开当前图纸"), Commands::CommandFlags::Base, Interface::cmdLocateDrawing},
+        {L"yxLocateDrawing", _(L"打开当前图纸文件"), Commands::CommandFlags::Base, Interface::cmdLocateDrawing},
         {L"yxCreateIntersectionPoints", _(L"创建两条线(及延长线)的交点。可使用PTYPE设置点样式。"), Commands::CommandFlags::Base, Interface::cmdCreateIntersectionPoints},
         {L"yxImeAutoSwitch", _(L"设置输入法自动切换"), Commands::CommandFlags::Base, Interface::cmdImeAutoSwitch},
         {L"yxDialogMiddleClickToOk", _(L"设置对话框中鼠标中键映射到确定按钮"), Commands::CommandFlags::Base, Interface::cmdDialogMiddleClickToOk},
         {L"yxCmdMiddleClickToEnter", _(L"设置命令执行状态下鼠标中键映射回车键"), Commands::CommandFlags::Base, Interface::cmdCmdMiddleClickToEnter},
+        {L"yxSetLanguage", _(L"设置语言"), Commands::CommandFlags::Base, Interface::cmdSetLanguage},
         {L"yx", _(L"显示或隐藏命令菜单"), Commands::CommandFlags::Base, Interface::cmdYx},
         {L"yxTest", _(L"开发用测试命令"), Commands::CommandFlags::Base, Interface::test},
         {L"yxUnload", _(L"关闭本插件"), Commands::CommandFlags::Base, Interface::cmdUnloadApp},
+        {L"yxRestart", _(L"重启本插件"), Commands::CommandFlags::Base, Interface::cmdRestartApp},
         {L"yxPrintClassHierarchy", _(L"打印类层次结构"), Commands::CommandFlags::Base, Interface::cmdPrintClassHierarchy},
-        {L"yxLocateSelf", _(L"在文件资源管理器中打开本工具文件"), Commands::CommandFlags::Base, Interface::cmdLocateSelf},
-        {L"yxPrintConfigFilename", _(L"显示配置文件路径"), Commands::CommandFlags::Base, cmdPrintConfigFilename}
+        {L"yxLocateSelf", _(L"打开本工具文件"), Commands::CommandFlags::Base, Interface::cmdLocateSelf},
+        {L"yxPrintConfigFilename", _(L"打开配置文件"), Commands::CommandFlags::Base, cmdPrintConfigFilename}
     };
 
     Interface::info();
 
     // 注册命令
     Commands::registerYxCmds(Commands::commandInfoList);
-
-    // 读取配置文件
-    auto& manager = ConfigManager::getInstance();
-    auto appPath = Common::getAppSubFolder();
-    if (!appPath.has_value())
-    {
-        AfxMessageBox(_(L"获取程序数据目录失败"), MB_OK | MB_ICONERROR);
-        return;
-    }
-    std::filesystem::path configPathObj = appPath.value() / Common::Config::configName;
-    if (!manager.loadConfig(configPathObj.wstring()))
-    {
-        std::wstring err = manager.getLastError();
-        AfxMessageBox(err.c_str(), MB_OK | MB_ICONERROR);
-    }
-    auto& config = manager.getConfig();
 
     // 输入法语言自动切换
     if (config.imeSettings.bEnabled)
@@ -138,7 +138,6 @@ void Interface::unload()
     // 关闭命令菜单
     MainBar::terminateBar();
     // 卸载命令
-    CAcModuleResourceOverride resOverride;
 	acedRegCmds->removeGroup(Common::cmdGroup);
     acutPrintf(_(L"\n已卸载 %s"), Common::getLocalProjectName());
 }
@@ -155,9 +154,21 @@ void Interface::cmdUnloadApp()
     Commands::executeCommand(pszCmdList);
 }
 
+void Interface::cmdRestartApp()
+{
+    std::wstring lispPath = std::filesystem::path(acedGetAppName()).generic_wstring();
+    Interface::unload();
+    std::wstring lispCmd = L"(progn (arxunload \"" + lispPath + L"\" nil) (arxload \"" + lispPath + L"\")(princ))";
+    Commands::CommandList pszCmdList =
+    {
+        lispCmd.c_str()
+    };
+    Commands::executeCommand(pszCmdList, false);
+}
+
 void Interface::info()
 {
-    CAcModuleResourceOverride resOverride;
+    
     acutPrintf(L"\n%s %s_%s | %s: IYATT-yx | %s: MIT | %s: https://github.com/IYATT-yx/IYATTyxCadTools\n",
         Common::getLocalProjectName(),
         BuildingTime::WDATE, BuildingTime::WTIME,
@@ -175,19 +186,16 @@ void Interface::cmdYx()
 
 void Interface::cmdSetByLayer()
 {
-    CAcModuleResourceOverride resOverride;
     UniversalPicker::run(nullptr, EntityStyle::setByLayer, _(L"设置实体样式为当前层样式"));
 }
 
 void Interface::cmdDimensionSolidify()
 {
-    CAcModuleResourceOverride resOverride;
     UniversalPicker::run(&Common::DimensionSubClasses, Dimension::dimensionSolidify, _(L"尺寸固化"));
 }
 
 void Interface::cmdDimensionRelink()
 {
-    CAcModuleResourceOverride resOverride;
     UniversalPicker::run(&Common::DimensionSubClasses, Dimension::dimensionRelink, _(L"尺寸恢复关联"));
 }
 
@@ -255,7 +263,6 @@ void Interface::cmdRemoveSurroundingCharsForDimension()
 
 void Interface::cmdSetBasicBox()
 {
-    CAcModuleResourceOverride resOverride;
     UniversalPicker::run(
         &Common::DimensionSubClasses,
         [](AcDbObjectId objId)
@@ -269,7 +276,6 @@ void Interface::cmdSetBasicBox()
 
 void Interface::cmdUnsetBasicBox()
 {
-    CAcModuleResourceOverride resOverride;
     UniversalPicker::run(
         &Common::DimensionSubClasses,
         [](AcDbObjectId objId)
@@ -283,7 +289,6 @@ void Interface::cmdUnsetBasicBox()
 
 void Interface::cmdSetRefDim()
 {
-    CAcModuleResourceOverride resOverride;
     UniversalPicker::run(
         &Common::DimensionSubClasses,
         [](AcDbObjectId objId)
@@ -297,7 +302,6 @@ void Interface::cmdSetRefDim()
 
 void Interface::cmdUnsetRefDim()
 {
-    CAcModuleResourceOverride resOverride;
     UniversalPicker::run(
         &Common::DimensionSubClasses,
         [](AcDbObjectId objId)
@@ -363,13 +367,11 @@ void Interface::cmdInsertBalloonNumberBlockWithStartNumber()
 
 void Interface::cmdPrintClassHierarchy()
 {
-    CAcModuleResourceOverride resOverride;
     UniversalPicker::run(nullptr, Common::printClassHierarchy, _(L"打印类层次结构"), UniversalPicker::SelectMode::Immediate, true);
 }
 
 void Interface::cmdExtractAnnotations()
 {
-    CAcModuleResourceOverride resOverride;
     FileDialog::FileDialogFilterBuilder fileFilterBuilder;
     CString strFileFilter = fileFilterBuilder.addFilter(_(L"CSV 文件"), { L"*.csv" }).build();
     CString filePath = FileDialog::ShowSaveFileDialog(_(L"保存 CSV 文件到"), _(L"数据文件.csv"), L"csv", strFileFilter);
@@ -616,7 +618,6 @@ void Interface::cmdImeAutoSwitch()
 
 void Interface::cmdCloneText()
 {
-    CAcModuleResourceOverride resOverride;
     AcString asSrcTextContent;
     acutPrintf(_(L"\n请选择要复制的源文本对象"));
     if (!TextUtil::getSelectedTextRawContent(asSrcTextContent) || asSrcTextContent.isEmpty())
@@ -804,7 +805,6 @@ void Interface::cmdBalloonNumberFilter()
 
 void Interface::cmdImportCsvToMTextMatrix()
 {
-    CAcModuleResourceOverride resOverride;
     FileDialog::FileDialogFilterBuilder fileFilterBuilter;
     CString strFileFilter = fileFilterBuilter.addFilter(_(L"CSV 文件"), { L"*.csv" }).build();
     CString strFilePath = FileDialog::ShowOpenFileDialog(_(L"选择要导入的文件"), L"csv", strFileFilter);
@@ -817,6 +817,7 @@ void Interface::cmdImportCsvToMTextMatrix()
     CsvModule::AcStringMatrix matrixData;
     CsvModule::readCsvToAcStringMatrix(strFilePath, matrixData);
 
+    CAcModuleResourceOverride resOverride;
     GenericPairEditDlg dlg(_(L"从 CSV 文件导入数据生成多行文本矩阵"), _(L"参数"), _(L"使用提示"), false, true, true);
     CString strTipMTextMatrixParameter;
     double TEXTSIZE;
@@ -951,7 +952,6 @@ void Interface::cmdImportCsvToMTextMatrix()
 
     void Interface::cmdCheckBalloonNumberMaxMin()
     {
-        CAcModuleResourceOverride resOverride;
         UniversalPicker::AcRxClassVector arcv = { AcDbBlockReference::desc() };
         AcString strValue;
         int max = INT_MIN;
@@ -1021,7 +1021,6 @@ void Interface::cmdImportCsvToMTextMatrix()
 
     void Interface::cmdPasteClipImage()
     {
-        CAcModuleResourceOverride resOverride;
         if (!Image::clipboardHasImage())
         {
             AfxMessageBox(_(L"剪贴板中没有检测到图像数据。"), MB_OK | MB_ICONWARNING);
@@ -1070,7 +1069,6 @@ void Interface::cmdImportCsvToMTextMatrix()
 
     void Interface::cmdCheckDuplicateBalloonNumbers()
     {
-        CAcModuleResourceOverride resOverride;
         UniversalPicker::AcRxClassVector arcv = { AcDbBlockReference::desc() };
 
         std::map<AcString, AcDbObjectIdArray> numberMap;
@@ -1124,7 +1122,6 @@ void Interface::cmdImportCsvToMTextMatrix()
 
     void Interface::cmdCheckBalloonNumberBreakpoints()
     {
-        CAcModuleResourceOverride resOverride;
         UniversalPicker::AcRxClassVector arcv = { AcDbBlockReference::desc() };
 
         // 使用 set 自动去重并升序排序
@@ -1215,7 +1212,6 @@ void Interface::cmdImportCsvToMTextMatrix()
 
     void Interface::cmdForceRemoveImage()
     {
-        CAcModuleResourceOverride resOverride;
         UniversalPicker::AcRxClassVector arcv = { AcDbRasterImage::desc() };
         UniversalPicker::run(
             &arcv,
@@ -1230,14 +1226,12 @@ void Interface::cmdImportCsvToMTextMatrix()
 
     void Interface::cmdLocateSelf()
     {
-        CAcModuleResourceOverride resOverride;
         const wchar_t* appName = acedGetAppName();
         FileDialog::locateFileInExplorer(appName);
     }
 
     void Interface::cmdChainSelection()
     {
-        CAcModuleResourceOverride resOverride;
         UniversalPicker::AcRxClassVector arcv = { AcDbArc::desc(), AcDbPolyline::desc(), AcDbLine::desc(), AcDbSpline::desc() };
         resbuf* pFilter = UniversalPicker::buildFilter(&arcv);
 
@@ -1311,7 +1305,6 @@ void Interface::cmdImportCsvToMTextMatrix()
     void Interface::cmdDimensionTolerancePrecision()
     {
         CAcModuleResourceOverride resOverride;
-
         GenericPairEditDlg dlg(_(L"设置尺寸标注的主单位精度和公差精度"), _(L"主单位精度"), _(L"公差精度"), false, true, true);
         // 设置 -1 表示不修改精度 
         CString strDimPrec = L"-1";
@@ -1399,7 +1392,6 @@ void Interface::cmdImportCsvToMTextMatrix()
             AcDbXline::desc()
         };
 
-        CAcModuleResourceOverride resOverride;
         AcDbObjectId lastId = AcDbObjectId::kNull;
         acutPrintf(_(L"\n请选择第一条线："));
         UniversalPicker::run(
@@ -1436,10 +1428,9 @@ void Interface::cmdImportCsvToMTextMatrix()
 
     void Interface::cmdPrintConfigFilename()
     {
-        CAcModuleResourceOverride resOverride;
         auto& manager = ConfigManager::getInstance();
         std::wstring configFilename = manager.getConfigFilename();
-        acutPrintf(_(L"\n配置文件路径：%s"), configFilename.c_str());
+        FileDialog::locateFileInExplorer(configFilename.c_str());
     }
 
     void Interface::cmdDialogMiddleClickToOk()
@@ -1555,4 +1546,40 @@ void Interface::cmdImportCsvToMTextMatrix()
             config.middleClickManagerSettings.dCmdMiddleClickDownUpInterval = dCmdMiddleClickDownUpInterval;
         }
         MiddleClickManager::getInstance().startUnifiedMiddleClickProc(config.middleClickManagerSettings);
+    }
+
+    void Interface::cmdSetLanguage()
+    {
+        CAcModuleResourceOverride resOverride;
+        CString title = _(L"设置语言");
+        GenericPairEditDlg dlg(title, _(L"语言代码"), L"提示", false, true, true);
+
+        auto& manager = ConfigManager::getInstance();
+        auto& config = manager.getConfig();
+        std::wstring languageCode = config.languageSettings.languageCode;
+        dlg.modifyEditControl(languageCode.c_str(), _(L"无匹配语言代码的翻译文件时，默认显示中文"));
+
+        dlg.setValidatorAndParser([&](const CString& value1, const CString& _2) -> CString
+            {
+                if (value1.IsEmpty())
+                {
+                    return _(L"必须输入语言代码");
+                }
+                config.languageSettings.languageCode = value1.GetString();
+                return GenericPairEditDlg::ValidatorOk;
+            });
+
+        if (dlg.DoModal() != IDOK)
+        {
+            acutPrintf(_(L"取消操作"));
+            return;
+        }
+
+        if (!manager.saveConfig())
+        {
+            std::wstring err = manager.getLastError();
+            AfxMessageBox(err.c_str(), MB_OK | MB_ICONERROR);
+            config.languageSettings.languageCode = languageCode;
+        }
+        AfxMessageBox(_(L"重启插件刷新语言设置"), MB_OK | MB_ICONINFORMATION);
     }

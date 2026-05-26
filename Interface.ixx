@@ -31,6 +31,7 @@ private:
 	static void cmdUpdateBalloonNumberBlock();
 	static void cmdImeAutoSwitch();
 	static void cmdUnloadApp();
+	static void cmdRestartApp();
 	static void cmdCloneText();
 	static void cmdIntersect();
 	static void cmdBalloonNumberOffset();
@@ -50,5 +51,6 @@ private:
 	static void cmdPrintConfigFilename();
 	static void cmdDialogMiddleClickToOk();
 	static void cmdCmdMiddleClickToEnter();
+	static void cmdSetLanguage();
 };
 
