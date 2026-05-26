@@ -47,9 +47,11 @@ SDK：
 * GNU gettext tools for Windows：https://github.com/vslavik/gettext-tools-windows  
 * poedit: https://github.com/vslavik/poedit  
 
+环境配置：  
 ObjectARX 环境配置参考：https://blog.iyatt.com/?p=24522  
 AutoCAD Mechanical SDK 环境配置参考：https://blog.iyatt.com/?p=24583  
 启用 vcpkg 参考：https://blog.iyatt.com/?p=24690  
+vcpkg 包搜索：https://vcpkg.io/en/packages  
 
 ### 项目开发策略
 
