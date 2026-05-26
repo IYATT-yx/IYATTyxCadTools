@@ -41,7 +41,7 @@ void Interface::init()
     auto appPath = Common::getAppSubFolder();
     if (!appPath.has_value())
     {
-        AfxMessageBox(_(L"获取程序数据目录失败"), MB_OK | MB_ICONERROR);
+        AfxMessageBox(L"Failed to get application data directory", MB_OK | MB_ICONERROR);
         return;
     }
     std::filesystem::path configPathObj = appPath.value() / Common::Config::configName;
