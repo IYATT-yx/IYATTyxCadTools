@@ -6,7 +6,7 @@
  *            Licensed under the MIT License. See LICENSE file in the project root for full license information.
  */
 module;
-#include "thirdparty/nlohmann/json.hpp"
+#include "nlohmann/json.hpp"
 
 export module IYATTyxJsonWrapper;
 import std;

@@ -191,9 +191,6 @@
     <ClInclude Include="MainBar.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="thirdparty\nlohmann\json.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CadTools.rc">
