@@ -118,11 +118,6 @@ BOOL MainBarChildDlg::OnInitDialog()
 	CAcModuleResourceOverride resOverride;
 
 	this->commandListControl.SetExtendedStyle(this->commandListControl.GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
-	//std::vector<CString> columnNames = {Common::loadString(IDS_LBL_CommandDescription), Common::loadString(IDS_LBL_CommandName), Common::loadString(IDS_LBL_ShortCommandName)};
-	//for (auto columnName : columnNames)
-	//{
- //       this->commandListControl.InsertColumn(0, columnName, LVCFMT_LEFT, 100);
-	//}
 	this->commandListControl.InsertColumn(0, _(L"命令描述"), LVCFMT_LEFT, 100);
 	this->commandListControl.InsertColumn(0, _(L"命令名"), LVCFMT_LEFT, 100);
 	this->commandListControl.InsertColumn(0, _(L"精简命令名"), LVCFMT_LEFT, 80);
