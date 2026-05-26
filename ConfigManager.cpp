@@ -33,7 +33,7 @@ bool ConfigManager::loadConfig(const std::wstring& filename)
     catch (const std::exception& e)
     {
         std::string what = e.what();
-        this->mLastError = _(L"结构映射失败：") + std::wstring(what.begin(), what.end());
+        this->mLastError = L"Structure mapping failed: " + std::wstring(what.begin(), what.end());
         return false;
     }
 
@@ -44,7 +44,7 @@ bool ConfigManager::saveConfig()
 {
     if (this->mConfigFilename.empty())
     {
-        this->mLastError = _(L"未设置路径");
+        this->mLastError = L"Path not set";
         return false;
     }
 
@@ -54,7 +54,7 @@ bool ConfigManager::saveConfig()
         std::wstring saveErr;
         if (!IYATTyxJsonWrapper::saveJson(this->mConfigFilename, j, saveErr))
         {
-            this->mLastError = _(L"硬盘持久化失败：") + saveErr;
+            this->mLastError = L"Disk persistence failed: " + saveErr;
             return false;
         }
         return true;
@@ -62,7 +62,7 @@ bool ConfigManager::saveConfig()
     catch (const std::exception& e)
     {
         std::string what = e.what();
-        this->mLastError = _(L"序列化失败：") + std::wstring(what.begin(), what.end());
+        this->mLastError = L"Serialization failed: " + std::wstring(what.begin(), what.end());
         return false;
     }
 }
