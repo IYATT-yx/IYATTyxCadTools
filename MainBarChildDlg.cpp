@@ -102,11 +102,10 @@ void MainBarChildDlg::OnSize (UINT nType, int cx, int cy)
 		CRect rect;
 		this->commandListControl.GetClientRect(&rect);
 		int width0 = this->commandListControl.GetColumnWidth(0);
-		int width1 = this->commandListControl.GetColumnWidth(1);
-		int remainingWidth = rect.Width() - width0 - width1;
+		int remainingWidth = rect.Width() - width0;
 		if (remainingWidth > 0)
 		{
-			this->commandListControl.SetColumnWidth(2, remainingWidth);
+			this->commandListControl.SetColumnWidth(1, remainingWidth);
 		}
 	}
 }
@@ -120,7 +119,6 @@ BOOL MainBarChildDlg::OnInitDialog()
 	this->commandListControl.SetExtendedStyle(this->commandListControl.GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
 	this->commandListControl.InsertColumn(0, _(L"命令描述"), LVCFMT_LEFT, 100);
 	this->commandListControl.InsertColumn(0, _(L"命令名"), LVCFMT_LEFT, 100);
-	this->commandListControl.InsertColumn(0, _(L"精简命令名"), LVCFMT_LEFT, 80);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 异常: OCX 属性页应返回 FALSE
@@ -131,10 +129,8 @@ void MainBarChildDlg::insertCommands(Commands::CommandInfoList& commandInfoList)
 	int idx = 0;
 	for (Commands::CommandInfo ci : commandInfoList)
 	{
-		AcString shortCommandName = ci.getShortCommandName();
-		this->commandListControl.InsertItem(idx, shortCommandName.constPtr());
-        this->commandListControl.SetItemText(idx, 1, ci.commandName.constPtr());
-		this->commandListControl.SetItemText(idx, 2, ci.commandDescription.constPtr());
+		this->commandListControl.InsertItem(idx, ci.commandName.constPtr());
+		this->commandListControl.SetItemText(idx, 1, ci.commandDescription.constPtr());
 		++idx;
 	}
 }
@@ -146,7 +142,7 @@ void MainBarChildDlg::OnNMDblclkList1(NMHDR* pNMHDR, LRESULT* pResult)
 
 	if (nIndex != -1)
 	{
-		CString strFullCmd = this->commandListControl.GetItemText(nIndex, 1);
+		CString strFullCmd = this->commandListControl.GetItemText(nIndex, 0);
 		if (!strFullCmd.IsEmpty())
 		{
 			Commands::CommandList pszCmdList = { strFullCmd.GetString() };
