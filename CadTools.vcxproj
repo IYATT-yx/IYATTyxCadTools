@@ -39,6 +39,8 @@
     <ClCompile Include="CsvModule.ixx" />
     <ClCompile Include="Dimension.cpp" />
     <ClCompile Include="Dimension.ixx" />
+    <ClCompile Include="DocCloseInterceptor.cpp" />
+    <ClCompile Include="DocCloseInterceptor.ixx" />
     <ClCompile Include="DocData.cpp" />
     <ClCompile Include="EncodingConverter.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>

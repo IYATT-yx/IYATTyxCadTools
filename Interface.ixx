@@ -52,5 +52,6 @@ private:
 	static void cmdDialogMiddleClickToOk();
 	static void cmdCmdMiddleClickToEnter();
 	static void cmdSetLanguage();
+	static void cmdClosePrompt();
 };
 

@@ -171,6 +171,12 @@
     <ClCompile Include="Translator.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="DocCloseInterceptor.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DocCloseInterceptor.ixx">
+      <Filter>头文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StdAfx.h">

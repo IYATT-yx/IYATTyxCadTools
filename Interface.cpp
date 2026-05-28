@@ -33,6 +33,7 @@ import MiddleClickManager;
 import AcadVarUtil;
 import Translator;
 import EncodingConverter;
+import DocCloseInterceptor;
 
 void Interface::init()
 {
@@ -96,6 +97,7 @@ void Interface::init()
         {L"yxImeAutoSwitch", _(L"设置输入法自动切换"), Commands::CommandFlags::Base, Interface::cmdImeAutoSwitch},
         {L"yxDialogMiddleClickToOk", _(L"设置对话框中鼠标中键映射到确定按钮"), Commands::CommandFlags::Base, Interface::cmdDialogMiddleClickToOk},
         {L"yxCmdMiddleClickToEnter", _(L"设置命令执行状态下鼠标中键映射回车键"), Commands::CommandFlags::Base, Interface::cmdCmdMiddleClickToEnter},
+        {L"yxSkipSavePromptOnViewChangesEnabled", _(L"设置跳过仅视图修改时的文件保存提示"), Commands::CommandFlags::Base, Interface::cmdClosePrompt},
         {L"yxSetLanguage", _(L"设置语言"), Commands::CommandFlags::Base, Interface::cmdSetLanguage},
         {L"yx", _(L"显示或隐藏命令菜单"), Commands::CommandFlags::Base, Interface::cmdYx},
         {L"yxTest", _(L"开发用测试命令"), Commands::CommandFlags::Base, Interface::test},
@@ -120,6 +122,12 @@ void Interface::init()
     // 中键处理
     MiddleClickManager::getInstance().startUnifiedMiddleClickProc(config.middleClickManagerSettings);
 
+    // 文件关闭提示拦截
+    if (config.closePromptSettings.bSkipSavePromptOnViewChangesEnabled)
+    {
+        DocCloseInterceptor::getInstance().start();
+    }
+
     // 显示命令报表悬浮窗
     MainBar::showBar(Commands::commandInfoList);
 }
@@ -135,6 +143,8 @@ void Interface::unload()
     ImeAutoSwitcher::stop();
     // 关闭中键处理
     MiddleClickManager::getInstance().stopUnifiedMiddleClickProc();
+    // 停止文件关闭提示拦截
+    DocCloseInterceptor::getInstance().stop();
     // 关闭命令菜单
     MainBar::terminateBar();
     // 卸载命令
@@ -857,729 +867,776 @@ void Interface::cmdImportCsvToMTextMatrix()
     TextUtil::createMTextMatrix(params[0], params[1], params[2], matrixData, asPnt3d(pt));
 }
 
-    void Interface::cmdSpatialTableExplorer()
+void Interface::cmdSpatialTableExplorer()
+{
+    CAcModuleResourceOverride resOverride;
+    CString title = _(L"将多行/单行文本按空间位置表格化导出到 CSV 文件");
+    GenericPairEditDlg dlg(title, _(L"参数"), _(L"使用提示"), false, true, true);
+
+    // 默认列容差和行容差
+    // 字高默认使用 TEXTSIZE 变量值，列容差默认按字高的 3 倍，行容差默认按字高的 1 倍（考虑注释比例缩放值）
+    CString strInitParameter;
+    double scale = Annotative::getCurrentScaleValue();
+    double TEXTSIZE;
+    if (!AcadVarUtil::getVar(AcadVarName::TEXTSIZE, TEXTSIZE))
     {
-        CAcModuleResourceOverride resOverride;
-        CString title = _(L"将多行/单行文本按空间位置表格化导出到 CSV 文件");
-        GenericPairEditDlg dlg(title, _(L"参数"), _(L"使用提示"), false, true, true);
+        AfxMessageBox(_(L"获取变量失败！"), MB_OK | MB_ICONERROR);
+        return;
+    }
+    strInitParameter.Format(L"%g %g", TEXTSIZE * scale * 3, TEXTSIZE * scale * 1);
+    dlg.modifyEditControl(strInitParameter, _(L"输入2个不小于0的数，使用空格分隔，分别为：列容差、行容差。文本距离超过容差视为不同列或行。"));
 
-        // 默认列容差和行容差
-        // 字高默认使用 TEXTSIZE 变量值，列容差默认按字高的 3 倍，行容差默认按字高的 1 倍（考虑注释比例缩放值）
-        CString strInitParameter;
-        double scale = Annotative::getCurrentScaleValue();
-        double TEXTSIZE;
-        if (!AcadVarUtil::getVar(AcadVarName::TEXTSIZE, TEXTSIZE))
+    std::vector<double> params;
+    dlg.setValidatorAndParser([&](const CString& edit1, const CString& _2) -> CString
         {
-            AfxMessageBox(_(L"获取变量失败！"), MB_OK | MB_ICONERROR);
-            return;
-        }
-        strInitParameter.Format(L"%g %g", TEXTSIZE * scale * 3, TEXTSIZE * scale * 1);
-        dlg.modifyEditControl(strInitParameter, _(L"输入2个不小于0的数，使用空格分隔，分别为：列容差、行容差。文本距离超过容差视为不同列或行。"));
-
-        std::vector<double> params;
-        dlg.setValidatorAndParser([&](const CString& edit1, const CString& _2) -> CString
+            const int paramsNumber = 2;
+            if (!Common::parse(edit1, paramsNumber, [](double v) { return v > 0; }, params))
             {
-                const int paramsNumber = 2;
-                if (!Common::parse(edit1, paramsNumber, [](double v) { return v > 0; }, params))
-                {
-                    return _(L"输入2个不小于0的数，使用空格分隔，分别为：列容差、行容差。文本距离超过容差视为不同列或行。");
-                }
-                return GenericPairEditDlg::ValidatorOk;
-            });
+                return _(L"输入2个不小于0的数，使用空格分隔，分别为：列容差、行容差。文本距离超过容差视为不同列或行。");
+            }
+            return GenericPairEditDlg::ValidatorOk;
+        });
 
     
-        if (dlg.DoModal() != IDOK)
-        {
-            acutPrintf(_(L"取消操作"));
-            return;
-        }
+    if (dlg.DoModal() != IDOK)
+    {
+        acutPrintf(_(L"取消操作"));
+        return;
+    }
 
-        FileDialog::FileDialogFilterBuilder fileFilterBuilter;
-        CString strFileFilter = fileFilterBuilter.addFilter(_(L"CSV 文件"), { L"*.csv" }).build();
-        CString strFilePath = FileDialog::ShowSaveFileDialog(_(L"保存 CSV 文件到"), _(L"数据文件.csv"), L"csv", strFileFilter);
-        if (strFilePath.IsEmpty())
-        {
-            acutPrintf(_(L"取消操作"));
-            return;
-        }
-        CsvWriter writer(strFilePath);
-        if (!writer.isValid())
-        {
-            AfxMessageBox(_(L"文件路径打开失败，请检查是否被占用或路径无效"), MB_OK | MB_ICONERROR);
-            return;
-        }
+    FileDialog::FileDialogFilterBuilder fileFilterBuilter;
+    CString strFileFilter = fileFilterBuilter.addFilter(_(L"CSV 文件"), { L"*.csv" }).build();
+    CString strFilePath = FileDialog::ShowSaveFileDialog(_(L"保存 CSV 文件到"), _(L"数据文件.csv"), L"csv", strFileFilter);
+    if (strFilePath.IsEmpty())
+    {
+        acutPrintf(_(L"取消操作"));
+        return;
+    }
+    CsvWriter writer(strFilePath);
+    if (!writer.isValid())
+    {
+        AfxMessageBox(_(L"文件路径打开失败，请检查是否被占用或路径无效"), MB_OK | MB_ICONERROR);
+        return;
+    }
 
-        TextUtil::TextEntityDataList elements;
-        UniversalPicker::run(
-            &TextUtil::textClassList,
-            [&](const AcDbObjectId& id)
+    TextUtil::TextEntityDataList elements;
+    UniversalPicker::run(
+        &TextUtil::textClassList,
+        [&](const AcDbObjectId& id)
+        {
+            TextUtil::TextEntityData data;
+            data.id = id;
+            if (TextUtil::readMText(id, data.text, false, &data.pos))
             {
-                TextUtil::TextEntityData data;
-                data.id = id;
-                if (TextUtil::readMText(id, data.text, false, &data.pos))
-                {
-                    acutPrintf(_(L"\n(%g,%g,%g)多行文本：%s"), data.pos.x, data.pos.y, data.pos.z, data.text.constPtr());
-                }
-                else if (TextUtil::readDText(id, data.text, false, &data.pos))
-                {
-                    acutPrintf(_(L"\n(%g,%g,%g)单行文本：%s"), data.text.constPtr());
-                }
-                elements.push_back(data);
-            },
-            title,
-            UniversalPicker::SelectMode::Batch,
-            true,
-            UniversalPicker::SortMode::None,
-            true
-        );
+                acutPrintf(_(L"\n(%g,%g,%g)多行文本：%s"), data.pos.x, data.pos.y, data.pos.z, data.text.constPtr());
+            }
+            else if (TextUtil::readDText(id, data.text, false, &data.pos))
+            {
+                acutPrintf(_(L"\n(%g,%g,%g)单行文本：%s"), data.text.constPtr());
+            }
+            elements.push_back(data);
+        },
+        title,
+        UniversalPicker::SelectMode::Batch,
+        true,
+        UniversalPicker::SortMode::None,
+        true
+    );
 
-        CsvModule::AcStringMatrix matrixData;
-        TextUtil::structureTextToAcStringMatrix(elements, params[0], params[1], matrixData);
+    CsvModule::AcStringMatrix matrixData;
+    TextUtil::structureTextToAcStringMatrix(elements, params[0], params[1], matrixData);
     
 
-        for (const auto& row : matrixData)
-        {
-            writer.writeRow(row);
-            acutPrintf(L"\n");
-            for (const auto& field : row)
-            {
-                acutPrintf(L"%s\t", field.constPtr());
-            }
-        }
-
-        acutPrintf(_(L"\n文件位置：%s"), strFilePath);
-    }
-
-    void Interface::cmdCheckBalloonNumberMaxMin()
+    for (const auto& row : matrixData)
     {
-        UniversalPicker::AcRxClassVector arcv = { AcDbBlockReference::desc() };
-        AcString strValue;
-        int max = INT_MIN;
-        int min = INT_MAX;
-        AcDbObjectId maxId = AcDbObjectId::kNull;
-        AcDbObjectId minId = AcDbObjectId::kNull;
-        AcDbObjectIdArray matchedIds;
-        UniversalPicker::run(
-            &arcv,
-            [&](const AcDbObjectId& id)
-            {
-                if (BalloonNumber::getBalloonAttributeValue(id, strValue))
-                {
-                    try
-                    {
-                        size_t pos;
-                        int number = std::stoi(strValue.constPtr(), &pos);
-                        if (pos != strValue.length())
-                        {
-                            throw std::exception();
-                        }
-                        if (number > max)
-                        {
-                            max = number;
-                            maxId = id;
-                        }
-                        if (number < min)
-                        {
-                            min = number;
-                            minId = id;
-                        }
-
-                    }
-                    catch (...)
-                    {
-
-                    }
-                }
-
-            },
-            _(L"查找气泡号最大和最小序号"),
-            UniversalPicker::SelectMode::Batch,
-            true,
-            UniversalPicker::SortMode::None,
-            true
-        );
-
-        AcDbObjectIdArray resultIds;
-        if (maxId != AcDbObjectId::kNull)
+        writer.writeRow(row);
+        acutPrintf(L"\n");
+        for (const auto& field : row)
         {
-            resultIds.append(maxId);
-        }
-        if (minId != AcDbObjectId::kNull)
-        {
-            resultIds.append(minId);
-        }
-        if (resultIds.length() > 0)
-        {
-            UniversalPicker::setSelection(resultIds);
-            acutPrintf(_(L"\n最大气泡号：%d，最小气泡号：%d"), max, min);
-        }
-        else
-        {
-            acutPrintf(_(L"\n未发现有效数字格式的气泡号"));
+            acutPrintf(L"%s\t", field.constPtr());
         }
     }
 
-    void Interface::cmdPasteClipImage()
-    {
-        if (!Image::clipboardHasImage())
-        {
-            AfxMessageBox(_(L"剪贴板中没有检测到图像数据。"), MB_OK | MB_ICONWARNING);
-            return;
-        }
+    acutPrintf(_(L"\n文件位置：%s"), strFilePath);
+}
 
-        FileDialog::FileDialogFilterBuilder filterBuilder;
-        CString fileFilter = filterBuilder.addFilter(_(L"PNG 图片"), { L"*.png" }).build();
-        CString defaultFilename;
-        defaultFilename.Format(_(L"图片%s.png"), Common::getTimestamp());
-        CString filename = FileDialog::ShowSaveFileDialog(_(L"选择图片保存路径"), defaultFilename, L"png", fileFilter, Common::getCurrPath(true));
-        if (filename.IsEmpty())
+void Interface::cmdCheckBalloonNumberMaxMin()
+{
+    UniversalPicker::AcRxClassVector arcv = { AcDbBlockReference::desc() };
+    AcString strValue;
+    int max = INT_MIN;
+    int min = INT_MAX;
+    AcDbObjectId maxId = AcDbObjectId::kNull;
+    AcDbObjectId minId = AcDbObjectId::kNull;
+    AcDbObjectIdArray matchedIds;
+    UniversalPicker::run(
+        &arcv,
+        [&](const AcDbObjectId& id)
         {
-            acutPrintf(_(L"取消操作"));
-            return;
-        }
-        if (!Image::saveClipboardBitmapToFile(filename))
-        {
-            AfxMessageBox(_(L"保存剪贴板图像数据到文件失败"), MB_OK | MB_ICONERROR);
-            return;
-        }
-        if (!Image::copyFileToClipboard(filename))
-        {
-            AfxMessageBox(_(L"复制文件到剪贴板失败"), MB_OK | MB_ICONERROR);
-            return;
-        }
-        const wchar_t* appName = acedGetAppName();
-        Commands::CommandList pszCmdList =
-        {
-            L"PASTECLIP"
-        };
-        Commands::executeCommand(pszCmdList);
-    }
-
-    void Interface::cmdLocateDrawing()
-    {
-        CString drawingPath = Common::getCurrPath();
-        if (drawingPath.IsEmpty())
-        {
-            AfxMessageBox(_(L"图纸未保存"), MB_OK | MB_ICONERROR);
-            return;
-        }
-
-        FileDialog::locateFileInExplorer(drawingPath);
-    }
-
-    void Interface::cmdCheckDuplicateBalloonNumbers()
-    {
-        UniversalPicker::AcRxClassVector arcv = { AcDbBlockReference::desc() };
-
-        std::map<AcString, AcDbObjectIdArray> numberMap;
-        AcString strValue;
-
-        UniversalPicker::run(
-            &arcv,
-            [&](const AcDbObjectId& id)
+            if (BalloonNumber::getBalloonAttributeValue(id, strValue))
             {
-                if (BalloonNumber::getBalloonAttributeValue(id, strValue))
+                try
                 {
-                    if (!strValue.isEmpty())
+                    size_t pos;
+                    int number = std::stoi(strValue.constPtr(), &pos);
+                    if (pos != strValue.length())
                     {
-                        numberMap[strValue].append(id);
+                        throw std::exception();
                     }
-                }
-            },
-            _(L"检查重复气泡号"),
-            UniversalPicker::SelectMode::Batch,
-            true,
-            UniversalPicker::SortMode::None,
-            true
-        );
-
-        AcDbObjectIdArray duplicateIds;
-        AcString reportMsg = L"";
-        for (auto const& [text, ids] : numberMap)
-        {
-            if (ids.length() > 1)
-            {
-                duplicateIds.append(ids);
-
-                if (!reportMsg.isEmpty())
-                {
-                    reportMsg.append(L", ");
-                }
-                reportMsg.append(text);
-            }
-        }
-
-        if (duplicateIds.length() > 0)
-        {
-            UniversalPicker::setSelection(duplicateIds);
-            acutPrintf(_(L"\n发现重复: %s"), reportMsg.constPtr());
-        }
-        else
-        {
-            acutPrintf(_(L"未发现重复"));
-        }
-    }
-
-    void Interface::cmdCheckBalloonNumberBreakpoints()
-    {
-        UniversalPicker::AcRxClassVector arcv = { AcDbBlockReference::desc() };
-
-        // 使用 set 自动去重并升序排序
-        std::set<int> numbers;
-        AcString strValue;
-
-        UniversalPicker::run(
-            &arcv,
-            [&](const AcDbObjectId& id)
-            {
-                if (BalloonNumber::getBalloonAttributeValue(id, strValue))
-                {
-                    try
+                    if (number > max)
                     {
-                        size_t pos = 0;
-                        // 强制宽字符转换，确保完全解析
-                        int number = std::stoi(strValue.constPtr(), &pos);
-
-                        if (pos == static_cast<size_t>(strValue.length()))
-                        {
-                            numbers.insert(number);
-                        }
+                        max = number;
+                        maxId = id;
                     }
-                    catch (...)
+                    if (number < min)
                     {
-                        // 无法转换为数字的内容不参与断点计算
+                        min = number;
+                        minId = id;
                     }
-                }
-            },
-            _(L"检查气泡号断点"),
-            UniversalPicker::SelectMode::Batch,
-            true,
-            UniversalPicker::SortMode::None,
-            true
-        );
 
-        // 只有 1 个或 0 个数字无法构成断点
-        if (numbers.size() < 2)
-        {
-            return;
-        }
-
-        AcString reportMsg = L"";
-        auto it = numbers.begin();
-        int prev = *it;
-        ++it;
-        for (; it != numbers.end(); ++it)
-        {
-            int curr = *it;
-            // 检查数字是否连续
-            if (curr != prev + 1)
-            {
-                if (!reportMsg.isEmpty())
-                {
-                    reportMsg.append(L", ");
                 }
+                catch (...)
+                {
 
-                int missStart = prev + 1;
-                int missEnd = curr - 1;
-                if (missStart == missEnd)
-                {
-                    // 单点缺失：如 3, 5 -> 4
-                    AcString tmp;
-                    tmp.format(L"%d", missStart);
-                    reportMsg.append(tmp);
-                }
-                else
-                {
-                    // 区间缺失：如 3, 7 -> 4-6
-                    AcString tmp;
-                    tmp.format(L"%d-%d", missStart, missEnd);
-                    reportMsg.append(tmp);
                 }
             }
-            prev = curr;
-        }
 
-        // 结果呈现
-        if (reportMsg.empty() == false)
+        },
+        _(L"查找气泡号最大和最小序号"),
+        UniversalPicker::SelectMode::Batch,
+        true,
+        UniversalPicker::SortMode::None,
+        true
+    );
+
+    AcDbObjectIdArray resultIds;
+    if (maxId != AcDbObjectId::kNull)
+    {
+        resultIds.append(maxId);
+    }
+    if (minId != AcDbObjectId::kNull)
+    {
+        resultIds.append(minId);
+    }
+    if (resultIds.length() > 0)
+    {
+        UniversalPicker::setSelection(resultIds);
+        acutPrintf(_(L"\n最大气泡号：%d，最小气泡号：%d"), max, min);
+    }
+    else
+    {
+        acutPrintf(_(L"\n未发现有效数字格式的气泡号"));
+    }
+}
+
+void Interface::cmdPasteClipImage()
+{
+    if (!Image::clipboardHasImage())
+    {
+        AfxMessageBox(_(L"剪贴板中没有检测到图像数据。"), MB_OK | MB_ICONWARNING);
+        return;
+    }
+
+    FileDialog::FileDialogFilterBuilder filterBuilder;
+    CString fileFilter = filterBuilder.addFilter(_(L"PNG 图片"), { L"*.png" }).build();
+    CString defaultFilename;
+    defaultFilename.Format(_(L"图片%s.png"), Common::getTimestamp());
+    CString filename = FileDialog::ShowSaveFileDialog(_(L"选择图片保存路径"), defaultFilename, L"png", fileFilter, Common::getCurrPath(true));
+    if (filename.IsEmpty())
+    {
+        acutPrintf(_(L"取消操作"));
+        return;
+    }
+    if (!Image::saveClipboardBitmapToFile(filename))
+    {
+        AfxMessageBox(_(L"保存剪贴板图像数据到文件失败"), MB_OK | MB_ICONERROR);
+        return;
+    }
+    if (!Image::copyFileToClipboard(filename))
+    {
+        AfxMessageBox(_(L"复制文件到剪贴板失败"), MB_OK | MB_ICONERROR);
+        return;
+    }
+    const wchar_t* appName = acedGetAppName();
+    Commands::CommandList pszCmdList =
+    {
+        L"PASTECLIP"
+    };
+    Commands::executeCommand(pszCmdList);
+}
+
+void Interface::cmdLocateDrawing()
+{
+    CString drawingPath = Common::getCurrPath();
+    if (drawingPath.IsEmpty())
+    {
+        AfxMessageBox(_(L"图纸未保存"), MB_OK | MB_ICONERROR);
+        return;
+    }
+
+    FileDialog::locateFileInExplorer(drawingPath);
+}
+
+void Interface::cmdCheckDuplicateBalloonNumbers()
+{
+    UniversalPicker::AcRxClassVector arcv = { AcDbBlockReference::desc() };
+
+    std::map<AcString, AcDbObjectIdArray> numberMap;
+    AcString strValue;
+
+    UniversalPicker::run(
+        &arcv,
+        [&](const AcDbObjectId& id)
         {
-            acutPrintf(_(L"\n缺失的气泡编号: %s"), reportMsg.constPtr());
-        }
-        else
-        {
-            acutPrintf(_(L"\n气泡编号连续，未发现断点"));
-        }
-    }
-
-    void Interface::cmdForceRemoveImage()
-    {
-        UniversalPicker::AcRxClassVector arcv = { AcDbRasterImage::desc() };
-        UniversalPicker::run(
-            &arcv,
-            Image::forceRemoveImageAndFile,
-            _(L"删除光栅图像及图片文件（无法撤销恢复）"),
-            UniversalPicker::SelectMode::Immediate,
-            false,
-            UniversalPicker::SortMode::None,
-            true
-        );
-    }
-
-    void Interface::cmdLocateSelf()
-    {
-        const wchar_t* appName = acedGetAppName();
-        FileDialog::locateFileInExplorer(appName);
-    }
-
-    void Interface::cmdChainSelection()
-    {
-        UniversalPicker::AcRxClassVector arcv = { AcDbArc::desc(), AcDbPolyline::desc(), AcDbLine::desc(), AcDbSpline::desc() };
-        resbuf* pFilter = UniversalPicker::buildFilter(&arcv);
-
-        UniversalPicker::run(
-            &arcv,
-            [&](const AcDbObjectId& id, bool& bBreak)
+            if (BalloonNumber::getBalloonAttributeValue(id, strValue))
             {
-                // 局部容器：确保每次点击都是独立的搜索过程
-                std::queue<AcDbObjectId> waitingQueue;
-                std::set<AcDbObjectId> processedIds;
-                AcDbObjectIdArray resultIds;
-
-                waitingQueue.push(id);
-                processedIds.insert(id);
-
-                // 广度优先搜索 (BFS)
-                while (!waitingQueue.empty())
+                if (!strValue.isEmpty())
                 {
-                    AcDbObjectId currentId = waitingQueue.front();
-                    waitingQueue.pop();
-                    resultIds.append(currentId);
+                    numberMap[strValue].append(id);
+                }
+            }
+        },
+        _(L"检查重复气泡号"),
+        UniversalPicker::SelectMode::Batch,
+        true,
+        UniversalPicker::SortMode::None,
+        true
+    );
 
-                    AcDbCurve* pCurve = Common::getObject<AcDbCurve>(currentId, AcDb::kForRead);
-                    if (pCurve == nullptr)
+    AcDbObjectIdArray duplicateIds;
+    AcString reportMsg = L"";
+    for (auto const& [text, ids] : numberMap)
+    {
+        if (ids.length() > 1)
+        {
+            duplicateIds.append(ids);
+
+            if (!reportMsg.isEmpty())
+            {
+                reportMsg.append(L", ");
+            }
+            reportMsg.append(text);
+        }
+    }
+
+    if (duplicateIds.length() > 0)
+    {
+        UniversalPicker::setSelection(duplicateIds);
+        acutPrintf(_(L"\n发现重复: %s"), reportMsg.constPtr());
+    }
+    else
+    {
+        acutPrintf(_(L"未发现重复"));
+    }
+}
+
+void Interface::cmdCheckBalloonNumberBreakpoints()
+{
+    UniversalPicker::AcRxClassVector arcv = { AcDbBlockReference::desc() };
+
+    // 使用 set 自动去重并升序排序
+    std::set<int> numbers;
+    AcString strValue;
+
+    UniversalPicker::run(
+        &arcv,
+        [&](const AcDbObjectId& id)
+        {
+            if (BalloonNumber::getBalloonAttributeValue(id, strValue))
+            {
+                try
+                {
+                    size_t pos = 0;
+                    // 强制宽字符转换，确保完全解析
+                    int number = std::stoi(strValue.constPtr(), &pos);
+
+                    if (pos == static_cast<size_t>(strValue.length()))
                     {
-                        continue;
+                        numbers.insert(number);
                     }
+                }
+                catch (...)
+                {
+                    // 无法转换为数字的内容不参与断点计算
+                }
+            }
+        },
+        _(L"检查气泡号断点"),
+        UniversalPicker::SelectMode::Batch,
+        true,
+        UniversalPicker::SortMode::None,
+        true
+    );
 
-                    AcGePoint3d startPt, endPt;
-                    if (pCurve->getStartPoint(startPt) == Acad::eOk && pCurve->getEndPoint(endPt) == Acad::eOk)
+    // 只有 1 个或 0 个数字无法构成断点
+    if (numbers.size() < 2)
+    {
+        return;
+    }
+
+    AcString reportMsg = L"";
+    auto it = numbers.begin();
+    int prev = *it;
+    ++it;
+    for (; it != numbers.end(); ++it)
+    {
+        int curr = *it;
+        // 检查数字是否连续
+        if (curr != prev + 1)
+        {
+            if (!reportMsg.isEmpty())
+            {
+                reportMsg.append(L", ");
+            }
+
+            int missStart = prev + 1;
+            int missEnd = curr - 1;
+            if (missStart == missEnd)
+            {
+                // 单点缺失：如 3, 5 -> 4
+                AcString tmp;
+                tmp.format(L"%d", missStart);
+                reportMsg.append(tmp);
+            }
+            else
+            {
+                // 区间缺失：如 3, 7 -> 4-6
+                AcString tmp;
+                tmp.format(L"%d-%d", missStart, missEnd);
+                reportMsg.append(tmp);
+            }
+        }
+        prev = curr;
+    }
+
+    // 结果呈现
+    if (reportMsg.empty() == false)
+    {
+        acutPrintf(_(L"\n缺失的气泡编号: %s"), reportMsg.constPtr());
+    }
+    else
+    {
+        acutPrintf(_(L"\n气泡编号连续，未发现断点"));
+    }
+}
+
+void Interface::cmdForceRemoveImage()
+{
+    UniversalPicker::AcRxClassVector arcv = { AcDbRasterImage::desc() };
+    UniversalPicker::run(
+        &arcv,
+        Image::forceRemoveImageAndFile,
+        _(L"删除光栅图像及图片文件（无法撤销恢复）"),
+        UniversalPicker::SelectMode::Immediate,
+        false,
+        UniversalPicker::SortMode::None,
+        true
+    );
+}
+
+void Interface::cmdLocateSelf()
+{
+    const wchar_t* appName = acedGetAppName();
+    FileDialog::locateFileInExplorer(appName);
+}
+
+void Interface::cmdChainSelection()
+{
+    UniversalPicker::AcRxClassVector arcv = { AcDbArc::desc(), AcDbPolyline::desc(), AcDbLine::desc(), AcDbSpline::desc() };
+    resbuf* pFilter = UniversalPicker::buildFilter(&arcv);
+
+    UniversalPicker::run(
+        &arcv,
+        [&](const AcDbObjectId& id, bool& bBreak)
+        {
+            // 局部容器：确保每次点击都是独立的搜索过程
+            std::queue<AcDbObjectId> waitingQueue;
+            std::set<AcDbObjectId> processedIds;
+            AcDbObjectIdArray resultIds;
+
+            waitingQueue.push(id);
+            processedIds.insert(id);
+
+            // 广度优先搜索 (BFS)
+            while (!waitingQueue.empty())
+            {
+                AcDbObjectId currentId = waitingQueue.front();
+                waitingQueue.pop();
+                resultIds.append(currentId);
+
+                AcDbCurve* pCurve = Common::getObject<AcDbCurve>(currentId, AcDb::kForRead);
+                if (pCurve == nullptr)
+                {
+                    continue;
+                }
+
+                AcGePoint3d startPt, endPt;
+                if (pCurve->getStartPoint(startPt) == Acad::eOk && pCurve->getEndPoint(endPt) == Acad::eOk)
+                {
+                    AcGePoint3d checkPts[2] = { startPt, endPt };
+
+                    for (const auto& pt : checkPts)
                     {
-                        AcGePoint3d checkPts[2] = { startPt, endPt };
+                        AcDbObjectIdArray neighbors = Common::getNeighborsAtPoint(pt, pFilter);
 
-                        for (const auto& pt : checkPts)
+                        for (int i = 0; i < neighbors.length(); ++i)
                         {
-                            AcDbObjectIdArray neighbors = Common::getNeighborsAtPoint(pt, pFilter);
+                            AcDbObjectId nId = neighbors[i];
 
-                            for (int i = 0; i < neighbors.length(); ++i)
+                            // 严格去重：
+                            // 1. 跳过当前正在处理的实体本身 (nId != currentId)
+                            // 2. 跳过已经进入过队列或处理过的实体 (processedIds.find == end)
+                            if (nId != currentId && processedIds.find(nId) == processedIds.end())
                             {
-                                AcDbObjectId nId = neighbors[i];
-
-                                // 严格去重：
-                                // 1. 跳过当前正在处理的实体本身 (nId != currentId)
-                                // 2. 跳过已经进入过队列或处理过的实体 (processedIds.find == end)
-                                if (nId != currentId && processedIds.find(nId) == processedIds.end())
-                                {
-                                    processedIds.insert(nId);
-                                    waitingQueue.push(nId);
-                                }
+                                processedIds.insert(nId);
+                                waitingQueue.push(nId);
                             }
                         }
                     }
                 }
+            }
 
-                if (resultIds.length() > 0)
-                {
-                    UniversalPicker::setSelection(resultIds);
-                    acutPrintf(_(L"\n自动链式选择成功：共选中 %d 条线条实体。"), resultIds.length());
-                    bBreak = true;
-                }
-            },
-            _(L"选中实体后自动链式选择"),
-            UniversalPicker::SelectMode::Immediate,
-            true
-        );
-
-        // 5. 清理过滤器资源
-        UniversalPicker::freeFilter(pFilter);
-    }
-
-    void Interface::cmdDimensionTolerancePrecision()
-    {
-        CAcModuleResourceOverride resOverride;
-        GenericPairEditDlg dlg(_(L"设置尺寸标注的主单位精度和公差精度"), _(L"主单位精度"), _(L"公差精度"), false, true, true);
-        // 设置 -1 表示不修改精度 
-        CString strDimPrec = L"-1";
-        CString strTolPrec = L"-1";
-        dlg.modifyEditControl(strDimPrec, strTolPrec);
-
-        int iDimPrec = -1;
-        int iTolPrec = -1;
-        dlg.setValidatorAndParser([&](const CString& val1, const CString& val2) -> CString
+            if (resultIds.length() > 0)
             {
-                try
-                {
-                    size_t pos;
-                    iDimPrec = std::stoi(val1.GetString(), &pos);
-                    if (pos != val1.GetLength())
-                    {
-                        throw std::exception();
-                    }
-                    if (iDimPrec < 0 && iDimPrec != -1)
-                    {
-                        throw std::exception();
-                    }
-                    if (iDimPrec > 8)
-                    {
-                        throw std::exception();
-                    }
+                UniversalPicker::setSelection(resultIds);
+                acutPrintf(_(L"\n自动链式选择成功：共选中 %d 条线条实体。"), resultIds.length());
+                bBreak = true;
+            }
+        },
+        _(L"选中实体后自动链式选择"),
+        UniversalPicker::SelectMode::Immediate,
+        true
+    );
 
-                    iTolPrec = std::stoi(val2.GetString(), &pos);
-                    if (pos != val2.GetLength())
-                    {
-                        throw std::exception();
-                    }
-                    if (iTolPrec < 0 && iTolPrec != -1)
-                    {
-                        throw std::exception();
-                    }
-                    if (iTolPrec > 8)
-                    {
-                        throw std::exception();
-                    }
-                }
-                catch (...)
-                {
-                    return _(L"精度值只能是 0 至 8 的整数，输入 -1 时不修改精度。");
-                }
-                return GenericPairEditDlg::ValidatorOk;
-            });
+    // 5. 清理过滤器资源
+    UniversalPicker::freeFilter(pFilter);
+}
 
-        if (dlg.DoModal() != IDOK)
+void Interface::cmdDimensionTolerancePrecision()
+{
+    CAcModuleResourceOverride resOverride;
+    GenericPairEditDlg dlg(_(L"设置尺寸标注的主单位精度和公差精度"), _(L"主单位精度"), _(L"公差精度"), false, true, true);
+    // 设置 -1 表示不修改精度 
+    CString strDimPrec = L"-1";
+    CString strTolPrec = L"-1";
+    dlg.modifyEditControl(strDimPrec, strTolPrec);
+
+    int iDimPrec = -1;
+    int iTolPrec = -1;
+    dlg.setValidatorAndParser([&](const CString& val1, const CString& val2) -> CString
         {
-            acutPrintf(_(L"取消操作"));
-            return;
-        }
-
-        UniversalPicker::run(
-            &Common::DimensionSubClasses,
-            [&](const AcDbObjectId& id)
+            try
             {
-                Dimension::setDimensionTolerancePreccision(id, iDimPrec, iTolPrec);
-            },
-            _(L"设置尺寸标注的主单位精度和公差精度"),
-            UniversalPicker::SelectMode::Immediate,
-            false,
-            UniversalPicker::SortMode::None,
-            true
-        );
-    }
+                size_t pos;
+                iDimPrec = std::stoi(val1.GetString(), &pos);
+                if (pos != val1.GetLength())
+                {
+                    throw std::exception();
+                }
+                if (iDimPrec < 0 && iDimPrec != -1)
+                {
+                    throw std::exception();
+                }
+                if (iDimPrec > 8)
+                {
+                    throw std::exception();
+                }
 
-    void Interface::cmdCreateIntersectionPoints()
-    {
-        // AcDbCurve 曲线类的子类
-        UniversalPicker::AcRxClassVector arcv =
-        {
-            AcDb2dPolyline::desc(),
-            AcDb3dPolyline::desc(),
-            AcDbArc::desc(),
-            AcDbCircle::desc(),
-            AcDbEllipse::desc(),
-            AcDbLeader::desc(),
-            AcDbLine::desc(),
-            AcDbPolyline::desc(),
-            AcDbRay::desc(),
-            AcDbSpline::desc(),
-            //AcDbHelix::desc(), // 不清楚是哪个库文件中定义的
-            AcDbXline::desc()
-        };
-
-        AcDbObjectId lastId = AcDbObjectId::kNull;
-        acutPrintf(_(L"\n请选择第一条线："));
-        UniversalPicker::run(
-            &arcv,
-            [&](const AcDbObjectId& id)
+                iTolPrec = std::stoi(val2.GetString(), &pos);
+                if (pos != val2.GetLength())
+                {
+                    throw std::exception();
+                }
+                if (iTolPrec < 0 && iTolPrec != -1)
+                {
+                    throw std::exception();
+                }
+                if (iTolPrec > 8)
+                {
+                    throw std::exception();
+                }
+            }
+            catch (...)
             {
-                if (lastId == AcDbObjectId::kNull)
-                {
-                    lastId = id;
-                    acutPrintf(_(L"\n请选择第二条线："));
-                }
-                else if (lastId != id)
-                {
-                    AcGePoint3dArray intersectionPoints;
-                    if (LineUtil::calculateLineIntersection(lastId, id, intersectionPoints))
-                    {
-                        PointUtil::drawPoints(intersectionPoints);
-                        acutPrintf(_(L"\n成功创建 %d 个交点"), intersectionPoints.length());
-                    }
-                    else
-                    {
-                        acutPrintf(_(L"\n未发现交点"));
-                    }
-                    lastId = AcDbObjectId::kNull;
-                    acutPrintf(_(L"\n请选择第一条线："));
-                }
+                return _(L"精度值只能是 0 至 8 的整数，输入 -1 时不修改精度。");
+            }
+            return GenericPairEditDlg::ValidatorOk;
+        });
 
-            },
-            _(L"创建两条线(及延长线)的交点。可使用PTYPE设置点样式。"),
-            UniversalPicker::SelectMode::Immediate,
-            true
-        );
+    if (dlg.DoModal() != IDOK)
+    {
+        acutPrintf(_(L"取消操作"));
+        return;
     }
 
-    void Interface::cmdPrintConfigFilename()
+    UniversalPicker::run(
+        &Common::DimensionSubClasses,
+        [&](const AcDbObjectId& id)
+        {
+            Dimension::setDimensionTolerancePreccision(id, iDimPrec, iTolPrec);
+        },
+        _(L"设置尺寸标注的主单位精度和公差精度"),
+        UniversalPicker::SelectMode::Immediate,
+        false,
+        UniversalPicker::SortMode::None,
+        true
+    );
+}
+
+void Interface::cmdCreateIntersectionPoints()
+{
+    // AcDbCurve 曲线类的子类
+    UniversalPicker::AcRxClassVector arcv =
     {
-        auto& manager = ConfigManager::getInstance();
-        std::wstring configFilename = manager.getConfigFilename();
-        FileDialog::locateFileInExplorer(configFilename.c_str());
-    }
+        AcDb2dPolyline::desc(),
+        AcDb3dPolyline::desc(),
+        AcDbArc::desc(),
+        AcDbCircle::desc(),
+        AcDbEllipse::desc(),
+        AcDbLeader::desc(),
+        AcDbLine::desc(),
+        AcDbPolyline::desc(),
+        AcDbRay::desc(),
+        AcDbSpline::desc(),
+        //AcDbHelix::desc(), // 不清楚是哪个库文件中定义的
+        AcDbXline::desc()
+    };
 
-    void Interface::cmdDialogMiddleClickToOk()
-    {
-        CAcModuleResourceOverride resOverride;
-        CString title = _(L"设置对话框中鼠标中键映射到确定按钮");
-        GenericPairEditDlg dlg(title, _(L"启用1/0"), L"", true, true, true);
-
-        CString edit1Result;
-        auto& manager = ConfigManager::getInstance();
-        auto& config = manager.getConfig();
-        bool bDialogMiddleClickToOkEnabled = config.middleClickManagerSettings.bDialogMiddleClickToOkEnabled;
-        edit1Result.Format(L"%d", config.middleClickManagerSettings.bDialogMiddleClickToOkEnabled);
-        dlg.modifyEditControl(edit1Result);
-
-        dlg.setValidatorAndParser([&](const CString& value1, const CString& _2) -> CString
+    AcDbObjectId lastId = AcDbObjectId::kNull;
+    acutPrintf(_(L"\n请选择第一条线："));
+    UniversalPicker::run(
+        &arcv,
+        [&](const AcDbObjectId& id)
+        {
+            if (lastId == AcDbObjectId::kNull)
             {
-                if (value1.IsEmpty())
-                {
-                    return _(L"必须输入1或0设置是否启用中键映射确定按钮");
-                }
-                if (value1.SpanIncluding(L"01") != value1)
-                {
-                    return _(L"必须输入1或0设置是否启用中键映射确定按钮");
-                }
-                edit1Result = value1;
-                return GenericPairEditDlg::ValidatorOk;
-            });
-
-        if (dlg.DoModal() != IDOK)
-        {
-            acutPrintf(_(L"取消操作"));
-            return;
-        }
-
-        config.middleClickManagerSettings.bDialogMiddleClickToOkEnabled = (edit1Result == L"1");
-        auto& middleClickManager = MiddleClickManager::getInstance();
-        middleClickManager.stopUnifiedMiddleClickProc();
-        if (!manager.saveConfig())
-        {
-            std::wstring err = manager.getLastError();
-            AfxMessageBox(err.c_str(), MB_OK | MB_ICONERROR);
-            // 保存失败，还原状态
-            config.middleClickManagerSettings.bDialogMiddleClickToOkEnabled = bDialogMiddleClickToOkEnabled;
-        }
-        middleClickManager.startUnifiedMiddleClickProc(config.middleClickManagerSettings);
-    }
-
-    void Interface::cmdCmdMiddleClickToEnter()
-    {
-        CAcModuleResourceOverride resOverride;
-        CString title = _(L"设置命令执行状态下鼠标中键映射回车键");
-        GenericPairEditDlg dlg(title, _(L"启用1/0"), _(L"间隔(ms)"), false, true, true);
-
-        CString edit1Result, edit2Result;
-        auto& manager = ConfigManager::getInstance();
-        auto& config = manager.getConfig();
-        bool bEnabled = config.middleClickManagerSettings.bCmdMiddleClickToEnterEnabled;
-        unsigned long dCmdMiddleClickDownUpInterval = config.middleClickManagerSettings.dCmdMiddleClickDownUpInterval;
-        edit1Result.Format(L"%d", bEnabled);
-        edit2Result.Format(L"%d", dCmdMiddleClickDownUpInterval);
-        const ConfigItems::MiddleClickManagerSettings defaultConfig;
-        dlg.modifyEditControl(edit1Result, edit2Result);
-
-        dlg.setValidatorAndParser([&](const CString& value1, const CString& value2) -> CString
+                lastId = id;
+                acutPrintf(_(L"\n请选择第二条线："));
+            }
+            else if (lastId != id)
             {
-                if (value1.IsEmpty() || value2.IsEmpty())
+                AcGePoint3dArray intersectionPoints;
+                if (LineUtil::calculateLineIntersection(lastId, id, intersectionPoints))
                 {
-                    return _(L"必须输入自启动状态和切换间隔时间");
+                    PointUtil::drawPoints(intersectionPoints);
+                    acutPrintf(_(L"\n成功创建 %d 个交点"), intersectionPoints.length());
                 }
-                if (value1.SpanIncluding(L"01") != value1)
+                else
                 {
-                    return _(L"自启动状态必须为 0 或 1，1表示自启动，0 表示不自启动");
+                    acutPrintf(_(L"\n未发现交点"));
                 }
-                try
-                {
-                    size_t pos;
-                    config.middleClickManagerSettings.dCmdMiddleClickDownUpInterval = std::stoi(value2.GetString(), &pos);
-                    if (pos != value2.GetLength())
-                    {
-                        throw std::exception();
-                    }
-                    if (config.middleClickManagerSettings.dCmdMiddleClickDownUpInterval < defaultConfig.dCmdMiddleClickDownUpInterval)
-                    {
-                        throw std::exception();
-                    }
-                }
-                catch (...)
-                {
-                    CString csInvalidInterval;
-                    csInvalidInterval.Format(_(L"切换间隔必须为不小于 %d 的整数"), defaultConfig.dCmdMiddleClickDownUpInterval);
-                    return csInvalidInterval;
-                }
+                lastId = AcDbObjectId::kNull;
+                acutPrintf(_(L"\n请选择第一条线："));
+            }
 
-                edit1Result = value1;
-                return GenericPairEditDlg::ValidatorOk;
-            });
+        },
+        _(L"创建两条线(及延长线)的交点。可使用PTYPE设置点样式。"),
+        UniversalPicker::SelectMode::Immediate,
+        true
+    );
+}
 
-        if (dlg.DoModal() != IDOK)
+void Interface::cmdPrintConfigFilename()
+{
+    auto& manager = ConfigManager::getInstance();
+    std::wstring configFilename = manager.getConfigFilename();
+    FileDialog::locateFileInExplorer(configFilename.c_str());
+}
+
+void Interface::cmdDialogMiddleClickToOk()
+{
+    CAcModuleResourceOverride resOverride;
+    CString title = _(L"设置对话框中鼠标中键映射到确定按钮");
+    GenericPairEditDlg dlg(title, _(L"启用1/0"), L"", true, true, true);
+
+    CString edit1Result;
+    auto& manager = ConfigManager::getInstance();
+    auto& config = manager.getConfig();
+    bool bDialogMiddleClickToOkEnabled = config.middleClickManagerSettings.bDialogMiddleClickToOkEnabled;
+    edit1Result.Format(L"%d", config.middleClickManagerSettings.bDialogMiddleClickToOkEnabled);
+    dlg.modifyEditControl(edit1Result);
+
+    dlg.setValidatorAndParser([&](const CString& value1, const CString& _2) -> CString
         {
-            acutPrintf(_(L"取消操作"));
-            return;
-        }
-
-        config.middleClickManagerSettings.bCmdMiddleClickToEnterEnabled = (edit1Result == L"1");
-        MiddleClickManager::getInstance().stopUnifiedMiddleClickProc();
-        if (!manager.saveConfig())
-        {
-            std::wstring err = manager.getLastError();
-            AfxMessageBox(err.c_str(), MB_OK | MB_ICONERROR);
-            // 保存失败，还原状态
-            config.middleClickManagerSettings.bCmdMiddleClickToEnterEnabled = bEnabled;
-            config.middleClickManagerSettings.dCmdMiddleClickDownUpInterval = dCmdMiddleClickDownUpInterval;
-        }
-        MiddleClickManager::getInstance().startUnifiedMiddleClickProc(config.middleClickManagerSettings);
-    }
-
-    void Interface::cmdSetLanguage()
-    {
-        CAcModuleResourceOverride resOverride;
-        CString title = _(L"设置语言");
-        GenericPairEditDlg dlg(title, _(L"语言代码"), L"提示", false, true, true);
-
-        auto& manager = ConfigManager::getInstance();
-        auto& config = manager.getConfig();
-        std::wstring languageCode = config.languageSettings.languageCode;
-        dlg.modifyEditControl(languageCode.c_str(), _(L"无匹配语言代码的翻译文件时，默认显示中文"));
-
-        dlg.setValidatorAndParser([&](const CString& value1, const CString& _2) -> CString
+            if (value1.IsEmpty())
             {
-                if (value1.IsEmpty())
-                {
-                    return _(L"必须输入语言代码");
-                }
-                config.languageSettings.languageCode = value1.GetString();
-                return GenericPairEditDlg::ValidatorOk;
-            });
+                return _(L"必须输入1或0设置是否启用中键映射确定按钮");
+            }
+            if (value1.SpanIncluding(L"01") != value1)
+            {
+                return _(L"必须输入1或0设置是否启用中键映射确定按钮");
+            }
+            edit1Result = value1;
+            return GenericPairEditDlg::ValidatorOk;
+        });
 
-        if (dlg.DoModal() != IDOK)
-        {
-            acutPrintf(_(L"取消操作"));
-            return;
-        }
-
-        if (!manager.saveConfig())
-        {
-            std::wstring err = manager.getLastError();
-            AfxMessageBox(err.c_str(), MB_OK | MB_ICONERROR);
-            config.languageSettings.languageCode = languageCode;
-        }
-        AfxMessageBox(_(L"重启插件刷新语言设置"), MB_OK | MB_ICONINFORMATION);
+    if (dlg.DoModal() != IDOK)
+    {
+        acutPrintf(_(L"取消操作"));
+        return;
     }
+
+    config.middleClickManagerSettings.bDialogMiddleClickToOkEnabled = (edit1Result == L"1");
+    auto& middleClickManager = MiddleClickManager::getInstance();
+    middleClickManager.stopUnifiedMiddleClickProc();
+    if (!manager.saveConfig())
+    {
+        std::wstring err = manager.getLastError();
+        AfxMessageBox(err.c_str(), MB_OK | MB_ICONERROR);
+        // 保存失败，还原状态
+        config.middleClickManagerSettings.bDialogMiddleClickToOkEnabled = bDialogMiddleClickToOkEnabled;
+    }
+    middleClickManager.startUnifiedMiddleClickProc(config.middleClickManagerSettings);
+}
+
+void Interface::cmdCmdMiddleClickToEnter()
+{
+    CAcModuleResourceOverride resOverride;
+    CString title = _(L"设置命令执行状态下鼠标中键映射回车键");
+    GenericPairEditDlg dlg(title, _(L"启用1/0"), _(L"间隔(ms)"), false, true, true);
+
+    CString edit1Result, edit2Result;
+    auto& manager = ConfigManager::getInstance();
+    auto& config = manager.getConfig();
+    bool bEnabled = config.middleClickManagerSettings.bCmdMiddleClickToEnterEnabled;
+    unsigned long dCmdMiddleClickDownUpInterval = config.middleClickManagerSettings.dCmdMiddleClickDownUpInterval;
+    edit1Result.Format(L"%d", bEnabled);
+    edit2Result.Format(L"%d", dCmdMiddleClickDownUpInterval);
+    const ConfigItems::MiddleClickManagerSettings defaultConfig;
+    dlg.modifyEditControl(edit1Result, edit2Result);
+
+    dlg.setValidatorAndParser([&](const CString& value1, const CString& value2) -> CString
+        {
+            if (value1.IsEmpty() || value2.IsEmpty())
+            {
+                return _(L"必须输入自启动状态和切换间隔时间");
+            }
+            if (value1.SpanIncluding(L"01") != value1)
+            {
+                return _(L"自启动状态必须为 0 或 1，1表示自启动，0 表示不自启动");
+            }
+            try
+            {
+                size_t pos;
+                config.middleClickManagerSettings.dCmdMiddleClickDownUpInterval = std::stoi(value2.GetString(), &pos);
+                if (pos != value2.GetLength())
+                {
+                    throw std::exception();
+                }
+                if (config.middleClickManagerSettings.dCmdMiddleClickDownUpInterval < defaultConfig.dCmdMiddleClickDownUpInterval)
+                {
+                    throw std::exception();
+                }
+            }
+            catch (...)
+            {
+                CString csInvalidInterval;
+                csInvalidInterval.Format(_(L"切换间隔必须为不小于 %d 的整数"), defaultConfig.dCmdMiddleClickDownUpInterval);
+                return csInvalidInterval;
+            }
+
+            edit1Result = value1;
+            return GenericPairEditDlg::ValidatorOk;
+        });
+
+    if (dlg.DoModal() != IDOK)
+    {
+        acutPrintf(_(L"取消操作"));
+        return;
+    }
+
+    config.middleClickManagerSettings.bCmdMiddleClickToEnterEnabled = (edit1Result == L"1");
+    MiddleClickManager::getInstance().stopUnifiedMiddleClickProc();
+    if (!manager.saveConfig())
+    {
+        std::wstring err = manager.getLastError();
+        AfxMessageBox(err.c_str(), MB_OK | MB_ICONERROR);
+        // 保存失败，还原状态
+        config.middleClickManagerSettings.bCmdMiddleClickToEnterEnabled = bEnabled;
+        config.middleClickManagerSettings.dCmdMiddleClickDownUpInterval = dCmdMiddleClickDownUpInterval;
+    }
+    MiddleClickManager::getInstance().startUnifiedMiddleClickProc(config.middleClickManagerSettings);
+}
+
+void Interface::cmdSetLanguage()
+{
+    CAcModuleResourceOverride resOverride;
+    CString title = _(L"设置语言");
+    GenericPairEditDlg dlg(title, _(L"语言代码"), L"提示", false, true, true);
+
+    auto& manager = ConfigManager::getInstance();
+    auto& config = manager.getConfig();
+    std::wstring languageCode = config.languageSettings.languageCode;
+    dlg.modifyEditControl(languageCode.c_str(), _(L"无匹配语言代码的翻译文件时，默认显示中文"));
+
+    dlg.setValidatorAndParser([&](const CString& value1, const CString& _2) -> CString
+        {
+            if (value1.IsEmpty())
+            {
+                return _(L"必须输入语言代码");
+            }
+            config.languageSettings.languageCode = value1.GetString();
+            return GenericPairEditDlg::ValidatorOk;
+        });
+
+    if (dlg.DoModal() != IDOK)
+    {
+        acutPrintf(_(L"取消操作"));
+        return;
+    }
+
+    if (!manager.saveConfig())
+    {
+        std::wstring err = manager.getLastError();
+        AfxMessageBox(err.c_str(), MB_OK | MB_ICONERROR);
+        config.languageSettings.languageCode = languageCode;
+    }
+    AfxMessageBox(_(L"重启插件刷新语言设置"), MB_OK | MB_ICONINFORMATION);
+}
+
+void Interface::cmdClosePrompt()
+{
+    CAcModuleResourceOverride resOverride;
+    CString title = _(L"设置跳过仅视图修改时的文件保存提示");
+    GenericPairEditDlg dlg(title, _(L"启用(1/0)"), L"提示", false, true, true);
+
+    auto& manager = ConfigManager::getInstance();
+    auto& config = manager.getConfig();
+    bool bSkipSavePromptOnViewChangesEnabled = config.closePromptSettings.bSkipSavePromptOnViewChangesEnabled;
+    CString edit1Result;
+    edit1Result.Format(L"%d", bSkipSavePromptOnViewChangesEnabled);
+    dlg.modifyEditControl(edit1Result, _(L"启用后。如果图纸仅发生平移和缩放，关闭图纸时不会提示保存文件。"));
+
+    dlg.setValidatorAndParser([&](const CString& value1, const CString& _2) -> CString
+        {
+            if (value1.IsEmpty())
+            {
+                return _(L"必须输入启用状态");
+            }
+            if (value1.SpanIncluding(L"01") != value1)
+            {
+                return _(L"启用状态必须为 0 或 1，1表示启用，0 表示不启用");
+            }
+            edit1Result = value1;
+            return GenericPairEditDlg::ValidatorOk;
+        });
+
+    if (dlg.DoModal() != IDOK)
+    {
+        acutPrintf(_(L"取消操作"));
+        return;
+    }
+
+    DocCloseInterceptor::getInstance().stop();
+    config.closePromptSettings.bSkipSavePromptOnViewChangesEnabled = (edit1Result == L"1");
+    if (!manager.saveConfig())
+    {
+        std::wstring err = manager.getLastError();
+        AfxMessageBox(err.c_str(), MB_OK | MB_ICONERROR);
+        config.closePromptSettings.bSkipSavePromptOnViewChangesEnabled = bSkipSavePromptOnViewChangesEnabled;
+    }
+    if (config.closePromptSettings.bSkipSavePromptOnViewChangesEnabled)
+    {
+        DocCloseInterceptor::getInstance().start();
+    }
+}
