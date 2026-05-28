@@ -39,13 +39,21 @@ export namespace ConfigItems
         NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(LanguageSettings, languageCode)
 	};
 
+	// 关闭提示设置
+	struct ClosePromptSettings
+	{
+		bool bSkipSavePromptOnViewChangesEnabled = false;
+        NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(ClosePromptSettings, bSkipSavePromptOnViewChangesEnabled)
+	};
+
 	// 全局配置
 	struct GlobalConfig
 	{
 		ImeSettings imeSettings;
 		MiddleClickManagerSettings middleClickManagerSettings;
         LanguageSettings languageSettings;
-		NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(GlobalConfig, imeSettings, middleClickManagerSettings, languageSettings)
+        ClosePromptSettings closePromptSettings;
+		NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(GlobalConfig, imeSettings, middleClickManagerSettings, languageSettings, closePromptSettings)
 	};
 };
 
