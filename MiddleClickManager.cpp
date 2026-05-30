@@ -13,7 +13,8 @@ import Common;
 import Commands;
 import Translator;
 
-inline constexpr const wchar_t* kWinStandardDialogClassName = L"#32770";
+inline constexpr const wchar_t* kWinStandardDialogClassName = L"#32770"; // 标准对话框类名
+inline constexpr const wchar_t* kAcadDialogClassName = L"adesk_dlg0000"; // AutoCAD 对话框类名
 
 MiddleClickManager::MiddleClickManager() : mhUnifiedMiddleClickHook(nullptr)
 {
@@ -92,7 +93,7 @@ LRESULT CALLBACK MiddleClickManager::unifiedMiddleClickProc(int nCode, WPARAM wP
                     wchar_t szClassName[256] = { 0 };
                     GetClassName(hWndActive, szClassName, 256);
 
-                    if (wcscmp(szClassName, kWinStandardDialogClassName) == 0)
+                    if (wcscmp(szClassName, kWinStandardDialogClassName) == 0 || wcscmp(szClassName, kAcadDialogClassName) == 0)
                     {
                         HWND hOkButton = GetDlgItem(hWndActive, IDOK);
                         if (hOkButton != nullptr)
