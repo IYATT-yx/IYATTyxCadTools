@@ -42,6 +42,7 @@ SDK：
 工具：  
 * GNU gettext tools for Windows：https://github.com/vslavik/gettext-tools-windows  
 * poedit: https://github.com/vslavik/poedit  
+* 查看窗口类名的代码: https://blog.iyatt.com/?p=24852  
 
 环境配置：  
 ObjectARX 环境配置参考：https://blog.iyatt.com/?p=24522  
