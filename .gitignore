@@ -4,3 +4,4 @@ x64
 *.aps
 *.dwl2
 vcpkg_installed/*
+*.log
