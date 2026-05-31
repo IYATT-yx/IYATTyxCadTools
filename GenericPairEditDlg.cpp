@@ -33,6 +33,7 @@
 #include "GenericPairEditDlg.hpp"
 
 import Common;
+import Translator;
 
 const CString GenericPairEditDlg::ValidatorOk = L""; // 验证通过的标志
 
@@ -226,7 +227,7 @@ bool GenericPairEditDlg::getGdtCheckStatus(const int& idx)
 {
 	if (idx < 0 || idx > 1)
 	{
-		AfxMessageBox(L"获取 GDT 复选框状态错误，指定下标的复选框不存在", MB_OK | MB_ICONERROR); // 针对开发者查错
+		AfxMessageBox(_(L"获取 GDT 复选框状态错误，指定下标的复选框不存在"), MB_OK | MB_ICONERROR); // 针对开发者查错
 		return false;
 	}
 

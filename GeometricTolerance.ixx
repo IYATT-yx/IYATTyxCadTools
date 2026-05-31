@@ -10,6 +10,7 @@ module;
 
 export module GeometricTolerance;
 import std;
+import Translator;
 
 export namespace GeometricTolerance
 {
@@ -58,25 +59,29 @@ export namespace GeometricTolerance
 		}
 	};
 
-	// 符号类型与名称的映射
-	std::map<Acm::GdtSymbolType, const wchar_t*> gdtNameMap =
+	const std::map<Acm::GdtSymbolType, const wchar_t*>& getGdtNameMap()
 	{
-		{Acm::kStraightness, L"直线度"},
-		{Acm::kFlatness, L"平面度"},
-		{Acm::kCircularity, L"圆度"},
-		{Acm::kCylindricity, L"圆柱度"},
-		{Acm::kProfileLine, L"线轮廓度"},
-		{Acm::kProfileSurface, L"面轮廓度"},
-		{Acm::kAngularity, L"倾斜度"},
-		{Acm::kPerpendicularity, L"垂直度"},
-		{Acm::kParallelism, L"平行度"},
-		{Acm::kPosition, L"位置度"},
-		{Acm::kCoaxialityForAxes, L"同轴度"},
-		{Acm::kConcentricityForCentrePoints, L"同心度"},
-		{Acm::kSymmetry, L"对称度"},
-		{Acm::kRunoutCircular, L"圆跳动"},
-		{Acm::kRunoutTotal, L"全跳动"}
-	};
+		static const std::map<Acm::GdtSymbolType, const wchar_t*> gdtNameMap =
+		{
+			{Acm::kStraightness, _(L"直线度")},
+			{Acm::kFlatness, _(L"平面度")},
+			{Acm::kCircularity, _(L"圆度")},
+			{Acm::kCylindricity, _(L"圆柱度")},
+			{Acm::kProfileLine, _(L"线轮廓度")},
+			{Acm::kProfileSurface, _(L"面轮廓度")},
+			{Acm::kAngularity, _(L"倾斜度")},
+			{Acm::kPerpendicularity, _(L"垂直度")},
+			{Acm::kParallelism, _(L"平行度")},
+			{Acm::kPosition, _(L"位置度")},
+			{Acm::kCoaxialityForAxes, _(L"同轴度")},
+			{Acm::kConcentricityForCentrePoints, _(L"同心度")},
+			{Acm::kSymmetry, _(L"对称度")},
+			{Acm::kRunoutCircular, _(L"圆跳动")},
+			{Acm::kRunoutTotal, _(L"全跳动")}
+		};
+
+		return gdtNameMap;
+	}
 
 	// 符号类型与 GDT 符号的映射
 	std::map<Acm::GdtSymbolType, const wchar_t*> gdtSymbolMap =

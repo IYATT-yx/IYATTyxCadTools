@@ -25,14 +25,14 @@ namespace BalloonNumber
         AcDbBlockTable* pBlockTable = nullptr;
         if (pDb->getBlockTable(pBlockTable, AcDb::kForRead) != Acad::eOk)
         {
-            AfxMessageBox(L"获取块表失败！", MB_OK | MB_ICONERROR);
-            throw std::runtime_error("获取块表失败！");
+            AfxMessageBox(_(L"获取块表失败！"), MB_OK | MB_ICONERROR);
+            throw WException(_(L"获取块表失败！"));
         }
-        if (pBlockTable->getAt(Common::BalloonNumberBlock::blockName, this->mBlockDefineId) != Acad::eOk)
+        if (pBlockTable->getAt(Common::BalloonNumberBlock::getBlockName(), this->mBlockDefineId) != Acad::eOk)
         {
             pBlockTable->close();
             AfxMessageBox(L"获取块定义失败！", MB_OK | MB_ICONERROR);
-            throw std::runtime_error("获取块定义失败！");
+            throw WException(_(L"获取块定义失败！"));
         }
         pBlockTable->close();
 
@@ -114,7 +114,7 @@ namespace BalloonNumber
             if (pIt->getEntity(pEnt, AcDb::kForRead) == Acad::eOk)
             {
                 AcDbAttributeDefinition* pAttDef = AcDbAttributeDefinition::cast(pEnt);
-                if (pAttDef && !pAttDef->isConstant() && AcString(pAttDef->tag()) == Common::BalloonNumberBlock::AttTag)
+                if (pAttDef && !pAttDef->isConstant() && AcString(pAttDef->tag()) == Common::BalloonNumberBlock::getAttTag())
                 {
                     AcDbAttribute* pAtt = new AcDbAttribute();
                     pAtt->setPropertiesFrom(pAttDef);
@@ -140,14 +140,14 @@ namespace BalloonNumber
 		pDb->getBlockTable(pBlockTable, AcDb::kForWrite);
 
 		// 检查块是否存在
-		if (!pBlockTable->has(Common::BalloonNumberBlock::blockName))
+		if (!pBlockTable->has(Common::BalloonNumberBlock::getBlockName()))
 		{
 			AcDbBlockTableRecord* pNewBTR = new AcDbBlockTableRecord();
-			pNewBTR->setName(Common::BalloonNumberBlock::blockName);
+			pNewBTR->setName(Common::BalloonNumberBlock::getBlockName());
 			pNewBTR->setOrigin(AcGePoint3d::kOrigin);
             if (Annotative::setObjAnnotative(pNewBTR) != Acad::eOk)
             {
-                AfxMessageBox(L"设置注释性失败！", MB_OK | MB_ICONERROR);
+                AfxMessageBox(_(L"设置注释性失败！"), MB_OK | MB_ICONERROR);
                 return;
             }
 
@@ -165,8 +165,8 @@ namespace BalloonNumber
 
 			// 创建属性定义
 			AcDbAttributeDefinition* pAttDef = new AcDbAttributeDefinition();
-			pAttDef->setTag(Common::BalloonNumberBlock::AttTag);
-			pAttDef->setPrompt(Common::BalloonNumberBlock::AttPrompt);
+			pAttDef->setTag(Common::BalloonNumberBlock::getAttTag());
+			pAttDef->setPrompt(Common::BalloonNumberBlock::getAttPrompt());
 			pAttDef->setHeight(TEXTSIZE);
 			pAttDef->setHorizontalMode(AcDb::kTextCenter);
 			pAttDef->setVerticalMode(AcDb::kTextVertMid);
@@ -190,16 +190,16 @@ namespace BalloonNumber
         AcDbBlockTable* pBlockTable = nullptr;
         if (pDb->getBlockTable(pBlockTable, AcDb::kForRead) != Acad::eOk)
         {
-            AfxMessageBox(L"获取块表失败！", MB_OK | MB_ICONERROR);
-            throw std::runtime_error("获取块表失败！");
+            AfxMessageBox(_(L"获取块表失败！"), MB_OK | MB_ICONERROR);
+            throw WException(_(L"获取块表失败！"));
             return;
         }
 
-        if (pBlockTable->getAt(Common::BalloonNumberBlock::blockName, blockDefineId) != Acad::eOk)
+        if (pBlockTable->getAt(Common::BalloonNumberBlock::getBlockName(), blockDefineId) != Acad::eOk)
         {
             pBlockTable->close();
-            AfxMessageBox(L"获取块定义失败！", MB_OK | MB_ICONERROR);
-            throw std::runtime_error("获取块定义失败！");
+            AfxMessageBox(_(L"获取块定义失败！"), MB_OK | MB_ICONERROR);
+            throw WException(_(L"获取块定义失败！"));
             return;
         }
         pBlockTable->close();
@@ -228,7 +228,7 @@ namespace BalloonNumber
     {
         if (num < 0)
         {
-            AfxMessageBox(L"开始序号不能小于 0", MB_OK | MB_ICONERROR);
+            AfxMessageBox(_(L"开始序号不能小于 0"), MB_OK | MB_ICONERROR);
             return;
         }
 
@@ -236,7 +236,7 @@ namespace BalloonNumber
         while (true)
         {
             BalloonNumber::BalloonNumberJig jig(static_cast<unsigned int>(num));
-            asPrompt.format(L"\n指定序号 %d 的插入点[退出(Esc)]：\n", num);
+            asPrompt.format(_(L"\n指定序号 %d 的插入点[退出(Esc)]：\n"), num);
             jig.setDispPrompt(asPrompt);
 
             if (jig.drag() == AcEdJig::kNormal)
@@ -272,7 +272,7 @@ namespace BalloonNumber
                 continue;
             }
             // 检查标签是否匹配
-            if (AcString(pAtt->tag()) == Common::BalloonNumberBlock::AttTag)
+            if (AcString(pAtt->tag()) == Common::BalloonNumberBlock::getAttTag())
             {
                 // 修改文本内容
                 pAtt->setTextString(std::to_wstring(newNum).c_str()); // 修改序号属性
@@ -312,7 +312,7 @@ namespace BalloonNumber
             if (pIt->getEntity(pEnt, AcDb::kForRead) == Acad::eOk)
             {
                 AcDbAttributeDefinition* pAttDef = AcDbAttributeDefinition::cast(pEnt);
-                if (pAttDef && !pAttDef->isConstant() && AcString(pAttDef->tag()) == Common::BalloonNumberBlock::AttTag)
+                if (pAttDef && !pAttDef->isConstant() && AcString(pAttDef->tag()) == Common::BalloonNumberBlock::getAttTag())
                 {
                     AcDbAttribute* pAtt = new AcDbAttribute();
                     pAtt->setPropertiesFrom(pAttDef);
@@ -345,7 +345,7 @@ namespace BalloonNumber
         {
             wchar_t* pBlockName = nullptr;
             pBTR->getName(pBlockName);
-            if (AcString(pBlockName) == Common::BalloonNumberBlock::blockName)
+            if (AcString(pBlockName) == Common::BalloonNumberBlock::getBlockName())
             {
                 bNameMatch = true;
             }
@@ -366,7 +366,7 @@ namespace BalloonNumber
             AcDbAttribute* pAtt = Common::getObject<AcDbAttribute>(pAttIt->objectId(), AcDb::kForRead);
             if (pAtt != nullptr)
             {
-                if (AcString(pAtt->tag()) == Common::BalloonNumberBlock::AttTag)
+                if (AcString(pAtt->tag()) == Common::BalloonNumberBlock::getAttTag())
                 {
                     outValue = pAtt->textString();
                     bFound = true;

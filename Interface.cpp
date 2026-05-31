@@ -417,7 +417,6 @@ void Interface::cmdExtractAnnotations()
                 double dMeasuredValue = dimData.dimensionValue();
                 Common::double2AcString(dMeasuredValue, asMeasuredValue, dimData.precision);
                 
-                //acutPrintf(L"\n调试：%s %s %f %f ", dimData.prefix.constPtr(), dimData.suffix.constPtr(), dimData.tolUpper, dimData.tolLower);
                 // 公差
                 AcString asTol,asTolUpper, asTolLower;
                 if (dimData.upperDeviation == 0 && dimData.lowerDeviation == 0) // 无公差
@@ -635,7 +634,7 @@ void Interface::cmdCloneText()
         acutPrintf(_(L"取消操作"));
         return;
     }
-    acutPrintf(L"\n读取到：%s\n", asSrcTextContent.constPtr());
+    acutPrintf(_(L"\n读取到：%s\n"), asSrcTextContent.constPtr());
 
     acutPrintf(_(L"请选择要粘贴到的文本对象"));
     UniversalPicker::run(

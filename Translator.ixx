@@ -69,3 +69,22 @@ export inline auto _(const wchar_t* text, const wchar_t* domain = L"messages")
 {
 	return Translator::getInstance().translate(text, domain);
 }
+
+/**
+ * @brief 宽字符串版字长
+ */
+export class WException : public std::exception
+{
+public:
+	explicit WException(std::wstring msg)
+		: m_msg(std::move(msg))
+	{}
+
+	const std::wstring& message() const noexcept
+	{
+		return m_msg;
+	}
+
+private:
+	std::wstring m_msg;
+};

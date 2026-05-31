@@ -12,6 +12,7 @@ module;
 module UniversalPicker;
 import Commands;
 import Common;
+import Translator;
 
 resbuf* UniversalPicker::buildFilter(UniversalPicker::AcRxClassVectorPtr arcv)
 {
@@ -88,7 +89,7 @@ void UniversalPicker::batchSelect(UniversalPicker::AcRxClassVectorPtr arcv, Univ
         acedInitGet(0, L"RD RU LD LU DR DL UR UL None");
         wchar_t kword[20];
         AcString asKword;
-        const wchar_t* prefix = L"\n排序模式 [右下(RD)/右上(RU)/左下(LD)/左上(LU)/下右(DR)/下左(DL)/上右(UR)/上左(UL)/无(None)] <";
+        const wchar_t* prefix = _(L"\n排序模式 [右下(RD)/右上(RU)/左下(LD)/左上(LU)/下右(DR)/下左(DL)/上右(UR)/上左(UL)/无(None)] <");
         const wchar_t* suffix = L">: ";
         asKword.format(L"%s%s%s", prefix, UniversalPicker::SortModeToString(finalMode), suffix);
         int stat = acedGetKword(asKword.constPtr(), kword);
@@ -364,8 +365,8 @@ void UniversalPicker::run(UniversalPicker::AcRxClassVectorPtr arcv, UniversalPic
 
     // 模式选择提示
     const wchar_t* modePrompt = (defaultSelectMode == UniversalPicker::SelectMode::Batch) ?
-        L"\n选择模式 [批量(B)/立即(I)]<B>：" :
-        L"\n选择模式 [批量(B)/立即(I)]<I>：";
+        _(L"\n选择模式 [批量(B)/立即(I)]<B>：") :
+        _(L"\n选择模式 [批量(B)/立即(I)]<I>：");
 
     UniversalPicker::SelectMode inputMode = defaultSelectMode;
     wchar_t keyword[2] = { 0 };

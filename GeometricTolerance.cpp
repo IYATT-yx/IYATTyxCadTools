@@ -31,7 +31,7 @@ namespace GeometricTolerance
 		// 第 1 个
 		GeometricTolerance::GeometricToleranceRow& row0 = data.rows[0];
 		row0.gdtSymbolType = pFcf->symbol();
-		row0.name = GeometricTolerance::gdtNameMap[row0.gdtSymbolType];
+		row0.name = GeometricTolerance::getGdtNameMap().at(row0.gdtSymbolType);
 		row0.gdtSymbol = GeometricTolerance::gdtSymbolMap[row0.gdtSymbolType];
 		row0.value = pFcf->value(Acm::FCFTolerance);
 		row0.primary = pFcf->value(Acm::FCFDatumPrimary);
@@ -43,7 +43,7 @@ namespace GeometricTolerance
 		row1.gdtSymbolType = pFcf->symbol2();
 		if (row1.gdtSymbolType != Acm::kNoType)
 		{
-            row1.name = GeometricTolerance::gdtNameMap[row1.gdtSymbolType];
+            row1.name = GeometricTolerance::getGdtNameMap().at(row1.gdtSymbolType);
             row1.gdtSymbol = GeometricTolerance::gdtSymbolMap[row1.gdtSymbolType];
 			row1.value = pFcf->value(Acm::FCFTolerance2);
             row1.primary = pFcf->value(Acm::FCFDatumPrimary2);
@@ -55,7 +55,7 @@ namespace GeometricTolerance
 			row2.gdtSymbolType = pFcf->symbol3();
 			if (row2.gdtSymbolType != Acm::kNoType)
 			{
-                row2.name = GeometricTolerance::gdtNameMap[row2.gdtSymbolType];
+                row2.name = GeometricTolerance::getGdtNameMap().at(row2.gdtSymbolType);
                 row2.gdtSymbol = GeometricTolerance::gdtSymbolMap[row2.gdtSymbolType];
                 row2.value = pFcf->value(Acm::FCFTolerance3);
                 row2.primary = pFcf->value(Acm::FCFDatumPrimary3);

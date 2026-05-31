@@ -162,8 +162,8 @@ export namespace Common
 {
 	inline const wchar_t* getLocalProjectName()
 	{
-		static const std::wstring name = _(L"AutoCAD Mechanical 2027 思能工具箱");
-		return name.c_str();
+		static const wchar_t* name = _(L"AutoCAD Mechanical 2027 思能工具箱");
+		return name;
 	}
 
 	constexpr const wchar_t* cmdGroup = L"IYATTyxCadToolsGlobalGroup";
@@ -208,12 +208,26 @@ export namespace Common
 		constexpr const WCHAR* programName = L"charmap.exe";
 	}
 
-	// 序号圆
+	// 气泡号
 	namespace BalloonNumberBlock
 	{
-		constexpr const wchar_t* blockName = L"气泡号块";
-		constexpr const wchar_t* AttTag = L"序号";
-		constexpr const wchar_t* AttPrompt = L"输入序号：";
+		inline const wchar_t* getBlockName()
+		{
+			static const wchar_t* blockName = _(L"气泡号块");
+            return blockName;
+		}
+
+		inline const wchar_t* getAttTag()
+		{
+            static const wchar_t* attTag = _(L"序号");
+			return attTag;
+		}
+
+		inline const wchar_t* getAttPrompt()
+		{
+            static const wchar_t* attPrompt = _(L"输入序号：");
+            return attPrompt;
+		}
 	}
 
 	// 标注类型的子类
