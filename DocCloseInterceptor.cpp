@@ -71,8 +71,26 @@ void DocCloseInterceptor::commandWillStart(const wchar_t* pCmdStr)
             {
                 int nDbmod = rb.resval.rint;
 
-                // 升级安全判断逻辑（包含新图纸默认的1，平移缩放的16，以及两者叠加的17）
-                if (nDbmod == 0 || nDbmod == 1 || nDbmod == 16 || nDbmod == 17)
+                bool bIsSafeToIntercept = false;
+
+                // 类别 1：完全没有修改对象数据库（最低位为 0）
+                // 完美涵盖：0(绝对干净)、16(纯视野移动)、8(纯窗口操作)、12(变量+窗口) 等
+                if ((nDbmod & 1) == 0)
+                {
+                    bIsSafeToIntercept = true;
+                }
+                // 类别 2：虽然触发了位 1，但符合纯打印(37)、视野打印(53)或模板初始化(33/49)的特征
+                // 特征：包含了位 32 (Field modified)，且没有发生常规的非打印变量污染
+                else
+                {
+                    if (nDbmod == 33 || nDbmod == 37 || nDbmod == 49 || nDbmod == 53)
+                    {
+                        bIsSafeToIntercept = true;
+                    }
+                }
+
+                // 只有判定为安全的非图形修改状态，才挂钩拦截器
+                if (bIsSafeToIntercept)
                 {
                     if (mhCbtHook == nullptr)
                     {
