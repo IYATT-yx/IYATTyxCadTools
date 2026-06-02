@@ -16,6 +16,7 @@ module ImeAutoSwitcher;
 import Common;
 import ConfigManager;
 import Translator;
+import AcadVarUtil;
 
 namespace ImeAutoSwitcher
 {
@@ -26,12 +27,12 @@ namespace ImeAutoSwitcher
 
     bool isCommandRunning()
     {
-        struct resbuf rb;
-        if (acedGetVar(L"CMDACTIVE", &rb) == RTNORM)
+        int cmdActive = 0;
+        if (!AcadVarUtil::getVar(L"CMDACTIVE", cmdActive))
         {
-            return (rb.resval.rint > 0);
+            return false;
         }
-        return false;
+        return (cmdActive > 0);
     }
 
     void ForceEnglishMode(HWND hWnd)

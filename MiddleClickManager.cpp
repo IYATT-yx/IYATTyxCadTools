@@ -12,6 +12,7 @@ module MiddleClickManager;
 import Common;
 import Commands;
 import Translator;
+import AcadVarUtil;
 
 inline constexpr const wchar_t* kWinStandardDialogClassName = L"#32770"; // 标准对话框类名
 inline constexpr const wchar_t* kAcadDialogClassName = L"adesk_dlg0000"; // AutoCAD 对话框类名
@@ -119,14 +120,9 @@ LRESULT CALLBACK MiddleClickManager::unifiedMiddleClickProc(int nCode, WPARAM wP
             if (instance.mbEnabledCmdEnter)
             {
                 DWORD dwDuration = GetTickCount() - dwMouseDownTime;
-                struct resbuf rb = { 0 };
                 int cmdActive = 0;
 
-                if (acedGetVar(L"CMDACTIVE", &rb) == RTNORM)
-                {
-                    cmdActive = rb.resval.rint;
-                }
-
+                AcadVarUtil::getVar(L"CMDACTIVE", cmdActive);
                 if (cmdActive > 0 && dwDuration < instance.mdCmdMiddleClickDownUpInterval)
                 {
                     static Commands::CommandList space = { L"" };
