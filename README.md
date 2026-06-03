@@ -74,4 +74,4 @@ vcpkg 包搜索：https://vcpkg.io/en/packages
 
 | 组件名称 | 用途说明 | 协议类型 | 官方/源码地址 |
 | :--- | :--- | :--- | :--- |
-| **nlohmann/json** | 用于处理配置文件的 JSON 序列化与解析。 | MIT | [GitHub](https://github.com/nlohmann/json) |
+| **nlohmann/json** | 用于处理 JSON 序列化与反序列化。 | MIT | [GitHub](https://github.com/nlohmann/json) |
