@@ -13,6 +13,14 @@
   <ItemGroup>
     <ClCompile Include="AcadVarUtil.ixx" />
     <ClCompile Include="acrxEntryPoint.cpp" />
+    <ClCompile Include="ActivityInsightsManager.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ActivityInsightsManager.ixx">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Annotative.cpp" />
     <ClCompile Include="Annotative.ixx" />
     <ClCompile Include="BalloonNumber.cpp" />
