@@ -6,11 +6,14 @@
  *            Licensed under the MIT License. See LICENSE file in the project root for full license information.
  */
 module;
-#include "stdafx.h"
+#include "StdAfx.h"
 
 module EntityStyle;
 
 import Common;
+import Commands;
+import UniversalPicker;
+import Translator;
 
 namespace EntityStyle
 {
@@ -33,4 +36,15 @@ namespace EntityStyle
 		// 线宽
 		pEntity->setLineWeight(AcDb::kLnWtByLayer);
 	}
+}
+
+// 命令注册
+namespace
+{
+	void cmdSetByLayer()
+	{
+		UniversalPicker::run(nullptr, EntityStyle::setByLayer, _(L"设置实体样式为当前层样式"));
+	}
+
+	Commands::AutoRegister ar({L"yxSetByLayer", []() { return _(L"设置实体样式为当前层样式"); }, Commands::CommandFlags::PickRedraw, cmdSetByLayer});
 }

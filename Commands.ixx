@@ -1,30 +1,30 @@
 ﻿/**
  * @file      Commands.ixx
- * @brief     命令模块。
+ * @brief     命令模块接口
  * @author    IYATT-yx
  * @copyright Copyright (c) 2026 IYATT-yx.
  *            Licensed under the MIT License. See LICENSE file in the project root for full license information.
  */
 module;
-#include "stdafx.h"
+#include "StdAfx.h"
 
 export module Commands;
+import std;
 
 export namespace Commands
 {
 	enum CommandFlags : int
 	{
-		Base = ACRX_CMD_MODAL, // 模态命令
-		//Pick = ACRX_CMD_MODAL | ACRX_CMD_USEPICKSET, // 模态命令，支持预选（先选实体后执行命令）
-		PickRedraw = ACRX_CMD_MODAL | ACRX_CMD_USEPICKSET | ACRX_CMD_REDRAW // 模态命令，支持预选，支持重绘
+		Base = ACRX_CMD_MODAL,                                                // 模态命令
+		PickRedraw = ACRX_CMD_MODAL | ACRX_CMD_USEPICKSET | ACRX_CMD_REDRAW   // 模态命令，支持预选与重绘
 	};
 
 	struct CommandInfo
 	{
-		AcString commandName; // 命令全名
-		AcString commandDescription; // 命令描述
+		AcString commandName;         // 命令全名
+		AcString commandDescription;  // 命令描述
 		Commands::CommandFlags flags; // 命令标志
-		AcRxFunctionPtr proc; // 命令处理函数
+		AcRxFunctionPtr proc;         // 命令处理函数
 
 		/**
 		 * @brief 获取命令的简名
@@ -53,22 +53,75 @@ export namespace Commands
 	};
 
 	using CommandInfoList = std::vector<Commands::CommandInfo>;
-	CommandInfoList commandInfoList;
+	inline CommandInfoList commandInfoList; // 全局命令列表缓存
 
 	using CommandList = std::vector<const wchar_t*>;
-};
 
-export namespace Commands
-{
 	/**
-	 * @brief 注册命令
-	 * @param cil 命令列表
+	 * @brief 静态注册用的描述信息结构体
 	 */
-	void registerYxCmds(Commands::CommandInfoList& cil);
+	struct CommandSpec
+	{
+		AcString commandName;
+		std::function<AcString()> getLocalizedDescription;
+		Commands::CommandFlags flags;
+		AcRxFunctionPtr proc;
+	};
+
+	/**
+	 * @brief 命令自注册中心单例
+	 */
+	class CommandRegistry
+	{
+	public:
+		static CommandRegistry& getInstance()
+		{
+			static CommandRegistry instance;
+			return instance;
+		}
+
+		void addSpec(CommandSpec spec)
+		{
+			this->specs.push_back(std::move(spec));
+		}
+
+		const std::vector<CommandSpec>& getSpecs() const
+		{
+			return this->specs;
+		}
+
+	private:
+		CommandRegistry() = default;
+		std::vector<CommandSpec> specs;
+	};
+
+	struct AutoRegister
+	{
+		// 单个注册
+		AutoRegister(CommandSpec spec)
+		{
+			CommandRegistry::getInstance().addSpec(std::move(spec));
+		}
+
+		// 批量注册
+		AutoRegister(std::initializer_list<CommandSpec> specs)
+		{
+			auto& reg = CommandRegistry::getInstance();
+			for (const auto& spec : specs)
+			{
+				reg.addSpec(spec);
+			}
+		}
+	};
+
+	/**
+	 * @brief 收集已自注册的命令并向 CAD 系统注册
+	 */
+	void registerYxCmds();
 
 	/**
 	 * @brief 执行命令
-	 * @param cmdList 命令列表
+     * @param cmdList 命令列表
 	 * @param usePrefix 是否使用 ._ 前缀
 	 * @param pDoc 文档指针
 	 */

@@ -7,10 +7,13 @@
  */
 module;
 #include "StdAfx.h"
+#include "GenericPairEditDlg.hpp"
 
 module DocCloseInterceptor;
 import Translator;
 import AcadVarUtil;
+import ConfigManager;
+import Commands;
 
 // 初始化静态成员
 DocCloseInterceptor* DocCloseInterceptor::spInstance = nullptr;
@@ -117,4 +120,59 @@ LRESULT CALLBACK DocCloseInterceptor::cbtFilterHook(int code, WPARAM wParam, LPA
 
     HHOOK hHook = (spInstance != nullptr) ? spInstance->mhCbtHook : nullptr;
     return CallNextHookEx(hHook, code, wParam, lParam);
+}
+
+namespace
+{
+    void cmdClosePrompt()
+    {
+        CAcModuleResourceOverride resOverride;
+        CString title = _(L"设置跳过仅视图修改时的文件保存提示");
+        GenericPairEditDlg dlg(title, _(L"启用(1/0)"), L"提示", false, true, true);
+
+        auto& manager = ConfigManager::getInstance();
+        auto& config = manager.getConfig();
+        bool bSkipSavePromptOnViewChangesEnabled = config.closePromptSettings.bSkipSavePromptOnViewChangesEnabled;
+        CString edit1Result;
+        edit1Result.Format(L"%d", bSkipSavePromptOnViewChangesEnabled);
+        dlg.modifyEditControl(edit1Result, _(L"启用后。如果图纸仅发生平移和缩放，关闭图纸时不会提示保存文件。"));
+
+        dlg.setValidatorAndParser([&](const CString& value1, const CString& _2) -> CString
+            {
+                if (value1.IsEmpty())
+                {
+                    return _(L"必须输入启用状态");
+                }
+                if (value1.SpanIncluding(L"01") != value1)
+                {
+                    return _(L"启用状态必须为 0 或 1，1表示启用，0 表示不启用");
+                }
+                edit1Result = value1;
+                return GenericPairEditDlg::ValidatorOk;
+            });
+
+        if (dlg.DoModal() != IDOK)
+        {
+            acutPrintf(_(L"取消操作"));
+            return;
+        }
+
+        DocCloseInterceptor::getInstance().stop();
+        config.closePromptSettings.bSkipSavePromptOnViewChangesEnabled = (edit1Result == L"1");
+        if (!manager.saveConfig())
+        {
+            std::wstring err = manager.getLastError();
+            AfxMessageBox(err.c_str(), MB_OK | MB_ICONERROR);
+            config.closePromptSettings.bSkipSavePromptOnViewChangesEnabled = bSkipSavePromptOnViewChangesEnabled;
+        }
+        if (config.closePromptSettings.bSkipSavePromptOnViewChangesEnabled)
+        {
+            DocCloseInterceptor::getInstance().start();
+        }
+    }
+
+    Commands::AutoRegister ar =
+    {
+        { L"yxSkipSavePromptOnViewChangesEnabled", []() { return _(L"设置跳过仅视图修改时的文件保存提示"); }, Commands::CommandFlags::Base, cmdClosePrompt },
+    };
 }

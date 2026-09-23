@@ -5,7 +5,13 @@
  * @copyright Copyright (c) 2026 IYATT-yx.
  *            Licensed under the MIT License. See LICENSE file in the project root for full license information.
  */
+moduel;
+#include "StdAfx.h"
+#include "GenericPairEditDlg.hpp"
+
 module Translator;
+import ConfigManager;
+import Commands;
 
 Translator& Translator::getInstance()
 {
@@ -252,4 +258,48 @@ std::unordered_map<std::wstring, std::wstring>Translator::loadMoFile(const std::
 	}
 
 	return localMap;
+}
+
+namespace
+{
+	void cmdSetLanguage()
+	{
+		CAcModuleResourceOverride resOverride;
+		CString title = _(L"设置语言");
+		GenericPairEditDlg dlg(title, _(L"语言代码"), L"提示", false, true, true);
+
+		auto& manager = ConfigManager::getInstance();
+		auto& config = manager.getConfig();
+		std::wstring languageCode = config.languageSettings.languageCode;
+		dlg.modifyEditControl(languageCode.c_str(), _(L"无匹配语言代码的翻译文件时，默认显示中文"));
+
+		dlg.setValidatorAndParser([&](const CString& value1, const CString& _2) -> CString
+			{
+				if (value1.IsEmpty())
+				{
+					return _(L"必须输入语言代码");
+				}
+				config.languageSettings.languageCode = value1.GetString();
+				return GenericPairEditDlg::ValidatorOk;
+			});
+
+		if (dlg.DoModal() != IDOK)
+		{
+			acutPrintf(_(L"取消操作"));
+			return;
+		}
+
+		if (!manager.saveConfig())
+		{
+			std::wstring err = manager.getLastError();
+			AfxMessageBox(err.c_str(), MB_OK | MB_ICONERROR);
+			config.languageSettings.languageCode = languageCode;
+		}
+		AfxMessageBox(_(L"重启插件刷新语言设置"), MB_OK | MB_ICONINFORMATION);
+	}
+
+	Commands::AutoRegister ar =
+	{
+		{ L"yxSetLanguage", []() { return _(L"设置语言"); }, Commands::CommandFlags::Base, cmdSetLanguage },
+	};
 }

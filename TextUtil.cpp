@@ -7,6 +7,7 @@
  */
 module;
 #include "StdAfx.h"
+#include "GenericPairEditDlg.hpp"
 
 module TextUtil;
 import Common;
@@ -16,6 +17,8 @@ import CsvModule;
 import std;
 import AcadVarUtil;
 import Translator;
+import Commands;
+import FileDialog;
 
 namespace TextUtil
 {
@@ -388,4 +391,187 @@ namespace TextUtil
 			}
 		}
 	}
+}
+
+namespace
+{
+	void cmdCloneText()
+	{
+		AcString asSrcTextContent;
+		acutPrintf(_(L"\n请选择要复制的源文本对象"));
+		if (!TextUtil::getSelectedTextRawContent(asSrcTextContent) || asSrcTextContent.isEmpty())
+		{
+			acutPrintf(_(L"取消操作"));
+			return;
+		}
+		acutPrintf(_(L"\n读取到：%s\n"), asSrcTextContent.constPtr());
+
+		acutPrintf(_(L"请选择要粘贴到的文本对象"));
+		UniversalPicker::run(
+			&TextUtil::textClassList,
+			[&asSrcTextContent](const AcDbObjectId& id)
+			{
+				TextUtil::updateTextEntityContent(id, asSrcTextContent);
+			},
+			_(L"将多行/单行文本内容复制给其它多行/单行文本"),
+			UniversalPicker::SelectMode::Immediate,
+			false,
+			UniversalPicker::SortMode::None,
+			true
+		);
+	}
+
+	void cmdImportCsvToMTextMatrix()
+	{
+		FileDialog::FileDialogFilterBuilder fileFilterBuilter;
+		CString strFileFilter = fileFilterBuilter.addFilter(_(L"CSV 文件"), { L"*.csv" }).build();
+		CString strFilePath = FileDialog::ShowOpenFileDialog(_(L"选择要导入的文件"), L"csv", strFileFilter);
+		if (strFilePath.IsEmpty())
+		{
+			acutPrintf(_(L"取消操作"));
+			return;
+		}
+
+		CsvModule::AcStringMatrix matrixData;
+		CsvModule::readCsvToAcStringMatrix(strFilePath, matrixData);
+
+		CAcModuleResourceOverride resOverride;
+		GenericPairEditDlg dlg(_(L"从 CSV 文件导入数据生成多行文本矩阵"), _(L"参数"), _(L"使用提示"), false, true, true);
+		CString strTipMTextMatrixParameter;
+		double TEXTSIZE;
+		if (!AcadVarUtil::getVar(AcadVarName::TEXTSIZE, TEXTSIZE))
+		{
+			AfxMessageBox(_(L"获取变量失败！"), MB_OK | MB_ICONERROR);
+			return;
+		}
+		double scale = Annotative::getCurrentScaleValue();
+		strTipMTextMatrixParameter.Format(_(L"输入3个不小于0的数，使用空格分隔，分别为：列宽、列步长、行步长。显示文字高度 = TEXTSIZE变量值%g × 注释比例缩放值%g = %g"), TEXTSIZE, scale, TEXTSIZE * scale);
+		dlg.modifyEditControl(L"", strTipMTextMatrixParameter);
+
+		std::vector<double> params;
+		dlg.setValidatorAndParser([&](const CString& edit1, const CString& _) -> CString
+			{
+				const int paramsNumber = 3;
+				if (!Common::parse(edit1, paramsNumber, [](double v) { return v > 0; }, params))
+				{
+					return strTipMTextMatrixParameter;
+				}
+				return GenericPairEditDlg::ValidatorOk;
+			});
+
+		if (dlg.DoModal() != IDOK)
+		{
+			acutPrintf(_(L"取消操作"));
+			return;
+		}
+
+		ads_point pt{};
+		if (acedGetPoint(nullptr, _(L"请选择位置"), pt) != RTNORM)
+		{
+			acutPrintf(_(L"取消操作"));
+			return;
+		}
+
+		TextUtil::createMTextMatrix(params[0], params[1], params[2], matrixData, asPnt3d(pt));
+	}
+
+	void cmdSpatialTableExplorer()
+	{
+		CAcModuleResourceOverride resOverride;
+		CString title = _(L"将多行/单行文本按空间位置表格化导出到 CSV 文件");
+		GenericPairEditDlg dlg(title, _(L"参数"), _(L"使用提示"), false, true, true);
+
+		// 默认列容差和行容差
+		// 字高默认使用 TEXTSIZE 变量值，列容差默认按字高的 3 倍，行容差默认按字高的 1 倍（考虑注释比例缩放值）
+		CString strInitParameter;
+		double scale = Annotative::getCurrentScaleValue();
+		double TEXTSIZE;
+		if (!AcadVarUtil::getVar(AcadVarName::TEXTSIZE, TEXTSIZE))
+		{
+			AfxMessageBox(_(L"获取变量失败！"), MB_OK | MB_ICONERROR);
+			return;
+		}
+		strInitParameter.Format(L"%g %g", TEXTSIZE * scale * 3, TEXTSIZE * scale * 1);
+		dlg.modifyEditControl(strInitParameter, _(L"输入2个不小于0的数，使用空格分隔，分别为：列容差、行容差。文本距离超过容差视为不同列或行。"));
+
+		std::vector<double> params;
+		dlg.setValidatorAndParser([&](const CString& edit1, const CString& _2) -> CString
+			{
+				const int paramsNumber = 2;
+				if (!Common::parse(edit1, paramsNumber, [](double v) { return v > 0; }, params))
+				{
+					return _(L"输入2个不小于0的数，使用空格分隔，分别为：列容差、行容差。文本距离超过容差视为不同列或行。");
+				}
+				return GenericPairEditDlg::ValidatorOk;
+			});
+
+
+		if (dlg.DoModal() != IDOK)
+		{
+			acutPrintf(_(L"取消操作"));
+			return;
+		}
+
+		FileDialog::FileDialogFilterBuilder fileFilterBuilter;
+		CString strFileFilter = fileFilterBuilter.addFilter(_(L"CSV 文件"), { L"*.csv" }).build();
+		CString strFilePath = FileDialog::ShowSaveFileDialog(_(L"保存 CSV 文件到"), _(L"数据文件.csv"), L"csv", strFileFilter);
+		if (strFilePath.IsEmpty())
+		{
+			acutPrintf(_(L"取消操作"));
+			return;
+		}
+		CsvWriter writer(strFilePath);
+		if (!writer.isValid())
+		{
+			AfxMessageBox(_(L"文件路径打开失败，请检查是否被占用或路径无效"), MB_OK | MB_ICONERROR);
+			return;
+		}
+
+		TextUtil::TextEntityDataList elements;
+		UniversalPicker::run(
+			&TextUtil::textClassList,
+			[&](const AcDbObjectId& id)
+			{
+				TextUtil::TextEntityData data;
+				data.id = id;
+				if (TextUtil::readMText(id, data.text, false, &data.pos))
+				{
+					acutPrintf(_(L"\n(%g,%g,%g)多行文本：%s"), data.pos.x, data.pos.y, data.pos.z, data.text.constPtr());
+				}
+				else if (TextUtil::readDText(id, data.text, false, &data.pos))
+				{
+					acutPrintf(_(L"\n(%g,%g,%g)单行文本：%s"), data.text.constPtr());
+				}
+				elements.push_back(data);
+			},
+			title,
+			UniversalPicker::SelectMode::Batch,
+			true,
+			UniversalPicker::SortMode::None,
+			true
+		);
+
+		CsvModule::AcStringMatrix matrixData;
+		TextUtil::structureTextToAcStringMatrix(elements, params[0], params[1], matrixData);
+
+
+		for (const auto& row : matrixData)
+		{
+			writer.writeRow(row);
+			acutPrintf(L"\n");
+			for (const auto& field : row)
+			{
+				acutPrintf(L"%s\t", field.constPtr());
+			}
+		}
+
+		acutPrintf(_(L"\n文件位置：%s"), strFilePath);
+	}
+
+	Commands::AutoRegister ar =
+	{
+		{ L"yxCloneText", []() { return _(L"将多行/单行文本内容复制给其它多行/单行文本"); }, Commands::CommandFlags::Base, cmdCloneText },
+		{ L"yxImportCsvToMTextMatrix", []() { return _(L"从 CSV 文件导入数据生成多行文本矩阵"); }, Commands::CommandFlags::PickRedraw, cmdImportCsvToMTextMatrix },
+		{ L"yxSpatialTableExplorer", []() { return _(L"将多行/单行文本按空间位置表格化导出到 CSV 文件"); }, Commands::CommandFlags::PickRedraw, cmdSpatialTableExplorer },
+	};
 }

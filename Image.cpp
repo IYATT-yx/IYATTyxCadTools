@@ -6,12 +6,15 @@
  *            Licensed under the MIT License. See LICENSE file in the project root for full license information.
  */
 module;
-#include "stdafx.h"
+#include "StdAfx.h"
 #include <atlimage.h>
 
 module Image;
 import Common;
 import Translator;
+import FileDialog;
+import Commands;
+import UniversalPicker;
 
 namespace Image
 {
@@ -132,3 +135,62 @@ namespace Image
         }
     }
 };
+
+namespace
+{
+    void cmdPasteClipImage()
+    {
+        if (!Image::clipboardHasImage())
+        {
+            AfxMessageBox(_(L"剪贴板中没有检测到图像数据。"), MB_OK | MB_ICONWARNING);
+            return;
+        }
+
+        FileDialog::FileDialogFilterBuilder filterBuilder;
+        CString fileFilter = filterBuilder.addFilter(_(L"PNG 图片"), { L"*.png" }).build();
+        CString defaultFilename;
+        defaultFilename.Format(_(L"图片%s.png"), Common::getTimestamp());
+        CString filename = FileDialog::ShowSaveFileDialog(_(L"选择图片保存路径"), defaultFilename, L"png", fileFilter, Common::getCurrPath(true));
+        if (filename.IsEmpty())
+        {
+            acutPrintf(_(L"取消操作"));
+            return;
+        }
+        if (!Image::saveClipboardBitmapToFile(filename))
+        {
+            AfxMessageBox(_(L"保存剪贴板图像数据到文件失败"), MB_OK | MB_ICONERROR);
+            return;
+        }
+        if (!Image::copyFileToClipboard(filename))
+        {
+            AfxMessageBox(_(L"复制文件到剪贴板失败"), MB_OK | MB_ICONERROR);
+            return;
+        }
+        const wchar_t* appName = acedGetAppName();
+        Commands::CommandList pszCmdList =
+        {
+            L"PASTECLIP"
+        };
+        Commands::executeCommand(pszCmdList);
+    }
+
+    void cmdForceRemoveImage()
+    {
+        UniversalPicker::AcRxClassVector arcv = { AcDbRasterImage::desc() };
+        UniversalPicker::run(
+            &arcv,
+            Image::forceRemoveImageAndFile,
+            _(L"删除光栅图像及图片文件（无法撤销恢复）"),
+            UniversalPicker::SelectMode::Immediate,
+            false,
+            UniversalPicker::SortMode::None,
+            true
+        );
+    }
+
+    Commands::AutoRegister ar =
+    {
+        { L"yxPasteClipImage", []() { return _(L"将剪贴板中的截图/图像数据保存到文件并插入图纸中"); }, Commands::CommandFlags::PickRedraw, cmdPasteClipImage },
+        { L"yxForceRemoveImage", []() { return _(L"删除光栅图像及图片文件（无法撤销恢复）"); }, Commands::CommandFlags::PickRedraw, cmdForceRemoveImage }
+    };
+}

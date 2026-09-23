@@ -6,7 +6,7 @@
  *            Licensed under the MIT License. See LICENSE file in the project root for full license information.
  */
 module;
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "dbtrans.h"
 
 module UniversalPicker;

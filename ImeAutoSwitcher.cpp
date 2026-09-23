@@ -8,7 +8,8 @@
  *            Licensed under the MIT License. See LICENSE file in the project root for full license information.
  */
 module;
-#include "stdafx.h"
+#include "StdAfx.h"
+#include "GenericPairEditDlg.hpp"
 #include <imm.h>
 #pragma comment(lib, "imm32.lib")
 
@@ -17,6 +18,7 @@ import Common;
 import ConfigManager;
 import Translator;
 import AcadVarUtil;
+import Commands;
 
 namespace ImeAutoSwitcher
 {
@@ -124,4 +126,84 @@ namespace ImeAutoSwitcher
             acutPrintf(_(L"\n停止输入法语言自动切换\n"));
         }
     }
+}
+
+namespace
+{
+    void cmdImeAutoSwitch()
+    {
+        CAcModuleResourceOverride resOverride;
+        CString title = _(L"设置输入法自动切换");
+        GenericPairEditDlg dlg(title, _(L"启用1/0"), _(L"启用1/0"), false, true, true);
+
+        CString edit1Result, edit2Result;
+        auto& manager = ConfigManager::getInstance();
+        auto& config = manager.getConfig();
+        bool bEnabled = config.imeSettings.bEnabled;
+        unsigned long iInterval = config.imeSettings.iIntervalMs;
+        const ConfigItems::ImeSettings defaultConfig;
+        edit1Result.Format(L"%d", config.imeSettings.bEnabled);
+        edit2Result.Format(L"%d", config.imeSettings.iIntervalMs);
+        dlg.modifyEditControl(edit1Result, edit2Result);
+
+        dlg.setValidatorAndParser([&](const CString& value1, const CString& value2) -> CString
+            {
+                if (value1.IsEmpty() || value2.IsEmpty())
+                {
+                    return _(L"必须输入自启动状态和切换间隔时间");
+                }
+                if (value1.SpanIncluding(L"01") != value1)
+                {
+                    return _(L"自启动状态必须为 0 或 1，1表示自启动，0 表示不自启动");
+                }
+                try
+                {
+                    size_t pos;
+                    config.imeSettings.iIntervalMs = std::stoi(value2.GetString(), &pos);
+                    if (pos != value2.GetLength())
+                    {
+                        throw std::exception();
+                    }
+                    if (config.imeSettings.iIntervalMs < defaultConfig.iIntervalMs)
+                    {
+                        throw std::exception();
+                    }
+                }
+                catch (...)
+                {
+                    CString csInvalidInterval;
+                    csInvalidInterval.Format(_(L"切换间隔必须为不小于 %d 的整数"), defaultConfig.iIntervalMs);
+                    return csInvalidInterval;
+                }
+
+                edit1Result = value1;
+                return GenericPairEditDlg::ValidatorOk;
+            });
+
+        if (dlg.DoModal() != IDOK)
+        {
+            acutPrintf(_(L"取消操作"));
+            return;
+        }
+
+        config.imeSettings.bEnabled = (edit1Result == L"1");
+        ImeAutoSwitcher::stop();
+        if (!manager.saveConfig())
+        {
+            std::wstring err = manager.getLastError();
+            AfxMessageBox(err.c_str(), MB_OK | MB_ICONERROR);
+            // 保存失败，还原状态
+            config.imeSettings.bEnabled = bEnabled;
+            config.imeSettings.iIntervalMs = iInterval;
+        }
+        if (config.imeSettings.bEnabled)
+        {
+            ImeAutoSwitcher::start(config.imeSettings.iIntervalMs);
+        }
+    }
+
+    Commands::AutoRegister ar =
+    {
+        { L"yxImeAutoSwitch", []() { return _(L"设置输入法自动切换"); }, Commands::CommandFlags::Base, cmdImeAutoSwitch },
+    };
 }

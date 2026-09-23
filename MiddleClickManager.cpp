@@ -7,12 +7,14 @@
  */
 module;
 #include "StdAfx.h"
+#include "GenericPairEditDlg.hpp"
 
 module MiddleClickManager;
 import Common;
 import Commands;
 import Translator;
 import AcadVarUtil;
+import Translator;
 
 inline constexpr const wchar_t* kWinStandardDialogClassName = L"#32770"; // 标准对话框类名
 inline constexpr const wchar_t* kAcadDialogClassName = L"adesk_dlg0000"; // AutoCAD 对话框类名
@@ -135,4 +137,128 @@ LRESULT CALLBACK MiddleClickManager::unifiedMiddleClickProc(int nCode, WPARAM wP
         }
     }
     return CallNextHookEx(nullptr, nCode, wParam, lParam);
+}
+
+namespace
+{
+    void cmdDialogMiddleClickToOk()
+    {
+        CAcModuleResourceOverride resOverride;
+        CString title = _(L"设置对话框中鼠标中键映射到确定按钮");
+        GenericPairEditDlg dlg(title, _(L"启用1/0"), L"", true, true, true);
+
+        CString edit1Result;
+        auto& manager = ConfigManager::getInstance();
+        auto& config = manager.getConfig();
+        bool bDialogMiddleClickToOkEnabled = config.middleClickManagerSettings.bDialogMiddleClickToOkEnabled;
+        edit1Result.Format(L"%d", config.middleClickManagerSettings.bDialogMiddleClickToOkEnabled);
+        dlg.modifyEditControl(edit1Result);
+
+        dlg.setValidatorAndParser([&](const CString& value1, const CString& _2) -> CString
+            {
+                if (value1.IsEmpty())
+                {
+                    return _(L"必须输入1或0设置是否启用中键映射确定按钮");
+                }
+                if (value1.SpanIncluding(L"01") != value1)
+                {
+                    return _(L"必须输入1或0设置是否启用中键映射确定按钮");
+                }
+                edit1Result = value1;
+                return GenericPairEditDlg::ValidatorOk;
+            });
+
+        if (dlg.DoModal() != IDOK)
+        {
+            acutPrintf(_(L"取消操作"));
+            return;
+        }
+
+        config.middleClickManagerSettings.bDialogMiddleClickToOkEnabled = (edit1Result == L"1");
+        auto& middleClickManager = MiddleClickManager::getInstance();
+        middleClickManager.stopUnifiedMiddleClickProc();
+        if (!manager.saveConfig())
+        {
+            std::wstring err = manager.getLastError();
+            AfxMessageBox(err.c_str(), MB_OK | MB_ICONERROR);
+            // 保存失败，还原状态
+            config.middleClickManagerSettings.bDialogMiddleClickToOkEnabled = bDialogMiddleClickToOkEnabled;
+        }
+        middleClickManager.startUnifiedMiddleClickProc(config.middleClickManagerSettings);
+    }
+
+    void cmdCmdMiddleClickToEnter()
+    {
+        CAcModuleResourceOverride resOverride;
+        CString title = _(L"设置命令执行状态下鼠标中键映射回车键");
+        GenericPairEditDlg dlg(title, _(L"启用1/0"), _(L"间隔(ms)"), false, true, true);
+
+        CString edit1Result, edit2Result;
+        auto& manager = ConfigManager::getInstance();
+        auto& config = manager.getConfig();
+        bool bEnabled = config.middleClickManagerSettings.bCmdMiddleClickToEnterEnabled;
+        unsigned long dCmdMiddleClickDownUpInterval = config.middleClickManagerSettings.dCmdMiddleClickDownUpInterval;
+        edit1Result.Format(L"%d", bEnabled);
+        edit2Result.Format(L"%d", dCmdMiddleClickDownUpInterval);
+        const ConfigItems::MiddleClickManagerSettings defaultConfig;
+        dlg.modifyEditControl(edit1Result, edit2Result);
+
+        dlg.setValidatorAndParser([&](const CString& value1, const CString& value2) -> CString
+            {
+                if (value1.IsEmpty() || value2.IsEmpty())
+                {
+                    return _(L"必须输入自启动状态和切换间隔时间");
+                }
+                if (value1.SpanIncluding(L"01") != value1)
+                {
+                    return _(L"自启动状态必须为 0 或 1，1表示自启动，0 表示不自启动");
+                }
+                try
+                {
+                    size_t pos;
+                    config.middleClickManagerSettings.dCmdMiddleClickDownUpInterval = std::stoi(value2.GetString(), &pos);
+                    if (pos != value2.GetLength())
+                    {
+                        throw std::exception();
+                    }
+                    if (config.middleClickManagerSettings.dCmdMiddleClickDownUpInterval < defaultConfig.dCmdMiddleClickDownUpInterval)
+                    {
+                        throw std::exception();
+                    }
+                }
+                catch (...)
+                {
+                    CString csInvalidInterval;
+                    csInvalidInterval.Format(_(L"切换间隔必须为不小于 %d 的整数"), defaultConfig.dCmdMiddleClickDownUpInterval);
+                    return csInvalidInterval;
+                }
+
+                edit1Result = value1;
+                return GenericPairEditDlg::ValidatorOk;
+            });
+
+        if (dlg.DoModal() != IDOK)
+        {
+            acutPrintf(_(L"取消操作"));
+            return;
+        }
+
+        config.middleClickManagerSettings.bCmdMiddleClickToEnterEnabled = (edit1Result == L"1");
+        MiddleClickManager::getInstance().stopUnifiedMiddleClickProc();
+        if (!manager.saveConfig())
+        {
+            std::wstring err = manager.getLastError();
+            AfxMessageBox(err.c_str(), MB_OK | MB_ICONERROR);
+            // 保存失败，还原状态
+            config.middleClickManagerSettings.bCmdMiddleClickToEnterEnabled = bEnabled;
+            config.middleClickManagerSettings.dCmdMiddleClickDownUpInterval = dCmdMiddleClickDownUpInterval;
+        }
+        MiddleClickManager::getInstance().startUnifiedMiddleClickProc(config.middleClickManagerSettings);
+    }
+
+    Commands::AutoRegister ar =
+    {
+        { L"yxDialogMiddleClickToOk", []() { return _(L"设置对话框中鼠标中键映射到确定按钮"); }, Commands::CommandFlags::Base, cmdDialogMiddleClickToOk },
+        { L"yxCmdMiddleClickToEnter", []() { return _(L"设置命令执行状态下鼠标中键映射回车键"); }, Commands::CommandFlags::Base, cmdCmdMiddleClickToEnter },
+    };
 }

@@ -6,13 +6,16 @@
  *            Licensed under the MIT License. See LICENSE file in the project root for full license information.
  */
 module;
-#include "stdafx.h"
+#include "StdAfx.h"
+#include "GenericPairEditDlg.hpp"
 
 module Dimension;
 import Common;
+import Commands;
 import TextUtil;
 import std;
 import Translator;
+import UniversalPicker;
 
 namespace Dimension
 {
@@ -403,4 +406,216 @@ namespace Dimension
 		}
 		return false;
 	}
+}
+
+namespace
+{
+	void cmdDimensionSolidify()
+	{
+		UniversalPicker::run(&Common::DimensionSubClasses, Dimension::dimensionSolidify, _(L"尺寸固化"));
+	}
+
+	void cmdDimensionRelink()
+	{
+		UniversalPicker::run(&Common::DimensionSubClasses, Dimension::dimensionRelink, _(L"尺寸恢复关联"));
+	}
+
+	void cmdDimensionTolerancePrecision()
+	{
+		CAcModuleResourceOverride resOverride;
+		GenericPairEditDlg dlg(_(L"设置尺寸标注的主单位精度和公差精度"), _(L"主单位精度"), _(L"公差精度"), false, true, true);
+		// 设置 -1 表示不修改精度 
+		CString strDimPrec = L"-1";
+		CString strTolPrec = L"-1";
+		dlg.modifyEditControl(strDimPrec, strTolPrec);
+
+		int iDimPrec = -1;
+		int iTolPrec = -1;
+		dlg.setValidatorAndParser([&](const CString& val1, const CString& val2) -> CString
+			{
+				try
+				{
+					size_t pos;
+					iDimPrec = std::stoi(val1.GetString(), &pos);
+					if (pos != val1.GetLength())
+					{
+						throw std::exception();
+					}
+					if (iDimPrec < 0 && iDimPrec != -1)
+					{
+						throw std::exception();
+					}
+					if (iDimPrec > 8)
+					{
+						throw std::exception();
+					}
+
+					iTolPrec = std::stoi(val2.GetString(), &pos);
+					if (pos != val2.GetLength())
+					{
+						throw std::exception();
+					}
+					if (iTolPrec < 0 && iTolPrec != -1)
+					{
+						throw std::exception();
+					}
+					if (iTolPrec > 8)
+					{
+						throw std::exception();
+					}
+				}
+				catch (...)
+				{
+					return _(L"精度值只能是 0 至 8 的整数，输入 -1 时不修改精度。");
+				}
+				return GenericPairEditDlg::ValidatorOk;
+			});
+
+		if (dlg.DoModal() != IDOK)
+		{
+			acutPrintf(_(L"取消操作"));
+			return;
+		}
+
+		UniversalPicker::run(
+			&Common::DimensionSubClasses,
+			[&](const AcDbObjectId& id)
+			{
+				Dimension::setDimensionTolerancePreccision(id, iDimPrec, iTolPrec);
+			},
+			_(L"设置尺寸标注的主单位精度和公差精度"),
+			UniversalPicker::SelectMode::Immediate,
+			false,
+			UniversalPicker::SortMode::None,
+			true
+		);
+	}
+
+	void cmdAddSurroundingCharsForDimension()
+	{
+		CAcModuleResourceOverride resOverride;
+		GenericPairEditDlg dlg(_(L"为标注添加前后缀"), _(L"前缀符号"), _(L"后缀符号"));
+
+		CString left, right;
+		dlg.setValidatorAndParser([&](const CString& value1, const CString& value2) -> CString
+			{
+				left = value1;
+				right = value2;
+				return GenericPairEditDlg::ValidatorOk;
+			});
+		if (dlg.DoModal() != IDOK)
+		{
+			acutPrintf(_(L"取消操作"));
+			return;
+		}
+
+		bool isLGdt = dlg.getGdtCheckStatus(0);
+		bool isRGdt = dlg.getGdtCheckStatus(1);
+		UniversalPicker::run(
+			&Common::DimensionSubClasses,
+			[&](AcDbObjectId objId)
+			{
+				Dimension::addSurroundingCharsForDimension(objId, left, right, isLGdt, isRGdt);
+			},
+			_(L"为标注添加前后缀"),
+			UniversalPicker::SelectMode::Immediate
+		);
+	}
+
+	void cmdRemoveSurroundingCharsForDimension()
+	{
+		CAcModuleResourceOverride resOverride;
+		GenericPairEditDlg dlg(_(L"为标注移除前后缀"), _(L"前缀符号"), _(L"后缀符号"));
+
+		CString left, right;
+		dlg.setValidatorAndParser([&](const CString& value1, const CString& value2) -> CString
+			{
+				left = value1;
+				right = value2;
+				return GenericPairEditDlg::ValidatorOk;
+			});
+		if (dlg.DoModal() != IDOK)
+		{
+			acutPrintf(_(L"取消操作"));
+			return;
+		}
+
+		bool isLGdt = dlg.getGdtCheckStatus(0);
+		bool isRGdt = dlg.getGdtCheckStatus(1);
+		UniversalPicker::run(
+			&Common::DimensionSubClasses,
+			[&](AcDbObjectId objId)
+			{
+				Dimension::removeSurroundingCharsForDimension(objId, left, right, isLGdt, isRGdt);
+			},
+			_(L"为标注移除前后缀"),
+			UniversalPicker::SelectMode::Immediate
+		);
+	}
+
+	void cmdSetBasicBox()
+	{
+		UniversalPicker::run(
+			&Common::DimensionSubClasses,
+			[](AcDbObjectId objId)
+			{
+				Dimension::setAndUnsetBasicBox(objId, true);
+			},
+			_(L"设置理论尺寸框"),
+			UniversalPicker::SelectMode::Immediate
+		);
+	}
+
+	void cmdUnsetBasicBox()
+	{
+		UniversalPicker::run(
+			&Common::DimensionSubClasses,
+			[](AcDbObjectId objId)
+			{
+				Dimension::setAndUnsetBasicBox(objId, false);
+			},
+			_(L"取消理论尺寸框"),
+			UniversalPicker::SelectMode::Immediate
+		);
+	}
+
+	void cmdSetRefDim()
+	{
+		UniversalPicker::run(
+			&Common::DimensionSubClasses,
+			[](AcDbObjectId objId)
+			{
+				Dimension::setAndUnsetRefDim(objId, true);
+			},
+			_(L"设置参考尺寸括号"),
+			UniversalPicker::SelectMode::Immediate
+		);
+	}
+
+	void cmdUnsetRefDim()
+	{
+		UniversalPicker::run(
+			&Common::DimensionSubClasses,
+			[](AcDbObjectId objId)
+			{
+				Dimension::setAndUnsetRefDim(objId, false);
+			},
+			_(L"取消理论尺寸括号"),
+			UniversalPicker::SelectMode::Immediate
+		);
+	}
+
+	Commands::AutoRegister ar =
+	{
+		{ L"yxDimensionSolidify", []() { return  _(L"尺寸固化"); }, Commands::CommandFlags::PickRedraw, cmdDimensionSolidify },
+		{ L"yxDimensionReslink", []() { return  _(L"尺寸恢复关联"); }, Commands::CommandFlags::PickRedraw, cmdDimensionRelink },
+		{ L"yxDimensionTolerancePrecision", []() { return _(L"设置尺寸标注的主单位精度和公差精度"); }, Commands::CommandFlags::PickRedraw, cmdDimensionTolerancePrecision },
+		{ L"yxAddSurroundingCharsForDimension", []() { return _(L"为标注添加前后缀"); }, Commands::CommandFlags::PickRedraw, cmdAddSurroundingCharsForDimension },
+		{ L"yxRemoveSurroundingCharsForDimension", []() { return _(L"为标注移除前后缀"); }, Commands::CommandFlags::PickRedraw, cmdRemoveSurroundingCharsForDimension },
+		{ L"yxSetBasicBox", []() { return _(L"设置理论尺寸框"); }, Commands::CommandFlags::PickRedraw, cmdSetBasicBox },
+		{ L"yxUnsetBasicBox", []() { return _(L"取消理论尺寸框"); }, Commands::CommandFlags::PickRedraw, cmdUnsetBasicBox },
+		{ L"yxSetRefDim", []() { return _(L"设置参考尺寸括号"); }, Commands::CommandFlags::PickRedraw, cmdSetRefDim },
+		{ L"yxUnsetRefDim", []() { return _(L"取消参考尺寸括号"); }, Commands::CommandFlags::PickRedraw, cmdUnsetRefDim }
+
+	};
 }

@@ -6,58 +6,84 @@
  *            Licensed under the MIT License. See LICENSE file in the project root for full license information.
  */
 module;
-#include "stdafx.h"
-
+#include "StdAfx.h"
 module Commands;
+
 import Common;
 
 namespace Commands
 {
-	void registerYxCmds(Commands::CommandInfoList& cil)
+	void registerYxCmds()
 	{
 		CAcModuleResourceOverride resOverride;
-		for (Commands::CommandInfo commandInfo : cil)
+
+		commandInfoList.clear();
+		const auto& specs = CommandRegistry::getInstance().getSpecs();
+
+		// 建立指针列表
+		std::vector<const CommandSpec*> sortedSpecs;
+		sortedSpecs.reserve(specs.size());
+		for (const auto& spec : specs)
 		{
+			sortedSpecs.push_back(&spec);
+		}
+
+		// 对指针列表进行排序
+		std::sort(sortedSpecs.begin(), sortedSpecs.end(), [](const CommandSpec* a, const CommandSpec* b) {
+			return wcscmp(a->commandName.constPtr(), b->commandName.constPtr()) < 0;
+			});
+
+		for (const auto& spec : specs)
+		{
+			CommandInfo info;
+			info.commandName = spec.commandName;
+			// 触发 Lambda 执行翻译，此时 Translator 已经成功 initialize
+			info.commandDescription = spec.getLocalizedDescription ? spec.getLocalizedDescription() : spec.commandName;
+			info.flags = spec.flags;
+			info.proc = spec.proc;
+
+			commandInfoList.push_back(info);
+
 			// 注册命令全名
-			acedRegCmds->addCommand(Common::cmdGroup, commandInfo.commandName.constPtr(), commandInfo.commandName.constPtr(), commandInfo.flags, commandInfo.proc);
+			acedRegCmds->addCommand(Common::cmdGroup, info.commandName.constPtr(), info.commandName.constPtr(), info.flags, info.proc);
+
 			// 注册命令简称
-			AcString shortCommandName = commandInfo.getShortCommandName();
-			acedRegCmds->addCommand(Common::cmdGroup, shortCommandName.constPtr(), shortCommandName.constPtr(), commandInfo.flags, commandInfo.proc);
+			AcString shortCommandName = info.getShortCommandName();
+			acedRegCmds->addCommand(Common::cmdGroup, shortCommandName.constPtr(), shortCommandName.constPtr(), info.flags, info.proc);
 		}
 	}
 
 	void executeCommand(const Commands::CommandList& cmdList, bool usePrefix, AcApDocument* pDoc)
 	{
-        if (cmdList.empty())
-        {
-            return;
-        }
+		if (cmdList.empty())
+		{
+			return;
+		}
 
-        if (pDoc == nullptr)
-        {
-            pDoc = acDocManager->curDocument();
-        }
+		if (pDoc == nullptr)
+		{
+			pDoc = acDocManager->curDocument();
+		}
 
-        if (pDoc == nullptr)
-        {
-            return;
-        }
+		if (pDoc == nullptr)
+		{
+			return;
+		}
 
-        AcString finalCmd;
-        if (usePrefix)
-        {
-            finalCmd.format(L"._%s\n", cmdList[0]);
-        }
-        else
-        {
-            finalCmd.format(L"%s\n", cmdList[0]);
-        }
-        for (size_t i = 1; i < cmdList.size(); ++i)
-        {
-            finalCmd.append(cmdList[i]);
-            finalCmd.append(L"\n");
-
-        }
-        acDocManager->sendStringToExecute(pDoc, finalCmd.constPtr(), false, true, true);
+		AcString finalCmd;
+		if (usePrefix)
+		{
+			finalCmd.format(L"._%s\n", cmdList[0]);
+		}
+		else
+		{
+			finalCmd.format(L"%s\n", cmdList[0]);
+		}
+		for (size_t i = 1; i < cmdList.size(); ++i)
+		{
+			finalCmd.append(cmdList[i]);
+			finalCmd.append(L"\n");
+		}
+		acDocManager->sendStringToExecute(pDoc, finalCmd.constPtr(), false, true, true);
 	}
 }
