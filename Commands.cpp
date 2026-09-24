@@ -33,8 +33,9 @@ namespace Commands
 			return wcscmp(a->commandName.constPtr(), b->commandName.constPtr()) < 0;
 			});
 
-		for (const auto& spec : specs)
+		for (const auto* pSpec : sortedSpecs)
 		{
+			const auto& spec = *pSpec;
 			CommandInfo info;
 			info.commandName = spec.commandName;
 			// 触发 Lambda 执行翻译，此时 Translator 已经成功 initialize
