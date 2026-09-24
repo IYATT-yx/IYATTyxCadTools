@@ -87,9 +87,20 @@ namespace ImeAutoSwitcher
                 if (currentTime - g_lastSwitchTime > g_intervalMs)
                 {
                     HWND hAcadWnd = adsw_acadMainWnd();
-                    // 仅在 CAD 是当前活动窗口时才进一步检查变量
+                    // 仅在 CAD 是当前活动窗口时才进一步检查
                     if (GetForegroundWindow() == hAcadWnd)
                     {
+                        // 获取当前获得键盘焦点的控件句柄
+                        HWND hFocusWnd = ::GetFocus();
+
+                        // 检查焦点控件的 ID 是否为搜索框的 IDC_EDIT_SEARCH
+                        if (hFocusWnd != nullptr && ::GetDlgCtrlID(hFocusWnd) == IDC_EDIT_SEARCH)
+                        {
+                            // 焦点在搜索框内，直接忽略，不切换输入法
+                            return CallNextHookEx(g_hKeyboardHook, nCode, wParam, lParam);
+                        }
+                        // ---------------------------------------------------------
+
                         if (!ImeAutoSwitcher::isCommandRunning())
                         {
                             ForceEnglishMode(hAcadWnd);

@@ -13,6 +13,7 @@
 #define IDC_BUTTON1                     108
 #define IDC_LIST1                       109
 #define IDD_MAINBAR                     110
+#define IDC_EDIT_SEARCH                 111
 
 // Next default values for new objects
 // 
