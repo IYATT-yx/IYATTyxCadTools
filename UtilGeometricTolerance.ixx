@@ -1,0 +1,121 @@
+﻿/**
+ * @file      UtilGeometricTolerance.ixx
+ * @brief     机械版几何公差模块
+ * @author    IYATT-yx
+ * @copyright Copyright (c) 2026 IYATT-yx.
+ *            Licensed under the MIT License. See LICENSE file in the project root for full license information.
+ */
+module;
+#include "StdAfx.h"
+
+export module UtilGeometricTolerance;
+import std;
+import FrameworkTranslator;
+
+export namespace UtilGeometricTolerance
+{
+	constexpr int GeometricToleranceDataLen = 3; // AutoCAD 最多允许3个
+
+	// 几何公差数据
+	struct GeometricToleranceRow
+	{
+		AcString name; // 名称
+		Acm::GdtSymbolType gdtSymbolType; // 符号类型枚举值
+		AcString gdtSymbol; // GDT 符号
+		AcString value; // 值
+        AcString primary; // 基准1
+        AcString secondary; // 基准2
+        AcString tertiary; // 基准3
+
+		AcString toString() const
+		{
+			AcString strTmp = this->name;
+			const AcString* strTmpList[] = {&this->value , &this->primary, &this->secondary, &this->tertiary};
+			for (const AcString* i : strTmpList)
+			{
+				if (!i->isEmpty())
+				{
+					strTmp.append(L"|");
+                    strTmp.append(*i);
+				}
+			}
+			return strTmp;
+		}
+	};
+
+	// 形位公差数据
+	struct GeometricToleranceData
+	{
+		bool status = false;
+		Adesk::UInt64 u64handle; // 在文件中的唯一句柄
+		UtilGeometricTolerance::GeometricToleranceRow rows[UtilGeometricTolerance::GeometricToleranceDataLen]; // 形位公差数据
+
+		// 句柄转字符串
+		AcString handleAsString() const
+		{
+			AcString str;
+			str.format(L"%I64u", this->u64handle);
+			return str;
+		}
+	};
+
+	const std::map<Acm::GdtSymbolType, const wchar_t*>& getGdtNameMap()
+	{
+		static const std::map<Acm::GdtSymbolType, const wchar_t*> gdtNameMap =
+		{
+			{Acm::kStraightness, _(L"直线度")},
+			{Acm::kFlatness, _(L"平面度")},
+			{Acm::kCircularity, _(L"圆度")},
+			{Acm::kCylindricity, _(L"圆柱度")},
+			{Acm::kProfileLine, _(L"线轮廓度")},
+			{Acm::kProfileSurface, _(L"面轮廓度")},
+			{Acm::kAngularity, _(L"倾斜度")},
+			{Acm::kPerpendicularity, _(L"垂直度")},
+			{Acm::kParallelism, _(L"平行度")},
+			{Acm::kPosition, _(L"位置度")},
+			{Acm::kCoaxialityForAxes, _(L"同轴度")},
+			{Acm::kConcentricityForCentrePoints, _(L"同心度")},
+			{Acm::kSymmetry, _(L"对称度")},
+			{Acm::kRunoutCircular, _(L"圆跳动")},
+			{Acm::kRunoutTotal, _(L"全跳动")}
+		};
+
+		return gdtNameMap;
+	}
+
+	// 符号类型与 GDT 符号的映射
+	std::map<Acm::GdtSymbolType, const wchar_t*> gdtSymbolMap =
+	{
+		{Acm::kStraightness, L"u"},
+		{Acm::kFlatness, L"c"},
+		{Acm::kCircularity, L"e"},
+		{Acm::kCylindricity, L"g"},
+		{Acm::kProfileLine, L"k"},
+		{Acm::kProfileSurface, L"d"},
+		{Acm::kAngularity, L"a"},
+		{Acm::kPerpendicularity, L"b"},
+		{Acm::kParallelism, L"f"},
+		{Acm::kPosition, L"j"},
+		{Acm::kCoaxialityForAxes, L"r"},
+		{Acm::kConcentricityForCentrePoints, L"r"},
+		{Acm::kSymmetry, L"i"},
+		{Acm::kRunoutCircular, L"h"},
+		{Acm::kRunoutTotal, L"t"}
+	};
+};
+
+export namespace UtilGeometricTolerance
+{
+	/**
+	 * @brief 读取形位公差数据
+	 * @param id 形位公差块表记录ID
+	 * @param data 传出形位公差数据
+	 */
+	void readFcf(const AcDbObjectId& id, GeometricToleranceData& data);
+
+	/**
+	 * @brief 解析形位公差数据得到纯文本数据
+	 * @param data 传入传出数据结构
+	 */
+	void resolveData(UtilGeometricTolerance::GeometricToleranceData& data);
+}

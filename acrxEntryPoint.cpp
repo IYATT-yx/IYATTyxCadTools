@@ -25,7 +25,7 @@
 #include "StdAfx.h"
 #include "resource.h"
 
-import Interface;
+import FrameworkLifecycleInterface;
 
 //-----------------------------------------------------------------------------
 #define szRDS _RXST("IYATTyx")
@@ -44,14 +44,14 @@ public:
 		AcRx::AppRetCode retCode =AcRxArxApp::On_kInitAppMsg (pkt) ;
 		
 		// TODO: Add your initialization code here
-		Interface::init();
+		FrameworkLifecycleInterface::init();
 
 		return (retCode) ;
 	}
 
 	virtual AcRx::AppRetCode On_kUnloadAppMsg (void *pkt) {
 		// TODO: Add your code here
-		Interface::unload();
+		FrameworkLifecycleInterface::unload();
 
 		// You *must* call On_kUnloadAppMsg here
 		AcRx::AppRetCode retCode =AcRxArxApp::On_kUnloadAppMsg (pkt) ;

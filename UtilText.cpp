@@ -7,18 +7,18 @@
  */
 module;
 #include "StdAfx.h"
-#include "GenericPairEditDlg.hpp"
+#include "UiGenericPairEditDlg.hpp"
 
 module UtilText;
-import Common;
-import UniversalPicker;
-import Annotative;
-import CsvModule;
+import UtilCommon;
+import UiUniversalPicker;
+import UtilAnnotative;
+import UtilIoCsvModule;
 import std;
-import AcadVarUtil;
-import Translator;
-import Commands;
-import FileDialog;
+import UtilAcadVar;
+import FrameworkTranslator;
+import FrameworkCommands;
+import UiFileDialog;
 
 namespace UtilText
 {
@@ -58,7 +58,7 @@ namespace UtilText
 
 	bool readMText(const AcDbObjectId& id, AcString& text, bool isRawContents, AcGePoint3d* pPos)
 	{
-		AcDbMText* pMText = Common::getObject<AcDbMText>(id, AcDb::kForRead);
+		AcDbMText* pMText = UtilCommon::getObject<AcDbMText>(id, AcDb::kForRead);
 		if (pMText == nullptr)
 		{
 			return false;
@@ -75,7 +75,7 @@ namespace UtilText
 
 		if (pPos != nullptr)
 		{
-			Common::getEntityCenter(pMText, pPos);
+			UtilCommon::getEntityCenter(pMText, pPos);
 		}
 
 		return true;
@@ -83,7 +83,7 @@ namespace UtilText
 
 	bool readDText(const AcDbObjectId& id, AcString& text, bool isRawContents, AcGePoint3d* pPos)
 	{
-		AcDbText* pText = Common::getObject<AcDbText>(id, AcDb::kForRead);
+		AcDbText* pText = UtilCommon::getObject<AcDbText>(id, AcDb::kForRead);
 		if (pText == nullptr)
 		{
 			return false;
@@ -97,7 +97,7 @@ namespace UtilText
 
 		if (pPos != nullptr)
 		{
-			Common::getEntityCenter(pText, pPos);
+			UtilCommon::getEntityCenter(pText, pPos);
 		}
 
 		return true;
@@ -105,7 +105,7 @@ namespace UtilText
 
 	bool readTextField(const AcDbObjectId& id, AcString& text)
 	{
-		AcDbEntity* pText = Common::getObject<AcDbEntity>(id, AcDb::kForRead);
+		AcDbEntity* pText = UtilCommon::getObject<AcDbEntity>(id, AcDb::kForRead);
 		if (pText == nullptr)
 		{
 			return false;
@@ -138,9 +138,9 @@ namespace UtilText
 	bool getSelectedTextRawContent(AcString& content)
 	{
 		AcDbObjectId srcId;
-		resbuf* filterRb = UniversalPicker::buildFilter(&UtilText::textClassList);
+		resbuf* filterRb = UiUniversalPicker::buildFilter(&UtilText::textClassList);
 
-		AcDbObjectId entId = UniversalPicker::getSelectedSingleEntityId(&UtilText::textClassList);
+		AcDbObjectId entId = UiUniversalPicker::getSelectedSingleEntityId(&UtilText::textClassList);
 		if (UtilText::readTextField(entId, content))
 		{
 			return true;
@@ -158,7 +158,7 @@ namespace UtilText
 
 	void updateTextEntityContent(const AcDbObjectId& id, const AcString& content)
 	{
-		AcDbEntity* pText = Common::getObject<AcDbEntity>(id, AcDb::kForWrite);
+		AcDbEntity* pText = UtilCommon::getObject<AcDbEntity>(id, AcDb::kForWrite);
 		if (pText == nullptr)
 		{
 			return;
@@ -214,7 +214,7 @@ namespace UtilText
 		pText->recordGraphicsModified();
 	}
 
-	void createMTextMatrix(double colWidth, double colStep, double rowStep, const CsvModule::AcStringMatrix& matrixData, AcGePoint3d topLeftPt, double dLineSpacingFactor)
+	void createMTextMatrix(double colWidth, double colStep, double rowStep, const UtilIoCsvModule::AcStringMatrix& matrixData, AcGePoint3d topLeftPt, double dLineSpacingFactor)
 	{
 		if (dLineSpacingFactor < 0.25 || dLineSpacingFactor > 4.0)
 		{
@@ -228,7 +228,7 @@ namespace UtilText
 			return;
 		}
 
-		double s = Annotative::getCurrentScaleValue();
+		double s = UtilAnnotative::getCurrentScaleValue();
 		if (s < 0)
 		{
 			s = 1.0;
@@ -253,7 +253,7 @@ namespace UtilText
 					pMText->setAttachment(AcDbMText::kTopLeft);
 					pMText->setWidth(colWidth * s);
 					double TEXTSIZE;
-					if (!AcadVarUtil::getVar(AcadVarName::TEXTSIZE, TEXTSIZE))
+					if (!UtilAcadVar::getVar(AcadVarName::TEXTSIZE, TEXTSIZE))
 					{
 						AfxMessageBox(_(L"获取变量失败！"), MB_OK | MB_ICONERROR);
 						return;
@@ -267,13 +267,13 @@ namespace UtilText
 					currentPt.z = topLeftPt.z;
 					pMText->setLocation(currentPt);
 
-					AcDbBlockTableRecord* pBTR = Common::getObject<AcDbBlockTableRecord>(pDb->currentSpaceId(), AcDb::kForWrite);
+					AcDbBlockTableRecord* pBTR = UtilCommon::getObject<AcDbBlockTableRecord>(pDb->currentSpaceId(), AcDb::kForWrite);
 					if (pBTR != nullptr)
 					{
 						if (pBTR->appendAcDbEntity(pMText) == Acad::eOk)
 						{
-							Annotative::setObjAnnotative(pMText, true);
-							Annotative::applyCurrentAnnotativeScale(pMText);
+							UtilAnnotative::setObjAnnotative(pMText, true);
+							UtilAnnotative::applyCurrentAnnotativeScale(pMText);
 							pMText->close();
 						}
 					}
@@ -286,7 +286,7 @@ namespace UtilText
 		}
 	}
 
-	void structureTextToAcStringMatrix(const UtilText::TextEntityDataList& elements, double xTol, double yTol, CsvModule::AcStringMatrix& matrix)
+	void structureTextToAcStringMatrix(const UtilText::TextEntityDataList& elements, double xTol, double yTol, UtilIoCsvModule::AcStringMatrix& matrix)
 	{
 		matrix.clear();
 		if (elements.empty())
@@ -391,187 +391,4 @@ namespace UtilText
 			}
 		}
 	}
-}
-
-namespace
-{
-	void cmdCloneText()
-	{
-		AcString asSrcTextContent;
-		acutPrintf(_(L"\n请选择要复制的源文本对象"));
-		if (!UtilText::getSelectedTextRawContent(asSrcTextContent) || asSrcTextContent.isEmpty())
-		{
-			acutPrintf(_(L"取消操作"));
-			return;
-		}
-		acutPrintf(_(L"\n读取到：%s\n"), asSrcTextContent.constPtr());
-
-		acutPrintf(_(L"请选择要粘贴到的文本对象"));
-		UniversalPicker::run(
-			&UtilText::textClassList,
-			[&asSrcTextContent](const AcDbObjectId& id)
-			{
-				UtilText::updateTextEntityContent(id, asSrcTextContent);
-			},
-			_(L"将多行/单行文本内容复制给其它多行/单行文本"),
-			UniversalPicker::SelectMode::Immediate,
-			false,
-			UniversalPicker::SortMode::None,
-			true
-		);
-	}
-
-	void cmdImportCsvToMTextMatrix()
-	{
-		FileDialog::FileDialogFilterBuilder fileFilterBuilter;
-		CString strFileFilter = fileFilterBuilter.addFilter(_(L"CSV 文件"), { L"*.csv" }).build();
-		CString strFilePath = FileDialog::ShowOpenFileDialog(_(L"选择要导入的文件"), L"csv", strFileFilter);
-		if (strFilePath.IsEmpty())
-		{
-			acutPrintf(_(L"取消操作"));
-			return;
-		}
-
-		CsvModule::AcStringMatrix matrixData;
-		CsvModule::readCsvToAcStringMatrix(strFilePath, matrixData);
-
-		CAcModuleResourceOverride resOverride;
-		GenericPairEditDlg dlg(_(L"从 CSV 文件导入数据生成多行文本矩阵"), _(L"参数"), _(L"使用提示"), false, true, true);
-		CString strTipMTextMatrixParameter;
-		double TEXTSIZE;
-		if (!AcadVarUtil::getVar(AcadVarName::TEXTSIZE, TEXTSIZE))
-		{
-			AfxMessageBox(_(L"获取变量失败！"), MB_OK | MB_ICONERROR);
-			return;
-		}
-		double scale = Annotative::getCurrentScaleValue();
-		strTipMTextMatrixParameter.Format(_(L"输入3个不小于0的数，使用空格分隔，分别为：列宽、列步长、行步长。显示文字高度 = TEXTSIZE变量值%g × 注释比例缩放值%g = %g"), TEXTSIZE, scale, TEXTSIZE * scale);
-		dlg.modifyEditControl(L"", strTipMTextMatrixParameter);
-
-		std::vector<double> params;
-		dlg.setValidatorAndParser([&](const CString& edit1, const CString& _) -> CString
-			{
-				const int paramsNumber = 3;
-				if (!Common::parse(edit1, paramsNumber, [](double v) { return v > 0; }, params))
-				{
-					return strTipMTextMatrixParameter;
-				}
-				return GenericPairEditDlg::ValidatorOk;
-			});
-
-		if (dlg.DoModal() != IDOK)
-		{
-			acutPrintf(_(L"取消操作"));
-			return;
-		}
-
-		ads_point pt{};
-		if (acedGetPoint(nullptr, _(L"请选择位置"), pt) != RTNORM)
-		{
-			acutPrintf(_(L"取消操作"));
-			return;
-		}
-
-		UtilText::createMTextMatrix(params[0], params[1], params[2], matrixData, asPnt3d(pt));
-	}
-
-	void cmdSpatialTableExplorer()
-	{
-		CAcModuleResourceOverride resOverride;
-		CString title = _(L"将多行/单行文本按空间位置表格化导出到 CSV 文件");
-		GenericPairEditDlg dlg(title, _(L"参数"), _(L"使用提示"), false, true, true);
-
-		// 默认列容差和行容差
-		// 字高默认使用 TEXTSIZE 变量值，列容差默认按字高的 3 倍，行容差默认按字高的 1 倍（考虑注释比例缩放值）
-		CString strInitParameter;
-		double scale = Annotative::getCurrentScaleValue();
-		double TEXTSIZE;
-		if (!AcadVarUtil::getVar(AcadVarName::TEXTSIZE, TEXTSIZE))
-		{
-			AfxMessageBox(_(L"获取变量失败！"), MB_OK | MB_ICONERROR);
-			return;
-		}
-		strInitParameter.Format(L"%g %g", TEXTSIZE * scale * 3, TEXTSIZE * scale * 1);
-		dlg.modifyEditControl(strInitParameter, _(L"输入2个不小于0的数，使用空格分隔，分别为：列容差、行容差。文本距离超过容差视为不同列或行。"));
-
-		std::vector<double> params;
-		dlg.setValidatorAndParser([&](const CString& edit1, const CString& _2) -> CString
-			{
-				const int paramsNumber = 2;
-				if (!Common::parse(edit1, paramsNumber, [](double v) { return v > 0; }, params))
-				{
-					return _(L"输入2个不小于0的数，使用空格分隔，分别为：列容差、行容差。文本距离超过容差视为不同列或行。");
-				}
-				return GenericPairEditDlg::ValidatorOk;
-			});
-
-
-		if (dlg.DoModal() != IDOK)
-		{
-			acutPrintf(_(L"取消操作"));
-			return;
-		}
-
-		FileDialog::FileDialogFilterBuilder fileFilterBuilter;
-		CString strFileFilter = fileFilterBuilter.addFilter(_(L"CSV 文件"), { L"*.csv" }).build();
-		CString strFilePath = FileDialog::ShowSaveFileDialog(_(L"保存 CSV 文件到"), _(L"数据文件.csv"), L"csv", strFileFilter);
-		if (strFilePath.IsEmpty())
-		{
-			acutPrintf(_(L"取消操作"));
-			return;
-		}
-		CsvWriter writer(strFilePath);
-		if (!writer.isValid())
-		{
-			AfxMessageBox(_(L"文件路径打开失败，请检查是否被占用或路径无效"), MB_OK | MB_ICONERROR);
-			return;
-		}
-
-		UtilText::TextEntityDataList elements;
-		UniversalPicker::run(
-			&UtilText::textClassList,
-			[&](const AcDbObjectId& id)
-			{
-				UtilText::TextEntityData data;
-				data.id = id;
-				if (UtilText::readMText(id, data.text, false, &data.pos))
-				{
-					acutPrintf(_(L"\n(%g,%g,%g)多行文本：%s"), data.pos.x, data.pos.y, data.pos.z, data.text.constPtr());
-				}
-				else if (UtilText::readDText(id, data.text, false, &data.pos))
-				{
-					acutPrintf(_(L"\n(%g,%g,%g)单行文本：%s"), data.text.constPtr());
-				}
-				elements.push_back(data);
-			},
-			title,
-			UniversalPicker::SelectMode::Batch,
-			true,
-			UniversalPicker::SortMode::None,
-			true
-		);
-
-		CsvModule::AcStringMatrix matrixData;
-		UtilText::structureTextToAcStringMatrix(elements, params[0], params[1], matrixData);
-
-
-		for (const auto& row : matrixData)
-		{
-			writer.writeRow(row);
-			acutPrintf(L"\n");
-			for (const auto& field : row)
-			{
-				acutPrintf(L"%s\t", field.constPtr());
-			}
-		}
-
-		acutPrintf(_(L"\n文件位置：%s"), strFilePath);
-	}
-
-	Commands::AutoRegister ar =
-	{
-		{ L"yxCloneText", []() { return _(L"将多行/单行文本内容复制给其它多行/单行文本"); }, Commands::CommandFlags::Base, cmdCloneText },
-		{ L"yxImportCsvToMTextMatrix", []() { return _(L"从 CSV 文件导入数据生成多行文本矩阵"); }, Commands::CommandFlags::PickRedraw, cmdImportCsvToMTextMatrix },
-		{ L"yxSpatialTableExplorer", []() { return _(L"将多行/单行文本按空间位置表格化导出到 CSV 文件"); }, Commands::CommandFlags::PickRedraw, cmdSpatialTableExplorer },
-	};
 }

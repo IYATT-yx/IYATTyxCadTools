@@ -11,114 +11,122 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AcadVarUtil.ixx" />
+    <ClCompile Include="UtilAcadVar.ixx" />
     <ClCompile Include="acrxEntryPoint.cpp" />
-    <ClCompile Include="ActivityInsightsManager.cpp">
+    <ClCompile Include="FrameworkActivityInsightsManager.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="ActivityInsightsManager.ixx">
+    <ClCompile Include="FrameworkActivityInsightsManager.ixx">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Annotative.cpp" />
-    <ClCompile Include="Annotative.ixx" />
-    <ClCompile Include="BalloonNumber.cpp" />
-    <ClCompile Include="BalloonNumber.ixx" />
-    <ClCompile Include="BuildingTime.ixx">
+    <ClCompile Include="UtilAnnotative.cpp" />
+    <ClCompile Include="UtilAnnotative.ixx" />
+    <ClCompile Include="UtilBalloonNumber.cpp" />
+    <ClCompile Include="UtilBalloonNumber.ixx" />
+    <ClCompile Include="FrameworkBuildingTime.ixx">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="CadTools.cpp" />
-    <ClCompile Include="Commands.cpp" />
-    <ClCompile Include="Commands.ixx" />
-    <ClCompile Include="Common-Inline.ixx" />
-    <ClCompile Include="Common.cpp" />
-    <ClCompile Include="Common.ixx" />
-    <ClCompile Include="ConfigManager.cpp">
+    <ClCompile Include="FrameworkCommands.cpp" />
+    <ClCompile Include="FrameworkCommands.ixx" />
+    <ClCompile Include="UtilCmdBalloon.ixx" />
+    <ClCompile Include="UtilCmdDevInternal.ixx" />
+    <ClCompile Include="UtilCmdDimension.ixx" />
+    <ClCompile Include="UtilCmdEntityGeometry.ixx" />
+    <ClCompile Include="UtilCmdImage.ixx" />
+    <ClCompile Include="UtilCmdSystemConfig.ixx" />
+    <ClCompile Include="UtilCmdText.ixx" />
+    <ClCompile Include="UtilCommon-Inline.ixx" />
+    <ClCompile Include="UtilCommon.cpp" />
+    <ClCompile Include="UtilCommon.ixx" />
+    <ClCompile Include="FrameworkConfigManager.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="ConfigManager.ixx">
+    <ClCompile Include="FrameworkConfigManager.ixx">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="CsvModule.cpp" />
-    <ClCompile Include="CsvModule.ixx" />
-    <ClCompile Include="Dimension.cpp" />
-    <ClCompile Include="Dimension.ixx" />
-    <ClCompile Include="DocCloseInterceptor.cpp" />
-    <ClCompile Include="DocCloseInterceptor.ixx" />
+    <ClCompile Include="UtilIoCsvModule.cpp" />
+    <ClCompile Include="UtilIoCsvModule.ixx" />
+    <ClCompile Include="UtilDimension.cpp" />
+    <ClCompile Include="UtilDimension.ixx" />
+    <ClCompile Include="FrameworkDocCloseInterceptor.cpp" />
+    <ClCompile Include="FrameworkDocCloseInterceptor.ixx" />
     <ClCompile Include="DocData.cpp" />
-    <ClCompile Include="EncodingConverter.cpp">
+    <ClCompile Include="UtilIoEncodingConverter.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="EncodingConverter.ixx">
+    <ClCompile Include="UtilIoEncodingConverter.ixx">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="EntityStyle.cpp">
+    <ClCompile Include="UtilEntityStyle.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="EntityStyle.ixx">
+    <ClCompile Include="UtilEntityStyle.ixx">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="FileDialog.cpp" />
-    <ClCompile Include="FileDialog.ixx" />
-    <ClCompile Include="GenericPairEditDlg.cpp" />
-    <ClCompile Include="GeometricTolerance.cpp" />
-    <ClCompile Include="GeometricTolerance.ixx" />
-    <ClCompile Include="Image.cpp" />
-    <ClCompile Include="Image.ixx" />
-    <ClCompile Include="ImeAutoSwitcher.cpp" />
-    <ClCompile Include="ImeAutoSwitcher.ixx" />
-    <ClCompile Include="Interface.cpp" />
-    <ClCompile Include="Interface.ixx">
+    <ClCompile Include="UiFileDialog.cpp" />
+    <ClCompile Include="UiFileDialog.ixx" />
+    <ClCompile Include="UiGenericPairEditDlg.cpp" />
+    <ClCompile Include="UtilGeometricTolerance.cpp" />
+    <ClCompile Include="UtilGeometricTolerance.ixx" />
+    <ClCompile Include="UtilImage.cpp" />
+    <ClCompile Include="UtilImage.ixx" />
+    <ClCompile Include="FrameworkImeAutoSwitcher.cpp" />
+    <ClCompile Include="FrameworkImeAutoSwitcher.ixx" />
+    <ClCompile Include="FrameworkLifecycleInterface.cpp" />
+    <ClCompile Include="FrameworkLifecycleInterface.ixx">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="IYATTyxJsonWrapper.cpp">
+    <ClCompile Include="UtilIoJsonWrapper.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="IYATTyxJsonWrapper.ixx">
+    <ClCompile Include="UtilIoJsonWrapper.ixx">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="LineUtil.cpp" />
-    <ClCompile Include="LineUtil.ixx" />
-    <ClCompile Include="MainBar.cpp" />
-    <ClCompile Include="MainBarChildDlg.cpp" />
-    <ClCompile Include="MiddleClickManager.cpp" />
-    <ClCompile Include="MiddleClickManager.ixx">
+    <ClCompile Include="UtilLine.cpp" />
+    <ClCompile Include="UtilLine.ixx" />
+    <ClCompile Include="UiMainBar.cpp" />
+    <ClCompile Include="UiMainBarChildDlg.cpp" />
+    <ClCompile Include="FrameworkMiddleClickManager.cpp" />
+    <ClCompile Include="FrameworkMiddleClickManager.ixx">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="PointUtil.cpp" />
-    <ClCompile Include="PointUtil.ixx" />
-    <ClCompile Include="TextUtil.cpp" />
-    <ClCompile Include="TextUtil.ixx" />
+    <ClCompile Include="UtilPoint.cpp" />
+    <ClCompile Include="UtilPoint.ixx" />
+    <ClCompile Include="UtilText.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="UtilText.ixx" />
     <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Translator.cpp" />
-    <ClCompile Include="Translator.ixx">
+    <ClCompile Include="FrameworkTranslator.cpp" />
+    <ClCompile Include="FrameworkTranslator.ixx">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="UniversalPicker.cpp" />
-    <ClCompile Include="UniversalPicker.ixx" />
-    <ClCompile Include="utils.cpp" />
-    <ClCompile Include="utils.ixx" />
+    <ClCompile Include="UiUniversalPicker.cpp" />
+    <ClCompile Include="UiUniversalPicker.ixx" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DocData.h" />
-    <ClInclude Include="GenericPairEditDlg.hpp" />
-    <ClInclude Include="MainBar.hpp" />
-    <ClInclude Include="MainBarChildDlg.hpp" />
+    <ClInclude Include="UiGenericPairEditDlg.hpp" />
+    <ClInclude Include="UiMainBar.hpp" />
+    <ClInclude Include="UiMainBarChildDlg.hpp" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="StdAfx.h" />
   </ItemGroup>
@@ -199,8 +207,8 @@
       <PreprocessorDefinitions Condition="'$(UseOfMfc)'=='Dynamic'">_AFXEXT;%(PreprocessorDefinitions);_USE_MATH_DEFINES</PreprocessorDefinitions>
       <!-- Added to avoid Narrow conversion warnings introduced in VS2015 /Wv:xx[.yy[.zzzzz],  is CL version -->
       <AdditionalOptions>/Wv:17.00.61030 %(AdditionalOptions)</AdditionalOptions>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">stdcpp23</LanguageStandard>
       <LanguageStandard_C Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">stdc17</LanguageStandard_C>
       <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|x64'">stdcpp23</LanguageStandard>

@@ -1,0 +1,198 @@
+﻿/**
+ * @file      UiMainBar.cpp
+ * @brief     主停靠控制条实现
+ * @author    IYATT-yx
+ * @copyright Copyright (c) 2026 IYATT-yx.
+ *            Licensed under the MIT License. See LICENSE file in the project root for full license information.
+ */
+#include "StdAfx.h"
+#include "resource.h"
+#include "UiMainBar.hpp"
+#include "acuidock.h"
+#include "acui.h"
+#include "adui.h"
+
+import UtilCommon;
+import FrameworkTranslator;
+
+//-----------------------------------------------------------------------------
+IMPLEMENT_DYNAMIC (UiMainBar, CAcUiDockControlBar)
+
+BEGIN_MESSAGE_MAP(UiMainBar, CAcUiDockControlBar)
+	ON_WM_CREATE()
+	ON_WM_SYSCOMMAND()
+	ON_WM_SIZE()
+END_MESSAGE_MAP()
+
+//-----------------------------------------------------------------------------
+//----- UiMainBar *pInstance = new UiMainBar;
+//----- pInstance->Create (acedGetAcadFrame (), "My title bar") ;
+//----- pInstance->EnableDocking (CBRS_ALIGN_ANY) ;
+//----- pInstance->RestoreControlBar () ;
+
+//-----------------------------------------------------------------------------
+// {AF1077A2-4013-4B0D-A115-A21137ADA1BC}
+static const GUID clsMainBar = 
+{ 
+    0xaf1077a2, 
+    0x4013, 
+    0x4b0d, 
+    { 0xa1, 0x15, 0xa2, 0x11, 0x37, 0xad, 0xa1, 0xbc } 
+};
+
+
+//-----------------------------------------------------------------------------
+UiMainBar::UiMainBar () : CAcUiDockControlBar() {
+}
+
+//-----------------------------------------------------------------------------
+UiMainBar::~UiMainBar () {
+
+}
+
+//-----------------------------------------------------------------------------
+#ifdef _DEBUG
+//- Please uncomment the 2 following lines to avoid linker error when compiling
+//- in release mode. But make sure to uncomment these lines only once per project
+//- if you derive multiple times from CAdUiDockControlBar/CAcUiDockControlBar
+//- classes.
+
+//void CAdUiDockControlBar::AssertValid () const {
+//}
+#endif
+
+//-----------------------------------------------------------------------------
+BOOL UiMainBar::Create (CWnd *pParent, LPCTSTR lpszTitle) {
+    LPCTSTR strWndClass = AfxRegisterWndClass (CS_DBLCLKS, LoadCursor (NULL, IDC_ARROW)) ;
+	CRect rect (0, 0, 250, 200) ;
+	if (!CAcUiDockControlBar::Create (
+			strWndClass, lpszTitle, WS_VISIBLE | WS_CHILD | WS_CLIPCHILDREN,
+			rect, pParent, 0
+		)
+	)
+		return (FALSE) ;
+
+	SetToolID (&clsMainBar) ;
+
+	// TODO: Add your code here
+
+	return (TRUE) ;
+}
+
+//-----------------------------------------------------------------------------
+//----- This member function is called when an application requests the window be 
+//----- created by calling the Create or CreateEx member function
+int UiMainBar::OnCreate (LPCREATESTRUCT lpCreateStruct) {
+	if ( CAcUiDockControlBar::OnCreate (lpCreateStruct) == -1 )
+		return (-1) ;
+
+	//----- Point to our resource
+	CAcModuleResourceOverride resourceOverride; 	
+	//----- Create it and set the parent as the dockctrl bar
+	mChildDlg.Create (IDD_MAINBAR, this) ;
+	//----- Move the window over so we can see the control lines
+	mChildDlg.MoveWindow (0, 0, 100, 100, TRUE) ;
+	return (0) ;
+}
+
+//-----------------------------------------------------------------------------
+void UiMainBar::SizeChanged (CRect *lpRect, BOOL bFloating, int flags) {
+	// If valid
+	if (::IsWindow (mChildDlg.GetSafeHwnd ())) 
+	{
+		//----- Always point to our resource to be safe
+		CAcModuleResourceOverride resourceOverride ;
+		//----- Then update its window size relatively
+		mChildDlg.SetWindowPos (this, lpRect->left + 4, lpRect->top + 4, lpRect->Width (), lpRect->Height (), SWP_NOZORDER) ;
+	}
+}
+
+//-----------------------------------------------------------------------------
+//-----  Function called when user selects a command from Control menu or when user 
+//----- selects the Maximize or the Minimize button.
+void UiMainBar::OnSysCommand (UINT nID, LPARAM lParam) {
+	CAcUiDockControlBar::OnSysCommand (nID, lParam) ;
+}
+
+//-----------------------------------------------------------------------------
+//----- The framework calls this member function after the window's size has changed
+void UiMainBar::OnSize (UINT nType, int cx, int cy) {
+	CAcUiDockControlBar::OnSize (nType, cx, cy) ;
+	// If valid
+	if (::IsWindow (mChildDlg.GetSafeHwnd ())) 
+	{
+		//----- Always point to our resource to be safe
+		CAcModuleResourceOverride resourceOverride ;
+		//----- then update its window position relatively
+		mChildDlg.MoveWindow (0, 0, cx, cy) ;
+	}
+}
+
+UiMainBar* UiMainBar::gpMainBar = nullptr;
+
+void UiMainBar::showBar(FrameworkCommands::CommandInfoList& commandInfoList)
+{
+	// 如果窗口已经创建，则只负责切换“显示/隐藏”
+	if (gpMainBar != nullptr && ::IsWindow(gpMainBar->m_hWnd))
+	{
+		if (gpMainBar->IsWindowVisible())
+		{
+			acedGetAcadFrame()->ShowControlBar(gpMainBar, FALSE, FALSE);
+		}
+		else
+		{
+			acedGetAcadFrame()->ShowControlBar(gpMainBar, TRUE, FALSE);
+			gpMainBar->SendMessage(WM_NCPAINT);
+		}
+		return; // 这里直接返回，不再执行后续插入逻辑
+	}
+
+	// 首次创建
+	if (gpMainBar == nullptr)
+	{
+		gpMainBar = new UiMainBar();
+	}
+
+	{
+		CAcModuleResourceOverride resOverride;
+		CWnd* pAcadWnd = acedGetAcadFrame();
+
+		if (!gpMainBar->Create(pAcadWnd, UtilCommon::getLocalProjectName()))
+		{
+			delete gpMainBar;
+			gpMainBar = nullptr;
+			return;
+		}
+	}
+	
+	gpMainBar->EnableDocking(CBRS_ALIGN_ANY);
+	gpMainBar->RestoreControlBar();
+	acedGetAcadFrame()->ShowControlBar(gpMainBar, TRUE, FALSE);
+
+	gpMainBar->insertCommands(commandInfoList);
+}
+void UiMainBar::insertCommands(FrameworkCommands::CommandInfoList& commandInfoList)
+{
+    this->mChildDlg.insertCommands(commandInfoList);
+}
+
+void UiMainBar::terminateBar()
+{
+	if (gpMainBar == nullptr)
+	{
+		return;
+	}
+
+	CAcModuleResourceOverride resourceOverride;
+
+	if (::IsWindow(gpMainBar->m_hWnd))
+	{
+		// 强制失去焦点
+		::SetFocus(acedGetAcadFrame()->GetSafeHwnd());
+		// 销毁窗口
+		gpMainBar->DestroyWindow();
+	}
+
+	delete gpMainBar;
+	gpMainBar = nullptr;
+}

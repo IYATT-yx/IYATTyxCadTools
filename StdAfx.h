@@ -41,7 +41,7 @@
     //-----------------------------------------------------------------------------
 #include <afxwin.h> //- MFC core and standard components
 #include <afxext.h> //- MFC extensions
-#include <afxcmn.h> //- MFC support for Windows Common Controls
+#include <afxcmn.h> //- MFC support for Windows UtilCommon Controls
 
                 //-----------------------------------------------------------------------------
     //- Include ObjectDBX/ObjectARX headers
