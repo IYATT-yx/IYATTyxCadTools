@@ -17,7 +17,7 @@ import UtilIoCsvModule;
 import UtilAcadVar;
 import UtilText;
 import FrameworkCommands;
-import UtilCommon;
+import UtilString;
 import UtilAnnotative;
 
 namespace
@@ -79,7 +79,7 @@ namespace
 		dlg.setValidatorAndParser([&](const CString& edit1, const CString& _) -> CString
 			{
 				const int paramsNumber = 3;
-				if (!UtilCommon::parse(edit1, paramsNumber, [](double v) { return v > 0; }, params))
+				if (!UtilString::parse(edit1, paramsNumber, [](double v) { return v > 0; }, params))
 				{
 					return strTipMTextMatrixParameter;
 				}
@@ -125,7 +125,7 @@ namespace
 		dlg.setValidatorAndParser([&](const CString& edit1, const CString& _2) -> CString
 			{
 				const int paramsNumber = 2;
-				if (!UtilCommon::parse(edit1, paramsNumber, [](double v) { return v > 0; }, params))
+				if (!UtilString::parse(edit1, paramsNumber, [](double v) { return v > 0; }, params))
 				{
 					return _(L"输入2个不小于0的数，使用空格分隔，分别为：列容差、行容差。文本距离超过容差视为不同列或行。");
 				}

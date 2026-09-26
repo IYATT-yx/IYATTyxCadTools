@@ -7,7 +7,6 @@
  */
 module UtilIoJsonWrapper;
 import UtilIoEncodingConverter;
-import UtilCommon;
 import FrameworkTranslator;
 
 namespace UtilIoJsonWrapper

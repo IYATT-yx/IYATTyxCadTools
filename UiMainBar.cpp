@@ -12,8 +12,8 @@
 #include "acui.h"
 #include "adui.h"
 
-import UtilCommon;
 import FrameworkTranslator;
+import UtilConstants;
 
 //-----------------------------------------------------------------------------
 IMPLEMENT_DYNAMIC (UiMainBar, CAcUiDockControlBar)
@@ -157,7 +157,7 @@ void UiMainBar::showBar(FrameworkCommands::CommandInfoList& commandInfoList)
 		CAcModuleResourceOverride resOverride;
 		CWnd* pAcadWnd = acedGetAcadFrame();
 
-		if (!gpMainBar->Create(pAcadWnd, UtilCommon::getLocalProjectName()))
+		if (!gpMainBar->Create(pAcadWnd, UtilConstants::getLocalProjectName()))
 		{
 			delete gpMainBar;
 			gpMainBar = nullptr;

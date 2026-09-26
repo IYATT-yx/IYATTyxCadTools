@@ -10,7 +10,7 @@ module;
 
 module FrameworkCommands;
 
-import UtilCommon;
+import UtilConstants;
 
 namespace FrameworkCommands
 {
@@ -47,11 +47,11 @@ namespace FrameworkCommands
 			commandInfoList.push_back(info);
 
 			// 注册命令全名
-			acedRegCmds->addCommand(UtilCommon::cmdGroup, info.commandName.constPtr(), info.commandName.constPtr(), info.flags, info.proc);
+			acedRegCmds->addCommand(UtilConstants::cmdGroup, info.commandName.constPtr(), info.commandName.constPtr(), info.flags, info.proc);
 
 			// 注册命令简称
 			AcString shortCommandName = info.getShortCommandName();
-			acedRegCmds->addCommand(UtilCommon::cmdGroup, shortCommandName.constPtr(), shortCommandName.constPtr(), info.flags, info.proc);
+			acedRegCmds->addCommand(UtilConstants::cmdGroup, shortCommandName.constPtr(), shortCommandName.constPtr(), info.flags, info.proc);
 		}
 	}
 

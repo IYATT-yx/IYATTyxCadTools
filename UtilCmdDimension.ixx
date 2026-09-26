@@ -12,24 +12,25 @@ module;
 export module UtilCmdDimension;
 import FrameworkCommands;
 import UiUniversalPicker;
-import UtilCommon;
+import UtilConstants;
 import UtilDimension;
 import FrameworkTranslator;
 import UtilIoCsvModule;
 import UiFileDialog;
 import UtilGeometricTolerance;
 import UtilText;
+import UtilString;
 
 namespace
 {
 	void cmdDimensionSolidify()
 	{
-		UiUniversalPicker::run(&UtilCommon::DimensionSubClasses, UtilDimension::dimensionSolidify, _(L"尺寸固化"));
+		UiUniversalPicker::run(&UtilConstants::DimensionSubClasses, UtilDimension::dimensionSolidify, _(L"尺寸固化"));
 	}
 
 	void cmdDimensionRelink()
 	{
-		UiUniversalPicker::run(&UtilCommon::DimensionSubClasses, UtilDimension::dimensionRelink, _(L"尺寸恢复关联"));
+		UiUniversalPicker::run(&UtilConstants::DimensionSubClasses, UtilDimension::dimensionRelink, _(L"尺寸恢复关联"));
 	}
 
 	void cmdDimensionTolerancePrecision()
@@ -90,7 +91,7 @@ namespace
 		}
 
 		UiUniversalPicker::run(
-			&UtilCommon::DimensionSubClasses,
+			&UtilConstants::DimensionSubClasses,
 			[&](const AcDbObjectId& id)
 			{
 				UtilDimension::setDimensionTolerancePreccision(id, iDimPrec, iTolPrec);
@@ -124,7 +125,7 @@ namespace
 		bool isLGdt = dlg.getGdtCheckStatus(0);
 		bool isRGdt = dlg.getGdtCheckStatus(1);
 		UiUniversalPicker::run(
-			&UtilCommon::DimensionSubClasses,
+			&UtilConstants::DimensionSubClasses,
 			[&](AcDbObjectId objId)
 			{
 				UtilDimension::addSurroundingCharsForDimension(objId, left, right, isLGdt, isRGdt);
@@ -155,7 +156,7 @@ namespace
 		bool isLGdt = dlg.getGdtCheckStatus(0);
 		bool isRGdt = dlg.getGdtCheckStatus(1);
 		UiUniversalPicker::run(
-			&UtilCommon::DimensionSubClasses,
+			&UtilConstants::DimensionSubClasses,
 			[&](AcDbObjectId objId)
 			{
 				UtilDimension::removeSurroundingCharsForDimension(objId, left, right, isLGdt, isRGdt);
@@ -168,7 +169,7 @@ namespace
 	void cmdSetBasicBox()
 	{
 		UiUniversalPicker::run(
-			&UtilCommon::DimensionSubClasses,
+			&UtilConstants::DimensionSubClasses,
 			[](AcDbObjectId objId)
 			{
 				UtilDimension::setAndUnsetBasicBox(objId, true);
@@ -181,7 +182,7 @@ namespace
 	void cmdUnsetBasicBox()
 	{
 		UiUniversalPicker::run(
-			&UtilCommon::DimensionSubClasses,
+			&UtilConstants::DimensionSubClasses,
 			[](AcDbObjectId objId)
 			{
 				UtilDimension::setAndUnsetBasicBox(objId, false);
@@ -194,7 +195,7 @@ namespace
 	void cmdSetRefDim()
 	{
 		UiUniversalPicker::run(
-			&UtilCommon::DimensionSubClasses,
+			&UtilConstants::DimensionSubClasses,
 			[](AcDbObjectId objId)
 			{
 				UtilDimension::setAndUnsetRefDim(objId, true);
@@ -207,7 +208,7 @@ namespace
 	void cmdUnsetRefDim()
 	{
 		UiUniversalPicker::run(
-			&UtilCommon::DimensionSubClasses,
+			&UtilConstants::DimensionSubClasses,
 			[](AcDbObjectId objId)
 			{
 				UtilDimension::setAndUnsetRefDim(objId, false);
@@ -236,7 +237,7 @@ namespace
 		}
 
 		UiUniversalPicker::AcRxClassVector filter = { AcmFCF::desc(), AcDbMText::desc(), AcDbText::desc() };
-		filter.insert(filter.end(), UtilCommon::DimensionSubClasses.begin(), UtilCommon::DimensionSubClasses.end());
+		filter.insert(filter.end(), UtilConstants::DimensionSubClasses.begin(), UtilConstants::DimensionSubClasses.end());
 		UiUniversalPicker::run(
 			&filter,
 			[&csv](AcDbObjectId objId)
@@ -252,7 +253,7 @@ namespace
 					// 名义值
 					AcString asMeasuredValue;
 					double dMeasuredValue = dimData.dimensionValue();
-					UtilCommon::double2AcString(dMeasuredValue, asMeasuredValue, dimData.precision);
+				    UtilString::double2AcString(dMeasuredValue, asMeasuredValue, dimData.precision);
 
 					// 公差
 					AcString asTol, asTolUpper, asTolLower;
@@ -267,15 +268,15 @@ namespace
 						if (abs(dimData.upperDeviation + dimData.lowerDeviation) < 1e-6) // 对称偏差
 						{
 							double dAbsTol = abs(dimData.upperDeviation);
-							asTol.format(L"%s%.*f", UtilCommon::SymbolCodes::PlusMinus, dimData.tolerancePrecision, dAbsTol);
+							asTol.format(L"%s%.*f", UtilConstants::SymbolCodes::PlusMinus, dimData.tolerancePrecision, dAbsTol);
 							asTolUpper.format(L"%.*f", dimData.tolerancePrecision, dAbsTol);
 							asTolLower.format(L"-%.*f", dimData.tolerancePrecision, dAbsTol);
 						}
 						else // 极限偏差
 						{
 
-							UtilCommon::double2AcString(dimData.upperDeviation, asTolUpper, dimData.tolerancePrecision);
-							UtilCommon::double2AcString(dimData.lowerDeviation, asTolLower, dimData.tolerancePrecision);
+							UtilString::double2AcString(dimData.upperDeviation, asTolUpper, dimData.tolerancePrecision);
+							UtilString::double2AcString(dimData.lowerDeviation, asTolLower, dimData.tolerancePrecision);
 							asTol.format(L"+%s/%s", asTolUpper.constPtr(), asTolLower.constPtr());
 							asTolUpper.format(L"%.*f", dimData.tolerancePrecision, dimData.upperDeviation);
 							asTolLower.format(L"%.*f", dimData.tolerancePrecision, dimData.lowerDeviation);

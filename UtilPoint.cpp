@@ -9,7 +9,7 @@ module;
 #include "StdAfx.h"
 
 module UtilPoint;
-import UtilCommon;
+import UtilEntity;
 import UiUniversalPicker;
 import FrameworkTranslator;
 import UtilLine;
@@ -26,7 +26,7 @@ namespace UtilPoint
 
         // 获取当前活动空间的块表记录（Model Space 或 Paper Space）
         AcDbObjectId currentSpaceId = acdbCurDwg()->currentSpaceId();
-        AcDbBlockTableRecord* pBlockTableRecord = UtilCommon::getObject<AcDbBlockTableRecord>(currentSpaceId, AcDb::kForWrite);
+        AcDbBlockTableRecord* pBlockTableRecord = UtilEntity::getObject<AcDbBlockTableRecord>(currentSpaceId, AcDb::kForWrite);
         if (pBlockTableRecord == nullptr)
         {
             return 0;

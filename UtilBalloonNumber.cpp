@@ -11,12 +11,13 @@ module;
 
 module UtilBalloonNumber;
 import std;
-import UtilCommon;
 import UtilAnnotative;
 import UtilAcadVar;
 import FrameworkTranslator;
 import FrameworkCommands;
 import UiUniversalPicker;
+import UtilConstants;
+import UtilEntity;
 
 namespace UtilBalloonNumber
 {
@@ -31,7 +32,7 @@ namespace UtilBalloonNumber
             AfxMessageBox(_(L"获取块表失败！"), MB_OK | MB_ICONERROR);
             throw WException(_(L"获取块表失败！"));
         }
-        if (pBlockTable->getAt(UtilCommon::BalloonNumberBlock::getBlockName(), this->mBlockDefineId) != Acad::eOk)
+        if (pBlockTable->getAt(UtilConstants::BalloonNumberBlock::getBlockName(), this->mBlockDefineId) != Acad::eOk)
         {
             pBlockTable->close();
             AfxMessageBox(L"获取块定义失败！", MB_OK | MB_ICONERROR);
@@ -104,7 +105,7 @@ namespace UtilBalloonNumber
 
     void BalloonNumberJig::setupAttributes()
     {
-        AcDbBlockTableRecord* pBlockDefinition = UtilCommon::getObject<AcDbBlockTableRecord>(this->mBlockDefineId);
+        AcDbBlockTableRecord* pBlockDefinition = UtilEntity::getObject<AcDbBlockTableRecord>(this->mBlockDefineId);
         if (pBlockDefinition == nullptr)
         {
             return;
@@ -117,7 +118,7 @@ namespace UtilBalloonNumber
             if (pIt->getEntity(pEnt, AcDb::kForRead) == Acad::eOk)
             {
                 AcDbAttributeDefinition* pAttDef = AcDbAttributeDefinition::cast(pEnt);
-                if (pAttDef && !pAttDef->isConstant() && AcString(pAttDef->tag()) == UtilCommon::BalloonNumberBlock::getAttTag())
+                if (pAttDef && !pAttDef->isConstant() && AcString(pAttDef->tag()) == UtilConstants::BalloonNumberBlock::getAttTag())
                 {
                     AcDbAttribute* pAtt = new AcDbAttribute();
                     pAtt->setPropertiesFrom(pAttDef);
@@ -143,10 +144,10 @@ namespace UtilBalloonNumber
 		pDb->getBlockTable(pBlockTable, AcDb::kForWrite);
 
 		// 检查块是否存在
-		if (!pBlockTable->has(UtilCommon::BalloonNumberBlock::getBlockName()))
+		if (!pBlockTable->has(UtilConstants::BalloonNumberBlock::getBlockName()))
 		{
 			AcDbBlockTableRecord* pNewBTR = new AcDbBlockTableRecord();
-			pNewBTR->setName(UtilCommon::BalloonNumberBlock::getBlockName());
+			pNewBTR->setName(UtilConstants::BalloonNumberBlock::getBlockName());
 			pNewBTR->setOrigin(AcGePoint3d::kOrigin);
             if (UtilAnnotative::setObjAnnotative(pNewBTR) != Acad::eOk)
             {
@@ -168,8 +169,8 @@ namespace UtilBalloonNumber
 
 			// 创建属性定义
 			AcDbAttributeDefinition* pAttDef = new AcDbAttributeDefinition();
-			pAttDef->setTag(UtilCommon::BalloonNumberBlock::getAttTag());
-			pAttDef->setPrompt(UtilCommon::BalloonNumberBlock::getAttPrompt());
+			pAttDef->setTag(UtilConstants::BalloonNumberBlock::getAttTag());
+			pAttDef->setPrompt(UtilConstants::BalloonNumberBlock::getAttPrompt());
 			pAttDef->setHeight(TEXTSIZE);
 			pAttDef->setHorizontalMode(AcDb::kTextCenter);
 			pAttDef->setVerticalMode(AcDb::kTextVertMid);
@@ -198,7 +199,7 @@ namespace UtilBalloonNumber
             return;
         }
 
-        if (pBlockTable->getAt(UtilCommon::BalloonNumberBlock::getBlockName(), blockDefineId) != Acad::eOk)
+        if (pBlockTable->getAt(UtilConstants::BalloonNumberBlock::getBlockName(), blockDefineId) != Acad::eOk)
         {
             pBlockTable->close();
             AfxMessageBox(_(L"获取块定义失败！"), MB_OK | MB_ICONERROR);
@@ -259,7 +260,7 @@ namespace UtilBalloonNumber
         bool bChanged = false;
 
         // 以写模式打开块参照
-        AcDbBlockReference* pBlkRef = UtilCommon::getObject<AcDbBlockReference>(blockRefId, AcDb::kForWrite);
+        AcDbBlockReference* pBlkRef = UtilEntity::getObject<AcDbBlockReference>(blockRefId, AcDb::kForWrite);
         if (pBlkRef == nullptr)
         {
             return false;
@@ -269,13 +270,13 @@ namespace UtilBalloonNumber
         for (pAttIt->start(); !pAttIt->done(); pAttIt->step())
         {
             AcDbObjectId attId = pAttIt->objectId();
-            AcDbAttribute* pAtt = UtilCommon::getObject<AcDbAttribute>(attId, AcDb::kForWrite);
+            AcDbAttribute* pAtt = UtilEntity::getObject<AcDbAttribute>(attId, AcDb::kForWrite);
             if (pAtt == nullptr)
             {
                 continue;
             }
             // 检查标签是否匹配
-            if (AcString(pAtt->tag()) == UtilCommon::BalloonNumberBlock::getAttTag())
+            if (AcString(pAtt->tag()) == UtilConstants::BalloonNumberBlock::getAttTag())
             {
                 // 修改文本内容
                 pAtt->setTextString(std::to_wstring(newNum).c_str()); // 修改序号属性
@@ -301,7 +302,7 @@ namespace UtilBalloonNumber
         }
 
         AcDbObjectId blockDefineId = pBlkRef->blockTableRecord();
-        AcDbBlockTableRecord* pBlockDef = UtilCommon::getObject<AcDbBlockTableRecord>(blockDefineId);
+        AcDbBlockTableRecord* pBlockDef = UtilEntity::getObject<AcDbBlockTableRecord>(blockDefineId);
         if (pBlockDef == nullptr)
         {
             return;
@@ -315,7 +316,7 @@ namespace UtilBalloonNumber
             if (pIt->getEntity(pEnt, AcDb::kForRead) == Acad::eOk)
             {
                 AcDbAttributeDefinition* pAttDef = AcDbAttributeDefinition::cast(pEnt);
-                if (pAttDef && !pAttDef->isConstant() && AcString(pAttDef->tag()) == UtilCommon::BalloonNumberBlock::getAttTag())
+                if (pAttDef && !pAttDef->isConstant() && AcString(pAttDef->tag()) == UtilConstants::BalloonNumberBlock::getAttTag())
                 {
                     AcDbAttribute* pAtt = new AcDbAttribute();
                     pAtt->setPropertiesFrom(pAttDef);
@@ -334,7 +335,7 @@ namespace UtilBalloonNumber
 
     bool getBalloonAttributeValue(const AcDbObjectId& blockRefId, AcString& outValue)
     {
-        AcDbBlockReference* pBlkRef = UtilCommon::getObject<AcDbBlockReference>(blockRefId, AcDb::kForRead);
+        AcDbBlockReference* pBlkRef = UtilEntity::getObject<AcDbBlockReference>(blockRefId, AcDb::kForRead);
         if (pBlkRef == nullptr)
         {
             return false;
@@ -342,13 +343,13 @@ namespace UtilBalloonNumber
 
         bool bNameMatch = false;
         AcDbObjectId btrId = pBlkRef->blockTableRecord();
-        AcDbBlockTableRecord* pBTR = UtilCommon::getObject<AcDbBlockTableRecord>(btrId, AcDb::kForRead);
+        AcDbBlockTableRecord* pBTR = UtilEntity::getObject<AcDbBlockTableRecord>(btrId, AcDb::kForRead);
 
         if (pBTR != nullptr)
         {
             wchar_t* pBlockName = nullptr;
             pBTR->getName(pBlockName);
-            if (AcString(pBlockName) == UtilCommon::BalloonNumberBlock::getBlockName())
+            if (AcString(pBlockName) == UtilConstants::BalloonNumberBlock::getBlockName())
             {
                 bNameMatch = true;
             }
@@ -366,10 +367,10 @@ namespace UtilBalloonNumber
         AcDbObjectIterator* pAttIt = pBlkRef->attributeIterator();
         for (pAttIt->start(); !pAttIt->done(); pAttIt->step())
         {
-            AcDbAttribute* pAtt = UtilCommon::getObject<AcDbAttribute>(pAttIt->objectId(), AcDb::kForRead);
+            AcDbAttribute* pAtt = UtilEntity::getObject<AcDbAttribute>(pAttIt->objectId(), AcDb::kForRead);
             if (pAtt != nullptr)
             {
-                if (AcString(pAtt->tag()) == UtilCommon::BalloonNumberBlock::getAttTag())
+                if (AcString(pAtt->tag()) == UtilConstants::BalloonNumberBlock::getAttTag())
                 {
                     outValue = pAtt->textString();
                     bFound = true;

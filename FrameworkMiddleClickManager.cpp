@@ -10,7 +10,6 @@ module;
 #include "UiGenericPairEditDlg.hpp"
 
 module FrameworkMiddleClickManager;
-import UtilCommon;
 import FrameworkCommands;
 import FrameworkTranslator;
 import UtilAcadVar;

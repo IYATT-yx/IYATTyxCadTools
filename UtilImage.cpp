@@ -10,7 +10,7 @@ module;
 #include <atlimage.h>
 
 module UtilImage;
-import UtilCommon;
+import UtilEntity;
 import FrameworkTranslator;
 import UiFileDialog;
 import FrameworkCommands;
@@ -96,7 +96,7 @@ namespace UtilImage
 
     void forceRemoveImageAndFile(const AcDbObjectId& id)
     {
-        AcDbRasterImage* pImg = UtilCommon::getObject<AcDbRasterImage>(id, AcDb::kForWrite);
+        AcDbRasterImage* pImg = UtilEntity::getObject<AcDbRasterImage>(id, AcDb::kForWrite);
         if (pImg == nullptr)
         {
             return;
@@ -109,7 +109,7 @@ namespace UtilImage
         pImg->erase();
 
         // 打开图像定义
-        AcDbRasterImageDef* pImgDef = UtilCommon::getObject<AcDbRasterImageDef>(imgDefId, AcDb::kForWrite);
+        AcDbRasterImageDef* pImgDef = UtilEntity::getObject<AcDbRasterImageDef>(imgDefId, AcDb::kForWrite);
         if (pImgDef == nullptr)
         {
             return;

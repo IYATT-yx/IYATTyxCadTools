@@ -14,7 +14,6 @@ module;
 #pragma comment(lib, "imm32.lib")
 
 module FrameworkImeAutoSwitcher;
-import UtilCommon;
 import FrameworkConfigManager;
 import FrameworkTranslator;
 import UtilAcadVar;

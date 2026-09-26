@@ -9,7 +9,6 @@ module;
 #include "StdAfx.h"
 
 module UiFileDialog;
-import UtilCommon;
 import FrameworkTranslator;
 
 namespace UiFileDialog

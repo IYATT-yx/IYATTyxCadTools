@@ -112,7 +112,7 @@ std::wstring FrameworkActivityInsightsManager::getCommonFolderPath()
     DWORD dwResult = ::GetEnvironmentVariableW(L"LOCALAPPDATA", localAppDataBuf, MAX_PATH);
     if (dwResult > 0 && dwResult < MAX_PATH)
     {
-        return std::wstring(localAppDataBuf) + L"\\Autodesk\\ActivityInsights\\UtilCommon";
+        return std::wstring(localAppDataBuf) + L"\\Autodesk\\ActivityInsights\\Common";
     }
     return L"";
 }

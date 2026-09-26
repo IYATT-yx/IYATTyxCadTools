@@ -11,7 +11,6 @@
 #include "UiMainBarChildDlg.hpp"
 
 import FrameworkCommands;
-import UtilCommon;
 import FrameworkTranslator;
 
 //-----------------------------------------------------------------------------

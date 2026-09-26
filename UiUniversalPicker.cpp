@@ -11,8 +11,8 @@ module;
 
 module UiUniversalPicker;
 import FrameworkCommands;
-import UtilCommon;
 import FrameworkTranslator;
+import UtilEntity;
 
 resbuf* UiUniversalPicker::buildFilter(UiUniversalPicker::AcRxClassVectorPtr arcv)
 {
@@ -218,7 +218,7 @@ void UiUniversalPicker::batchSelect(UiUniversalPicker::AcRxClassVectorPtr arcv, 
         // 统一刷新图形
         for (const auto& id : processedIds)
         {
-            AcDbEntity* pEnt = UtilCommon::getObject<AcDbEntity>(id, AcDb::kForRead);
+            AcDbEntity* pEnt = UtilEntity::getObject<AcDbEntity>(id, AcDb::kForRead);
             if (pEnt != nullptr)
             {
                 AcDbDimension* pDim = AcDbDimension::cast(pEnt);
@@ -322,7 +322,7 @@ void UiUniversalPicker::immediateSelect(UiUniversalPicker::AcRxClassVectorPtr ar
 
                         // --- 实时刷新逻辑开始 ---
                         // 事务提交后，只需以只读方式打开进行绘制触发
-                        AcDbEntity* pEnt = UtilCommon::getObject<AcDbEntity>(id, AcDb::kForRead);
+                        AcDbEntity* pEnt = UtilEntity::getObject<AcDbEntity>(id, AcDb::kForRead);
                         if (pEnt != nullptr)
                         {
                             // 如果是标注类，必须重构其图形块

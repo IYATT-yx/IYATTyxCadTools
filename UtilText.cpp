@@ -10,7 +10,8 @@ module;
 #include "UiGenericPairEditDlg.hpp"
 
 module UtilText;
-import UtilCommon;
+import UtilEntity;
+import UtilGeom;
 import UiUniversalPicker;
 import UtilAnnotative;
 import UtilIoCsvModule;
@@ -58,7 +59,7 @@ namespace UtilText
 
 	bool readMText(const AcDbObjectId& id, AcString& text, bool isRawContents, AcGePoint3d* pPos)
 	{
-		AcDbMText* pMText = UtilCommon::getObject<AcDbMText>(id, AcDb::kForRead);
+		AcDbMText* pMText = UtilEntity::getObject<AcDbMText>(id, AcDb::kForRead);
 		if (pMText == nullptr)
 		{
 			return false;
@@ -75,7 +76,7 @@ namespace UtilText
 
 		if (pPos != nullptr)
 		{
-			UtilCommon::getEntityCenter(pMText, pPos);
+			UtilGeom::getEntityCenter(pMText, pPos);
 		}
 
 		return true;
@@ -83,7 +84,7 @@ namespace UtilText
 
 	bool readDText(const AcDbObjectId& id, AcString& text, bool isRawContents, AcGePoint3d* pPos)
 	{
-		AcDbText* pText = UtilCommon::getObject<AcDbText>(id, AcDb::kForRead);
+		AcDbText* pText = UtilEntity::getObject<AcDbText>(id, AcDb::kForRead);
 		if (pText == nullptr)
 		{
 			return false;
@@ -97,7 +98,7 @@ namespace UtilText
 
 		if (pPos != nullptr)
 		{
-			UtilCommon::getEntityCenter(pText, pPos);
+			UtilGeom::getEntityCenter(pText, pPos);
 		}
 
 		return true;
@@ -105,7 +106,7 @@ namespace UtilText
 
 	bool readTextField(const AcDbObjectId& id, AcString& text)
 	{
-		AcDbEntity* pText = UtilCommon::getObject<AcDbEntity>(id, AcDb::kForRead);
+		AcDbEntity* pText = UtilEntity::getObject<AcDbEntity>(id, AcDb::kForRead);
 		if (pText == nullptr)
 		{
 			return false;
@@ -158,7 +159,7 @@ namespace UtilText
 
 	void updateTextEntityContent(const AcDbObjectId& id, const AcString& content)
 	{
-		AcDbEntity* pText = UtilCommon::getObject<AcDbEntity>(id, AcDb::kForWrite);
+		AcDbEntity* pText = UtilEntity::getObject<AcDbEntity>(id, AcDb::kForWrite);
 		if (pText == nullptr)
 		{
 			return;
@@ -267,7 +268,7 @@ namespace UtilText
 					currentPt.z = topLeftPt.z;
 					pMText->setLocation(currentPt);
 
-					AcDbBlockTableRecord* pBTR = UtilCommon::getObject<AcDbBlockTableRecord>(pDb->currentSpaceId(), AcDb::kForWrite);
+					AcDbBlockTableRecord* pBTR = UtilEntity::getObject<AcDbBlockTableRecord>(pDb->currentSpaceId(), AcDb::kForWrite);
 					if (pBTR != nullptr)
 					{
 						if (pBTR->appendAcDbEntity(pMText) == Acad::eOk)

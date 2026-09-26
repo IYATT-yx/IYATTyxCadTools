@@ -9,14 +9,14 @@ module;
 #include "StdAfx.h"
 
 module UtilGeometricTolerance;
-import UtilCommon;
 import UtilText;
+import UtilEntity;
 
 namespace UtilGeometricTolerance
 {
 	void readFcf(const AcDbObjectId& id, GeometricToleranceData& data)
 	{
-		AcmFCF* pFcf = UtilCommon::getObject<AcmFCF>(id, AcDb::kForRead);
+		AcmFCF* pFcf = UtilEntity::getObject<AcmFCF>(id, AcDb::kForRead);
 		if (pFcf == nullptr)
 		{
 			data.status = false;

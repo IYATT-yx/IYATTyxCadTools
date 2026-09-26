@@ -1,213 +1,262 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="源文件">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="头文件">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="资源文件">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Framework">
+      <UniqueIdentifier>{4a39b279-2b34-42cc-91fa-3d3d5d1df1e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AppBoot">
+      <UniqueIdentifier>{354344e6-0e85-4037-80d6-b02580353724}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Ui">
+      <UniqueIdentifier>{791d3b9d-8dd5-4a0d-979a-5a17708ad728}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{92e89b7b-e8fd-4036-8ab6-e85c909ace94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils\Io">
+      <UniqueIdentifier>{16670f31-7278-4567-b7ad-fa8743c25c0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils\Cmds">
+      <UniqueIdentifier>{12c32265-a346-445f-96ac-c57b44375e9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework\Lifecycle">
+      <UniqueIdentifier>{834553e1-3091-4853-a33c-1e88b854243d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework\Config">
+      <UniqueIdentifier>{92e600cb-8de3-4967-9ba6-037e98913c8c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="StdAfx.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="FrameworkActivityInsightsManager.cpp">
+      <Filter>Framework</Filter>
     </ClCompile>
-    <ClCompile Include="DocData.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="FrameworkActivityInsightsManager.ixx">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameworkBuildingTime.ixx">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameworkCommands.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameworkCommands.ixx">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameworkDocCloseInterceptor.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameworkDocCloseInterceptor.ixx">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameworkImeAutoSwitcher.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameworkImeAutoSwitcher.ixx">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameworkMiddleClickManager.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameworkMiddleClickManager.ixx">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameworkTranslator.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameworkTranslator.ixx">
+      <Filter>Framework</Filter>
     </ClCompile>
     <ClCompile Include="acrxEntryPoint.cpp">
-      <Filter>源文件</Filter>
+      <Filter>AppBoot</Filter>
     </ClCompile>
     <ClCompile Include="CadTools.cpp">
-      <Filter>源文件</Filter>
+      <Filter>AppBoot</Filter>
     </ClCompile>
-    <ClCompile Include="UniversalPicker.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="DocData.cpp">
+      <Filter>AppBoot</Filter>
     </ClCompile>
-    <ClCompile Include="Interface.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="StdAfx.cpp">
+      <Filter>AppBoot</Filter>
     </ClCompile>
-    <ClCompile Include="Common.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="UiFileDialog.cpp">
+      <Filter>Ui</Filter>
     </ClCompile>
-    <ClCompile Include="Dimension.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="UiFileDialog.ixx">
+      <Filter>Ui</Filter>
     </ClCompile>
-    <ClCompile Include="GenericPairEditDlg.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="UiGenericPairEditDlg.cpp">
+      <Filter>Ui</Filter>
     </ClCompile>
-    <ClCompile Include="EntityStyle.ixx">
-      <Filter>头文件</Filter>
+    <ClCompile Include="UiMainBar.cpp">
+      <Filter>Ui</Filter>
     </ClCompile>
-    <ClCompile Include="EntityStyle.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="UiMainBarChildDlg.cpp">
+      <Filter>Ui</Filter>
     </ClCompile>
-    <ClCompile Include="Interface.ixx">
-      <Filter>头文件</Filter>
+    <ClCompile Include="UiUniversalPicker.cpp">
+      <Filter>Ui</Filter>
     </ClCompile>
-    <ClCompile Include="Common-Inline.ixx">
-      <Filter>头文件</Filter>
+    <ClCompile Include="UiUniversalPicker.ixx">
+      <Filter>Ui</Filter>
     </ClCompile>
-    <ClCompile Include="Common.ixx">
-      <Filter>头文件</Filter>
+    <ClCompile Include="UtilAcadVar.ixx">
+      <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="BuildingTime.ixx">
-      <Filter>头文件</Filter>
+    <ClCompile Include="UtilAnnotative.cpp">
+      <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="UniversalPicker.ixx">
-      <Filter>头文件</Filter>
+    <ClCompile Include="UtilAnnotative.ixx">
+      <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Dimension.ixx">
-      <Filter>头文件</Filter>
+    <ClCompile Include="UtilBalloonNumber.cpp">
+      <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="BalloonNumber.ixx">
-      <Filter>头文件</Filter>
+    <ClCompile Include="UtilBalloonNumber.ixx">
+      <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="BalloonNumber.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="UtilDimension.cpp">
+      <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="GeometricTolerance.ixx">
-      <Filter>头文件</Filter>
+    <ClCompile Include="UtilDimension.ixx">
+      <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="GeometricTolerance.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="UtilEntityStyle.cpp">
+      <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="TextUtil.ixx">
-      <Filter>头文件</Filter>
+    <ClCompile Include="UtilEntityStyle.ixx">
+      <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="TextUtil.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="UtilGeometricTolerance.cpp">
+      <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="CsvModule.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="UtilGeometricTolerance.ixx">
+      <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="CsvModule.ixx">
-      <Filter>头文件</Filter>
+    <ClCompile Include="UtilImage.cpp">
+      <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Annotative.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="UtilImage.ixx">
+      <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Annotative.ixx">
-      <Filter>头文件</Filter>
+    <ClCompile Include="UtilLine.cpp">
+      <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="ImeAutoSwitcher.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="UtilLine.ixx">
+      <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="ImeAutoSwitcher.ixx">
-      <Filter>头文件</Filter>
+    <ClCompile Include="UtilPoint.cpp">
+      <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="MainBarChildDlg.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="UtilPoint.ixx">
+      <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="MainBar.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="UtilText.cpp">
+      <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Commands.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="UtilText.ixx">
+      <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Commands.ixx">
-      <Filter>头文件</Filter>
+    <ClCompile Include="UtilIoCsvModule.cpp">
+      <Filter>Utils\Io</Filter>
     </ClCompile>
-    <ClCompile Include="FileDialog.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="UtilIoCsvModule.ixx">
+      <Filter>Utils\Io</Filter>
     </ClCompile>
-    <ClCompile Include="FileDialog.ixx">
-      <Filter>头文件</Filter>
+    <ClCompile Include="UtilIoEncodingConverter.cpp">
+      <Filter>Utils\Io</Filter>
     </ClCompile>
-    <ClCompile Include="Image.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="UtilIoEncodingConverter.ixx">
+      <Filter>Utils\Io</Filter>
     </ClCompile>
-    <ClCompile Include="Image.ixx">
-      <Filter>头文件</Filter>
+    <ClCompile Include="UtilIoJsonWrapper.cpp">
+      <Filter>Utils\Io</Filter>
     </ClCompile>
-    <ClCompile Include="LineUtil.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="UtilIoJsonWrapper.ixx">
+      <Filter>Utils\Io</Filter>
     </ClCompile>
-    <ClCompile Include="PointUtil.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="UtilCmdBalloon.ixx">
+      <Filter>Utils\Cmds</Filter>
     </ClCompile>
-    <ClCompile Include="LineUtil.ixx">
-      <Filter>头文件</Filter>
+    <ClCompile Include="UtilCmdDevInternal.ixx">
+      <Filter>Utils\Cmds</Filter>
     </ClCompile>
-    <ClCompile Include="PointUtil.ixx">
-      <Filter>头文件</Filter>
+    <ClCompile Include="UtilCmdDimension.ixx">
+      <Filter>Utils\Cmds</Filter>
     </ClCompile>
-    <ClCompile Include="IYATTyxJsonWrapper.ixx">
-      <Filter>头文件</Filter>
+    <ClCompile Include="UtilCmdEntityGeometry.ixx">
+      <Filter>Utils\Cmds</Filter>
     </ClCompile>
-    <ClCompile Include="EncodingConverter.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="UtilCmdImage.ixx">
+      <Filter>Utils\Cmds</Filter>
     </ClCompile>
-    <ClCompile Include="EncodingConverter.ixx">
-      <Filter>头文件</Filter>
+    <ClCompile Include="UtilCmdSystemConfig.ixx">
+      <Filter>Utils\Cmds</Filter>
     </ClCompile>
-    <ClCompile Include="IYATTyxJsonWrapper.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="UtilCmdText.ixx">
+      <Filter>Utils\Cmds</Filter>
     </ClCompile>
-    <ClCompile Include="ConfigManager.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="FrameworkLifecycleInterface.cpp">
+      <Filter>Framework\Lifecycle</Filter>
     </ClCompile>
-    <ClCompile Include="ConfigManager.ixx">
-      <Filter>头文件</Filter>
+    <ClCompile Include="FrameworkLifecycleInterface.ixx">
+      <Filter>Framework\Lifecycle</Filter>
     </ClCompile>
-    <ClCompile Include="MiddleClickManager.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="FrameworkConfigManager.cpp">
+      <Filter>Framework\Config</Filter>
     </ClCompile>
-    <ClCompile Include="MiddleClickManager.ixx">
-      <Filter>头文件</Filter>
+    <ClCompile Include="FrameworkConfigManager.ixx">
+      <Filter>Framework\Config</Filter>
     </ClCompile>
-    <ClCompile Include="AcadVarUtil.ixx">
-      <Filter>头文件</Filter>
+    <ClCompile Include="UtilGeom.cpp">
+      <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Translator.ixx">
-      <Filter>头文件</Filter>
+    <ClCompile Include="UtilGeom.ixx">
+      <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Translator.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="UtilConstants.ixx">
+      <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="DocCloseInterceptor.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="UtilEntity.ixx">
+      <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="DocCloseInterceptor.ixx">
-      <Filter>头文件</Filter>
+    <ClCompile Include="UtilEntity.cpp">
+      <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="ActivityInsightsManager.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="UtilString.cpp">
+      <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="ActivityInsightsManager.ixx">
-      <Filter>头文件</Filter>
+    <ClCompile Include="UtilString.ixx">
+      <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="utils.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="UtilSystem.ixx">
+      <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="utils.ixx">
-      <Filter>头文件</Filter>
+    <ClCompile Include="UtilSystem.cpp">
+      <Filter>Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="StdAfx.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="DocData.h">
-      <Filter>头文件</Filter>
+      <Filter>AppBoot</Filter>
     </ClInclude>
     <ClInclude Include="Resource.h">
-      <Filter>头文件</Filter>
+      <Filter>AppBoot</Filter>
     </ClInclude>
-    <ClInclude Include="GenericPairEditDlg.hpp">
-      <Filter>头文件</Filter>
+    <ClInclude Include="StdAfx.h">
+      <Filter>AppBoot</Filter>
     </ClInclude>
-    <ClInclude Include="MainBarChildDlg.hpp">
-      <Filter>头文件</Filter>
+    <ClInclude Include="UiGenericPairEditDlg.hpp">
+      <Filter>Ui</Filter>
     </ClInclude>
-    <ClInclude Include="MainBar.hpp">
-      <Filter>头文件</Filter>
+    <ClInclude Include="UiMainBar.hpp">
+      <Filter>Ui</Filter>
+    </ClInclude>
+    <ClInclude Include="UiMainBarChildDlg.hpp">
+      <Filter>Ui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

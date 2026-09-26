@@ -39,9 +39,6 @@
     <ClCompile Include="UtilCmdImage.ixx" />
     <ClCompile Include="UtilCmdSystemConfig.ixx" />
     <ClCompile Include="UtilCmdText.ixx" />
-    <ClCompile Include="UtilCommon-Inline.ixx" />
-    <ClCompile Include="UtilCommon.cpp" />
-    <ClCompile Include="UtilCommon.ixx" />
     <ClCompile Include="FrameworkConfigManager.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
@@ -50,6 +47,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="UtilConstants.ixx" />
+    <ClCompile Include="UtilEntity.cpp" />
+    <ClCompile Include="UtilEntity.ixx" />
+    <ClCompile Include="UtilGeom.cpp" />
+    <ClCompile Include="UtilGeom.ixx" />
     <ClCompile Include="UtilIoCsvModule.cpp" />
     <ClCompile Include="UtilIoCsvModule.ixx" />
     <ClCompile Include="UtilDimension.cpp" />
@@ -105,6 +107,10 @@
     </ClCompile>
     <ClCompile Include="UtilPoint.cpp" />
     <ClCompile Include="UtilPoint.ixx" />
+    <ClCompile Include="UtilString.cpp" />
+    <ClCompile Include="UtilString.ixx" />
+    <ClCompile Include="UtilSystem.cpp" />
+    <ClCompile Include="UtilSystem.ixx" />
     <ClCompile Include="UtilText.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>

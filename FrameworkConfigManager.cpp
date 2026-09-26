@@ -9,7 +9,6 @@
 module FrameworkConfigManager;
 import UtilIoJsonWrapper;
 import std;
-import UtilCommon;
 import FrameworkTranslator;
 
 bool FrameworkConfigManager::loadConfig(const std::wstring& filename)

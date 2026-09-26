@@ -11,6 +11,7 @@ module;
 #include "StdAfx.h"
 
 export module UiUniversalPicker;
+import UtilConstants;
 
 export class UiUniversalPicker
 {
@@ -53,9 +54,9 @@ public:
 	// 处理函数原型
 	using EntityProcessor = std::function<void(const AcDbObjectId&)>;
 	using EntityProcessorBreak = std::function<void(const AcDbObjectId&, bool&)>;
-	// 实体类型数组
-	using AcRxClassVector = std::vector<AcRxClass*>;
-	using AcRxClassVectorPtr = AcRxClassVector*;
+
+	using AcRxClassVector = UtilConstants::AcRxClassVector;
+	using AcRxClassVectorPtr = UtilConstants::AcRxClassVectorPtr;
 
 private:
 	/**

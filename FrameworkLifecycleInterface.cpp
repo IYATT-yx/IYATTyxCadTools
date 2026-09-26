@@ -12,24 +12,25 @@ module;
 
 module FrameworkLifecycleInterface;
 import FrameworkBuildingTime;
-import UtilCommon;
+import UtilConstants;
 import FrameworkConfigManager;
 import FrameworkDocCloseInterceptor;
 import FrameworkTranslator;
 import FrameworkImeAutoSwitcher;
 import FrameworkMiddleClickManager;
+import UtilSystem;
 
 void FrameworkLifecycleInterface::init()
 {
     // 读取配置文件
     auto& manager = FrameworkConfigManager::getInstance();
-    auto appPath = UtilCommon::getAppSubFolder();
+    auto appPath = UtilSystem::getAppSubFolder();
     if (!appPath.has_value())
     {
         AfxMessageBox(L"Failed to get application data directory", MB_OK | MB_ICONERROR);
         return;
     }
-    std::filesystem::path configPathObj = appPath.value() / UtilCommon::Config::configName;
+    std::filesystem::path configPathObj = appPath.value() / UtilConstants::Config::configName;
     if (!manager.loadConfig(configPathObj.wstring()))
     {
         std::wstring err = manager.getLastError();
@@ -76,7 +77,7 @@ void FrameworkLifecycleInterface::info()
 {
     
     acutPrintf(L"\n%s %s_%s | %s: IYATT-yx | %s: MIT | %s: https://github.com/IYATT-yx/IYATTyxCadTools\n",
-        UtilCommon::getLocalProjectName(),
+        UtilConstants::getLocalProjectName(),
         FrameworkBuildingTime::WDATE, FrameworkBuildingTime::WTIME,
         _(L"作者"),
         _(L"开源协议"),
@@ -101,6 +102,6 @@ void FrameworkLifecycleInterface::unload()
     // 关闭命令菜单
     UiMainBar::terminateBar();
     // 卸载命令
-    acedRegCmds->removeGroup(UtilCommon::cmdGroup);
-    acutPrintf(_(L"\n已卸载 %s"), UtilCommon::getLocalProjectName());
+    acedRegCmds->removeGroup(UtilConstants::cmdGroup);
+    acutPrintf(_(L"\n已卸载 %s"), UtilConstants::getLocalProjectName());
 }

@@ -8,8 +8,9 @@
 #include "StdAfx.h"
 #include "UiGenericPairEditDlg.hpp"
 
-import UtilCommon;
+import UtilConstants;
 import FrameworkTranslator;
+import UtilSystem;
 
 const CString UiGenericPairEditDlg::ValidatorOk = L""; // 验证通过的标志
 
@@ -68,7 +69,7 @@ BOOL UiGenericPairEditDlg::OnInitDialog()
 
 	// 创建 GDT 字体
 	lf.lfCharSet = ANSI_CHARSET;
-	wcscpy(lf.lfFaceName, UtilCommon::CharMap::font);
+	wcscpy(lf.lfFaceName, UtilConstants::CharMap::font);
 	lf.lfItalic = false;
 	lf.lfUnderline = false;
 	if (lf.lfHeight < 0)
@@ -167,7 +168,7 @@ void UiGenericPairEditDlg::OnBnClickedCancel()
 
 void UiGenericPairEditDlg::OnBnClickedButton1()
 {
-	UtilCommon::startCharMapWithGDT();
+	UtilSystem::startCharMapWithGDT();
 }
 
 void UiGenericPairEditDlg::OnBnClickedCheck1()

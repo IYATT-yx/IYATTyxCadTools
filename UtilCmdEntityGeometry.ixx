@@ -9,10 +9,12 @@ module;
 #include "StdAfx.h"
 
 export module UtilCmdEntityGeometry;
+import std;
 import UiUniversalPicker;
 import FrameworkCommands;
 import FrameworkTranslator;
-import UtilCommon;
+import UtilEntity;
+import UtilGeom;
 import UtilPoint;
 import UtilLine;
 import UtilEntityStyle;
@@ -43,7 +45,7 @@ namespace
 					waitingQueue.pop();
 					resultIds.append(currentId);
 
-					AcDbCurve* pCurve = UtilCommon::getObject<AcDbCurve>(currentId, AcDb::kForRead);
+					AcDbCurve* pCurve = UtilEntity::getObject<AcDbCurve>(currentId, AcDb::kForRead);
 					if (pCurve == nullptr)
 					{
 						continue;
@@ -56,7 +58,7 @@ namespace
 
 						for (const auto& pt : checkPts)
 						{
-							AcDbObjectIdArray neighbors = UtilCommon::getNeighborsAtPoint(pt, pFilter);
+							AcDbObjectIdArray neighbors = UtilGeom::getNeighborsAtPoint(pt, pFilter);
 
 							for (int i = 0; i < neighbors.length(); ++i)
 							{

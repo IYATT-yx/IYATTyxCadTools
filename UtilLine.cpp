@@ -9,14 +9,14 @@ module;
 #include "StdAfx.h"
 
 module UtilLine;
-import UtilCommon;
+import UtilEntity;
 
 namespace UtilLine
 {
 	bool calculateLineIntersection(const AcDbObjectId& lineId1, const AcDbObjectId& lineId2, AcGePoint3dArray& results)
 	{
-		AcDbCurve* pLine1 = UtilCommon::getObject<AcDbCurve>(lineId1, AcDb::kForRead);
-        AcDbCurve* pLine2 = UtilCommon::getObject<AcDbCurve>(lineId2, AcDb::kForRead);
+		AcDbCurve* pLine1 = UtilEntity::getObject<AcDbCurve>(lineId1, AcDb::kForRead);
+        AcDbCurve* pLine2 = UtilEntity::getObject<AcDbCurve>(lineId2, AcDb::kForRead);
 		if (pLine1 == nullptr || pLine2 == nullptr)
 		{
 			return false;

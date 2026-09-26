@@ -9,7 +9,6 @@ module;
 #include "StdAfx.h"
 
 export module UtilBalloonNumber;
-import UtilCommon;
 
 export namespace UtilBalloonNumber
 {

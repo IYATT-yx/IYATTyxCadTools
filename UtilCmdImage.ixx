@@ -13,7 +13,7 @@ import FrameworkCommands;
 import UiUniversalPicker;
 import UiFileDialog;
 import UtilImage;
-import UtilCommon;
+import UtilSystem;
 import FrameworkTranslator;
 
 namespace
@@ -29,8 +29,8 @@ namespace
         UiFileDialog::FileDialogFilterBuilder filterBuilder;
         CString fileFilter = filterBuilder.addFilter(_(L"PNG 图片"), { L"*.png" }).build();
         CString defaultFilename;
-        defaultFilename.Format(_(L"图片%s.png"), UtilCommon::getTimestamp());
-        CString filename = UiFileDialog::ShowSaveFileDialog(_(L"选择图片保存路径"), defaultFilename, L"png", fileFilter, UtilCommon::getCurrPath(true));
+        defaultFilename.Format(_(L"图片%s.png"), UtilSystem::getTimestamp());
+        CString filename = UiFileDialog::ShowSaveFileDialog(_(L"选择图片保存路径"), defaultFilename, L"png", fileFilter, UtilSystem::getCurrPath(true));
         if (filename.IsEmpty())
         {
             acutPrintf(_(L"取消操作"));

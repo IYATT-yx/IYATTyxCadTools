@@ -18,7 +18,7 @@ import FrameworkMiddleClickManager;
 import FrameworkConfigManager;
 import FrameworkImeAutoSwitcher;
 import UiFileDialog;
-import UtilCommon;
+import UtilSystem;
 import FrameworkDocCloseInterceptor;
 
 namespace
@@ -217,7 +217,7 @@ namespace
 
     void cmdLocateDrawing()
     {
-        CString drawingPath = UtilCommon::getCurrPath();
+        CString drawingPath = UtilSystem::getCurrPath();
         if (drawingPath.IsEmpty())
         {
             AfxMessageBox(_(L"图纸未保存"), MB_OK | MB_ICONERROR);

@@ -9,7 +9,7 @@ module;
 #include "StdAfx.h"
 
 export module UtilDimension;
-import UtilCommon;
+import UtilGeom;
 
 export namespace UtilDimension
 {
@@ -36,7 +36,7 @@ export namespace UtilDimension
 		{
 			if (this->angle)
 			{
-				return UtilCommon::rad2deg(this->measured);
+				return UtilGeom::rad2deg(this->measured);
 			}
 			else
 			{

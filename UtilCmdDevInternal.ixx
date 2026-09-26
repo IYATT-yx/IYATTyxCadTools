@@ -12,7 +12,7 @@ export module UtilCmdDevInternal;
 import std;
 import UiUniversalPicker;
 import FrameworkCommands;
-import UtilCommon;
+import UtilEntity;
 import FrameworkTranslator;
 import FrameworkLifecycleInterface;
 
@@ -22,7 +22,7 @@ namespace
 {
     void cmdPrintClassHierarchy()
     {
-        UiUniversalPicker::run(nullptr, UtilCommon::printClassHierarchy, _(L"打印类层次结构"), UiUniversalPicker::SelectMode::Immediate, true);
+        UiUniversalPicker::run(nullptr, UtilEntity::printClassHierarchy, _(L"打印类层次结构"), UiUniversalPicker::SelectMode::Immediate, true);
     }
 
     void cmdUnloadApp()

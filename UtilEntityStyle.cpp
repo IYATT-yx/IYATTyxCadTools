@@ -10,7 +10,7 @@ module;
 
 module UtilEntityStyle;
 
-import UtilCommon;
+import UtilEntity;
 import FrameworkCommands;
 import UiUniversalPicker;
 import FrameworkTranslator;
@@ -19,7 +19,7 @@ namespace UtilEntityStyle
 {
 	void setByLayer(const AcDbObjectId& objId)
 	{
-		AcDbEntity* pEntity = UtilCommon::getObject<AcDbEntity>(objId, AcDb::kForWrite);
+		AcDbEntity* pEntity = UtilEntity::getObject<AcDbEntity>(objId, AcDb::kForWrite);
 		if (pEntity == nullptr)
 		{
 			return;
