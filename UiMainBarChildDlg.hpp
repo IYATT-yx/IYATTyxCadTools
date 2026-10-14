@@ -34,8 +34,13 @@ protected:
 	DECLARE_MESSAGE_MAP()
 private:
 	CListCtrl commandListControl;
-	CEdit searchEditControl;                 // 搜索输入框控件
+	CStatic searchLabelControl;					// 标签
+	CEdit searchEditControl;					// 搜索框
+	CButton clearButtonControl;					// 清空按钮
 	const FrameworkCommands::CommandInfoList* pAllCommands = nullptr;  // 全量命令数据引用（用于实时筛选）
+
+protected:
+	afx_msg void OnBnClickedBtnClear();      // 清空按钮点击事件
 public:
 	virtual BOOL OnInitDialog();
 	/**

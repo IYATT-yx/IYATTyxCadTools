@@ -31,6 +31,7 @@ BEGIN_MESSAGE_MAP(UiMainBarChildDlg, CAcUiDialog)
 	ON_WM_SIZE()
 	ON_NOTIFY(NM_CLICK, IDC_LIST1, &UiMainBarChildDlg::OnNMDblclkList1)
 	ON_EN_CHANGE(IDC_EDIT_SEARCH, &UiMainBarChildDlg::OnEnChangeEditSearch)
+	ON_BN_CLICKED(IDC_BTN_CLEAR, &UiMainBarChildDlg::OnBnClickedBtnClear)			// 绑定清空按钮事件
 END_MESSAGE_MAP()
 
 //-----------------------------------------------------------------------------
@@ -71,13 +72,32 @@ void UiMainBarChildDlg::OnSize(UINT nType, int cx, int cy)
 {
 	CAcUiDialog::OnSize(nType, cx, cy);
 
-	const int editHeight = 22; // 搜索框高度
+	const int editHeight = 22; // 控件统一高度
 	const int margin = 2;     // 控件间距
+	const int labelWidth = 40; // “筛选：”标签宽度
+	const int btnWidth = 50;   // “清空”按钮宽度
 
-	// 定位搜索框（置于顶端）
+	// 定位左侧标签“筛选：”（固定宽高）
+	if (this->searchLabelControl.GetSafeHwnd())
+	{
+		this->searchLabelControl.MoveWindow(0, 0, labelWidth, editHeight);
+	}
+
+	// 定位右侧“清空”按钮（固定宽高，贴紧右侧）
+	if (this->clearButtonControl.GetSafeHwnd())
+	{
+		int btnLeft = cx - btnWidth;
+		if (btnLeft < labelWidth) btnLeft = labelWidth;
+		this->clearButtonControl.MoveWindow(btnLeft, 0, btnWidth, editHeight);
+	}
+
+	// 定位中间的搜索编辑框（宽度随窗口拉伸变大）
 	if (this->searchEditControl.GetSafeHwnd())
 	{
-		this->searchEditControl.MoveWindow(0, 0, cx, editHeight);
+		int editLeft = labelWidth + margin;
+		int editRight = (this->clearButtonControl.GetSafeHwnd()) ? (cx - btnWidth - margin) : cx;
+		int editWidth = (editRight > editLeft) ? (editRight - editLeft) : 0;
+		this->searchEditControl.MoveWindow(editLeft, 0, editWidth, editHeight);
 	}
 
 	// 定位列表控件（起点在搜索框下方：editHeight + margin）
@@ -104,6 +124,12 @@ BOOL UiMainBarChildDlg::OnInitDialog()
 	CAcUiDialog::OnInitDialog();
 
 	CAcModuleResourceOverride resOverride;
+
+	this->searchLabelControl.Create(_(L" 筛选："), WS_CHILD | WS_VISIBLE | SS_CENTERIMAGE, CRect(0, 0, 0, 0), this, IDC_STATIC);
+	this->searchLabelControl.SetFont(this->GetFont());
+
+	this->clearButtonControl.Create(_(L"清空"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, CRect(0, 0, 0, 0), this, IDC_BTN_CLEAR);
+	this->clearButtonControl.SetFont(this->GetFont());
 
 	this->commandListControl.SetExtendedStyle(this->commandListControl.GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
 	this->commandListControl.InsertColumn(0, _(L"命令描述"), LVCFMT_LEFT, 100);
@@ -186,4 +212,13 @@ void UiMainBarChildDlg::OnEnChangeEditSearch()
 	CString filterText;
 	this->searchEditControl.GetWindowText(filterText);
 	this->updateListByFilter(filterText);
+}
+
+void UiMainBarChildDlg::OnBnClickedBtnClear()
+{
+	if (this->searchEditControl.GetSafeHwnd())
+	{
+		this->searchEditControl.SetWindowText(L""); // 清空编辑框文字
+		this->searchEditControl.SetFocus();            // 保持焦点在搜索框
+	}
 }
