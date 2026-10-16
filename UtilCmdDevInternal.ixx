@@ -15,7 +15,7 @@ import FrameworkCommands;
 import UtilEntity;
 import FrameworkTranslator;
 import FrameworkLifecycleInterface;
-
+import UtilConstants;
 import FrameworkActivityInsightsManager;
 
 namespace
@@ -94,6 +94,90 @@ namespace
 
         acutPrintf(L"\n[IYATT-yx] ===== 图纸日志打印结束 (共 %d 项) =====\n", vecUniqueHistory.size());
     }
+    
+    void cmdExportCommandTreeToClipboard()
+    {
+        // 遍历收集命令，构建树状文本
+        // key: 命令组名 (对应插件或模块标识), value: 该组下的所有命令列表
+        std::map<std::wstring, std::vector<std::wstring>> groupMap;
+
+        // 获取全局命令栈迭代器
+        AcEdCommandIterator* iter = acedRegCmds->iterator();
+        for (; iter && !iter->done(); iter->next())
+        {
+            const AcEdCommand* pCmd = iter->command();
+            if (pCmd != nullptr)
+            {
+                const wchar_t* globalNamePtr = pCmd->globalName();
+                const wchar_t* groupNamePtr = iter->commandGroup(); // 获取命令所属的组（插件标识）
+
+                std::wstring gName = (groupNamePtr != nullptr) ? groupNamePtr : L"UNKNOWN_GROUP";
+                std::wstring cName = (globalNamePtr != nullptr) ? globalNamePtr : L"UNKNOWN_CMD";
+
+                groupMap[gName].push_back(cName);
+            }
+        }
+        delete iter;
+
+        // 使用内存字符串流组装清晰的树状结构文本
+        std::wstringstream wss;
+        wss << L"========================================\r\n";
+        wss << _(L"     AutoCAD 已加载插件与命令树状图     \r\n");
+        wss << L"========================================\r\n\r\n";
+
+        wss << _(L"总计命令组数: ") << groupMap.size() << L"\r\n\r\n";
+
+        size_t groupCount = groupMap.size();
+        size_t groupIndex = 0;
+
+        for (const auto& pair : groupMap)
+        {
+            groupIndex++;
+            bool isLastGroup = (groupIndex == groupCount);
+
+            std::wstring groupPrefix = isLastGroup ? L"└── " : L"├── ";
+
+            wss << groupPrefix << _(L"[命令组/模块] ") << pair.first
+                << _(L" (包含命令数: ") << pair.second.size() << L")\r\n";
+
+            const auto& cmdList = pair.second;
+            for (size_t i = 0; i < cmdList.size(); ++i)
+            {
+                bool isLastCmd = (i == cmdList.size() - 1);
+                std::wstring cmdBranchPrefix = isLastGroup ? L"    " : L"│   ";
+                std::wstring cmdPrefix = isLastCmd ? L"└── " : L"├── ";
+
+                wss << cmdBranchPrefix << cmdPrefix << _(L"命令: ") << cmdList[i] << L"\r\n";
+            }
+        }
+
+        std::wstring finalString = wss.str();
+
+        // 将生成的文本直接写入 Windows 剪切板
+        if (OpenClipboard(nullptr))
+        {
+            EmptyClipboard();
+
+            HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, (finalString.length() + 1) * sizeof(wchar_t));
+            if (hMem != nullptr)
+            {
+                void* pMem = GlobalLock(hMem);
+                if (pMem != nullptr)
+                {
+                    memcpy(pMem, finalString.c_str(), (finalString.length() + 1) * sizeof(wchar_t));
+                    GlobalUnlock(hMem);
+                    SetClipboardData(CF_UNICODETEXT, hMem);
+                }
+            }
+            CloseClipboard();
+
+            acutPrintf(_(L"\n命令树状图已成功复制到剪切板！请直接按 Ctrl+V 粘贴查看。"));
+        }
+        else
+        {
+            acutPrintf(_(L"\n错误: 无法打开系统剪切板！"));
+        }
+    }
 
     FrameworkCommands::AutoRegister ar =
     {
@@ -101,5 +185,6 @@ namespace
         { L"yxRestart", []() { return _(L"重启本插件"); }, FrameworkCommands::CommandFlags::Base, cmdRestartApp },
         { L"yxUnload", []() { return _(L"关闭本插件"); }, FrameworkCommands::CommandFlags::Base, cmdUnloadApp },
         { L"yxTest", []() { return _(L"测试"); }, FrameworkCommands::CommandFlags::Base, test },
+        { L"yxExportCommandTree", []() { return _(L"导出命令树状图到剪贴板"); } , FrameworkCommands::CommandFlags::Base, cmdExportCommandTreeToClipboard},
     };
 }
