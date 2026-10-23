@@ -107,6 +107,13 @@ export namespace UtilBalloonNumber
 	 * @return true 表示匹配；false 表示不匹配
 	 */
 	bool meetCriteria(const AcString& attrValue, const AcString& criteria);
+
+	/**
+	 * @brief 判断是否为气泡号块
+	 * @param blockRefId 块参照 ID
+	 * @return true 表示是气泡号块；false 表示不是
+	 */
+	bool isBalloonNumberBlock(const AcDbObjectId& blockRefId);
 }
 
 namespace UtilBalloonNumber

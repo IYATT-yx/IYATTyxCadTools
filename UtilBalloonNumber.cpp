@@ -333,7 +333,7 @@ namespace UtilBalloonNumber
         delete pIt;
     }
 
-    bool getBalloonAttributeValue(const AcDbObjectId& blockRefId, AcString& outValue)
+    bool isBalloonNumberBlock(const AcDbObjectId& blockRefId)
     {
         AcDbBlockReference* pBlkRef = UtilEntity::getObject<AcDbBlockReference>(blockRefId, AcDb::kForRead);
         if (pBlkRef == nullptr)
@@ -354,16 +354,23 @@ namespace UtilBalloonNumber
                 bNameMatch = true;
             }
             acutDelString(pBlockName);
-            pBTR->close();
         }
+        return bNameMatch;
+    }
 
-        if (!bNameMatch)
+    bool getBalloonAttributeValue(const AcDbObjectId& blockRefId, AcString& outValue)
+    {
+        if (!UtilBalloonNumber::isBalloonNumberBlock(blockRefId))
         {
-            pBlkRef->close();
-            return false;
+            return false;;
         }
 
         bool bFound = false;
+        AcDbBlockReference* pBlkRef = UtilEntity::getObject<AcDbBlockReference>(blockRefId, AcDb::kForRead);
+        if (pBlkRef == nullptr)
+        {
+            return false;
+        }
         AcDbObjectIterator* pAttIt = pBlkRef->attributeIterator();
         for (pAttIt->start(); !pAttIt->done(); pAttIt->step())
         {
@@ -385,7 +392,6 @@ namespace UtilBalloonNumber
         }
 
         delete pAttIt;
-        pBlkRef->close();
         return bFound;
     }
 
