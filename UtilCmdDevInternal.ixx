@@ -181,10 +181,10 @@ namespace
 
     FrameworkCommands::AutoRegister ar =
     {
-        { L"yxPrintClassHierarchy", []() { return _(L"打印类层次结构"); }, FrameworkCommands::CommandFlags::Base, cmdPrintClassHierarchy },
+        { L"yxClass", []() { return _(L"打印类层次结构"); }, FrameworkCommands::CommandFlags::Base, cmdPrintClassHierarchy },
         { L"yxRestart", []() { return _(L"重启本插件"); }, FrameworkCommands::CommandFlags::Base, cmdRestartApp },
         { L"yxUnload", []() { return _(L"关闭本插件"); }, FrameworkCommands::CommandFlags::Base, cmdUnloadApp },
         { L"yxTest", []() { return _(L"测试"); }, FrameworkCommands::CommandFlags::Base, test },
-        { L"yxExportCommandTree", []() { return _(L"导出命令树状图到剪贴板"); } , FrameworkCommands::CommandFlags::Base, cmdExportCommandTreeToClipboard},
+        { L"yxTree", []() { return _(L"导出已注册命令树状图到剪贴板"); } , FrameworkCommands::CommandFlags::Base, cmdExportCommandTreeToClipboard},
     };
 }

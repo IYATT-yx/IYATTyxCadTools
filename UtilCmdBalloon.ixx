@@ -522,13 +522,13 @@ namespace
 
     FrameworkCommands::AutoRegister ar =
     {
-        { L"yxInsertBalloonNumberBlockWithStartNumber", []() { return  _(L"插入带起始编号的气泡号"); }, FrameworkCommands::CommandFlags::Base, cmdInsertBalloonNumberBlockWithStartNumber },
-        { L"yxUpdateBalloonNumberBlock", []() { return  _(L"更新气泡号"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdUpdateBalloonNumberBlock },
-        { L"yxBalloonNumberOffset", []() { return  _(L"偏置气泡号"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdBalloonNumberOffset },
-        { L"yxBalloonNumberFilter", []() { return  _(L"筛选气泡号"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdBalloonNumberFilter },
-        { L"yxCheckBalloonNumberMaxMin", []() { return  _(L"查找气泡号最大和最小序号"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdCheckBalloonNumberMaxMin },
-        { L"yxCheckDuplicateBalloonNumbers", []() { return  _(L"检查重复气泡号"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdCheckDuplicateBalloonNumbers },
-        { L"yxCheckBalloonNumberBreakpoints", []() { return  _(L"检查气泡号断点"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdCheckBalloonNumberBreakpoints },
-        { L"yxSelectBalloonNumberBlock", []() { return  _(L"从已选择实体中选择出气泡号"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdSelectBalloonNumberBlock },
+        { L"yxBlAdd", []() { return _(L"插入带起始编号的气泡号"); }, FrameworkCommands::CommandFlags::Base, cmdInsertBalloonNumberBlockWithStartNumber },
+        { L"yxBlUpd", []() { return _(L"更新气泡号"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdUpdateBalloonNumberBlock },
+        { L"yxBlOff", []() { return _(L"偏置气泡号"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdBalloonNumberOffset },
+        { L"yxBlFlt", []() { return _(L"筛选气泡号"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdBalloonNumberFilter },
+        { L"yxBlMinMax", []() { return _(L"查找气泡号最大和最小序号"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdCheckBalloonNumberMaxMin },
+        { L"yxBlChkDup", []() { return _(L"检查重复气泡号"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdCheckDuplicateBalloonNumbers },
+        { L"yxBlChkBrk", []() { return _(L"检查气泡号断点"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdCheckBalloonNumberBreakpoints },
+        { L"yxBlSel", []() { return _(L"从已选择实体中选择出气泡号"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdSelectBalloonNumberBlock },
     };
 }

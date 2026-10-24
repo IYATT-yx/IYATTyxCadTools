@@ -70,7 +70,7 @@ namespace
 
     FrameworkCommands::AutoRegister ar =
     {
-        { L"yxPasteClipImage", []() { return _(L"将剪贴板中的截图/图像数据保存到文件并插入图纸中"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdPasteClipImage },
-        { L"yxForceRemoveImage", []() { return _(L"删除光栅图像及图片文件（无法撤销恢复）"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdForceRemoveImage }
+        { L"yxImgPaste", []() { return _(L"将剪贴板中的截图/图像数据保存到文件并插入图纸中"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdPasteClipImage },
+        { L"yxImgDel", []() { return _(L"删除光栅图像及图片文件（无法撤销恢复）"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdForceRemoveImage }
     };
 }

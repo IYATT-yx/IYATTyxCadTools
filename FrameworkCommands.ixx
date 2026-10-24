@@ -25,31 +25,6 @@ export namespace FrameworkCommands
 		AcString commandDescription;  // 命令描述
 		FrameworkCommands::CommandFlags flags; // 命令标志
 		AcRxFunctionPtr proc;         // 命令处理函数
-
-		/**
-		 * @brief 获取命令的简名
-		 * @return 命令简名。yx 开头，加命令全名中的大写字母拼接。
-		 */
-		AcString getShortCommandName() const
-		{
-			AcString prefix = L"yx";
-
-			if (this->commandName.isEmpty())
-			{
-				return prefix;
-			}
-
-			AcString shortCommandName;
-			for (size_t i = 0; i < this->commandName.length(); ++i)
-			{
-				wchar_t ch = this->commandName[i];
-				if (iswupper(ch))
-				{
-					shortCommandName += ch;
-				}
-			}
-			return prefix + shortCommandName;
-		}
 	};
 
 	using CommandInfoList = std::vector<FrameworkCommands::CommandInfo>;

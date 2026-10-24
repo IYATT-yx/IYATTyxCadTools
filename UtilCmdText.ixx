@@ -197,8 +197,8 @@ namespace
 
 	FrameworkCommands::AutoRegister ar =
 	{
-		{ L"yxCloneText", []() { return _(L"将多行/单行文本内容复制给其它多行/单行文本"); }, FrameworkCommands::CommandFlags::Base, cmdCloneText },
-		{ L"yxImportCsvToMTextMatrix", []() { return _(L"从 CSV 文件导入数据生成多行文本矩阵"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdImportCsvToMTextMatrix },
-		{ L"yxSpatialTableExplorer", []() { return _(L"将多行/单行文本按空间位置表格化导出到 CSV 文件"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdSpatialTableExplorer },
+		{ L"yxTxtClone", []() { return _(L"将多行/单行文本内容复制给其它多行/单行文本"); }, FrameworkCommands::CommandFlags::Base, cmdCloneText },
+		{ L"yxCsvImp", []() { return _(L"从 CSV 文件导入数据生成多行文本矩阵"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdImportCsvToMTextMatrix },
+		{ L"yxTblExp", []() { return _(L"将多行/单行文本按空间位置表格化导出到 CSV 文件"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdSpatialTableExplorer },
 	};
 }

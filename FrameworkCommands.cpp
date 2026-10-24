@@ -48,10 +48,6 @@ namespace FrameworkCommands
 
 			// 注册命令全名
 			acedRegCmds->addCommand(UtilConstants::cmdGroup, info.commandName.constPtr(), info.commandName.constPtr(), info.flags, info.proc);
-
-			// 注册命令简称
-			AcString shortCommandName = info.getShortCommandName();
-			acedRegCmds->addCommand(UtilConstants::cmdGroup, shortCommandName.constPtr(), shortCommandName.constPtr(), info.flags, info.proc);
 		}
 	}
 

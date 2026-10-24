@@ -335,15 +335,15 @@ namespace
 
 	FrameworkCommands::AutoRegister ar =
 	{
-		{ L"yxDimensionSolidify", []() { return  _(L"尺寸固化"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdDimensionSolidify },
-		{ L"yxDimensionReslink", []() { return  _(L"尺寸恢复关联"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdDimensionRelink },
-		{ L"yxDimensionTolerancePrecision", []() { return _(L"设置尺寸标注的主单位精度和公差精度"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdDimensionTolerancePrecision },
-		{ L"yxAddSurroundingCharsForDimension", []() { return _(L"为标注添加前后缀"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdAddSurroundingCharsForDimension },
-		{ L"yxRemoveSurroundingCharsForDimension", []() { return _(L"为标注移除前后缀"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdRemoveSurroundingCharsForDimension },
-		{ L"yxSetBasicBox", []() { return _(L"设置理论尺寸框"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdSetBasicBox },
-		{ L"yxUnsetBasicBox", []() { return _(L"取消理论尺寸框"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdUnsetBasicBox },
-		{ L"yxSetRefDim", []() { return _(L"设置参考尺寸括号"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdSetRefDim },
-		{ L"yxUnsetRefDim", []() { return _(L"取消参考尺寸括号"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdUnsetRefDim },
-		{ L"yxExtractAnnotations", []() { return _(L"提取标注到CSV文件"); }, FrameworkCommands::CommandFlags::Base, cmdExtractAnnotations },
+		{ L"yxDimSolid", []() { return _(L"尺寸固化"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdDimensionSolidify },
+		{ L"yxDimRel", []() { return _(L"尺寸恢复关联"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdDimensionRelink },
+		{ L"yxDimPrec", []() { return _(L"设置尺寸标注的主单位精度和公差精度"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdDimensionTolerancePrecision },
+		{ L"yxDimAdd", []() { return _(L"为标注添加前后缀"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdAddSurroundingCharsForDimension },
+		{ L"yxDimDel", []() { return _(L"为标注移除前后缀"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdRemoveSurroundingCharsForDimension },
+		{ L"yxDimBox", []() { return _(L"设置理论尺寸框"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdSetBasicBox },
+		{ L"yxDimUnbox", []() { return _(L"取消理论尺寸框"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdUnsetBasicBox },
+		{ L"yxDimRef", []() { return _(L"设置参考尺寸括号"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdSetRefDim },
+		{ L"yxDimUnref", []() { return _(L"取消参考尺寸括号"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdUnsetRefDim },
+		{ L"yxDimExp", []() { return _(L"提取标注到CSV文件"); }, FrameworkCommands::CommandFlags::Base, cmdExtractAnnotations },
 	};
 }

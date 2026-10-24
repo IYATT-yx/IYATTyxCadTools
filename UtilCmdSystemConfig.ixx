@@ -326,13 +326,13 @@ namespace
     FrameworkCommands::AutoRegister ar =
     {
         { L"yx", []() { return _(L"显示或隐藏命令菜单"); }, FrameworkCommands::CommandFlags::Base, yx },
-        { L"yxDialogMiddleClickToOk", []() { return _(L"设置对话框中鼠标中键映射到确定按钮"); }, FrameworkCommands::CommandFlags::Base, cmdDialogMiddleClickToOk },
-        { L"yxCmdMiddleClickToEnter", []() { return _(L"设置命令执行状态下鼠标中键映射回车键"); }, FrameworkCommands::CommandFlags::Base, cmdCmdMiddleClickToEnter },
-        { L"yxImeAutoSwitch", []() { return _(L"设置输入法自动切换"); }, FrameworkCommands::CommandFlags::Base, cmdImeAutoSwitch },
-        { L"yxLocateDrawing", []() { return _(L"打开图纸所在的位置"); }, FrameworkCommands::CommandFlags::Base, cmdLocateDrawing },
-        { L"yxLocateSelf", []() { return _(L"打开本工具所在的位置"); }, FrameworkCommands::CommandFlags::Base, cmdLocateSelf },
-        { L"yxOpenConfigFile", []() { return _(L"打开配置文件所在的位置"); }, FrameworkCommands::CommandFlags::Base, cmdOpenConfigFile },
-        { L"yxSetLanguage", []() { return _(L"设置语言"); }, FrameworkCommands::CommandFlags::Base, cmdSetLanguage },
-        { L"yxSkipSavePromptOnViewChangesEnabled", []() { return _(L"设置跳过仅视图修改时的文件保存提示"); }, FrameworkCommands::CommandFlags::Base, cmdClosePrompt },
+        { L"yxDlgMid", []() { return _(L"设置对话框中鼠标中键映射到确定按钮"); }, FrameworkCommands::CommandFlags::Base, cmdDialogMiddleClickToOk },
+        { L"yxCmdMid", []() { return _(L"设置命令执行状态下鼠标中键映射回车键"); }, FrameworkCommands::CommandFlags::Base, cmdCmdMiddleClickToEnter },
+        { L"yxIme", []() { return _(L"设置输入法自动切换"); }, FrameworkCommands::CommandFlags::Base, cmdImeAutoSwitch },
+        { L"yxLocDrw", []() { return _(L"打开图纸所在的位置"); }, FrameworkCommands::CommandFlags::Base, cmdLocateDrawing },
+        { L"yxLocSelf", []() { return _(L"打开本工具所在的位置"); }, FrameworkCommands::CommandFlags::Base, cmdLocateSelf },
+        { L"yxCfgOpen", []() { return _(L"打开配置文件所在的位置"); }, FrameworkCommands::CommandFlags::Base, cmdOpenConfigFile },
+        { L"yxLang", []() { return _(L"设置语言"); }, FrameworkCommands::CommandFlags::Base, cmdSetLanguage },
+        { L"yxSkipSave", []() { return _(L"设置跳过仅视图修改时的文件保存提示"); }, FrameworkCommands::CommandFlags::Base, cmdClosePrompt },
     };
 }
