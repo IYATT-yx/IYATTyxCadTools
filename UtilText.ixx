@@ -111,4 +111,11 @@ export namespace UtilText
 	 * @param matrix   [out] 输出的二维矩阵引用。内部使用 std::move 优化以减少拷贝开销
 	 */
 	void structureTextToAcStringMatrix(const UtilText::TextEntityDataList& elements, double xTol, double yTol, UtilIoCsvModule::AcStringMatrix& matrix);
+
+	/**
+	 * @brief 去除指定文字的内嵌格式代码，转换为纯文本
+	 * @param id 文字对象 id
+	 * @return 操作是否成功
+	 */
+	bool stripTextEntityFormat(const AcDbObjectId& id);
 }

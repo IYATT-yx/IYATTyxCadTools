@@ -195,10 +195,32 @@ namespace
 		acutPrintf(_(L"\n文件位置：%s"), strFilePath);
 	}
 
+	void cmdStripTextEntityFormat()
+	{
+		size_t count = 0;
+		UiUniversalPicker::run(
+			&UtilText::textClassList,
+			[&count](const AcDbObjectId& id)
+			{
+				if (UtilText::stripTextEntityFormat(id))
+				{
+					++count;
+				}
+			},
+			_(L"去除多行/单行文本格式"),
+			UiUniversalPicker::SelectMode::Batch,
+			false,
+			UiUniversalPicker::SortMode::None,
+			true
+		);
+        acutPrintf(_(L"\n已处理 %d 个文本"), count);
+	}
+
 	FrameworkCommands::AutoRegister ar =
 	{
 		{ L"yxTxtClone", []() { return _(L"将多行/单行文本内容复制给其它多行/单行文本"); }, FrameworkCommands::CommandFlags::Base, cmdCloneText },
 		{ L"yxCsvImp", []() { return _(L"从 CSV 文件导入数据生成多行文本矩阵"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdImportCsvToMTextMatrix },
 		{ L"yxTblExp", []() { return _(L"将多行/单行文本按空间位置表格化导出到 CSV 文件"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdSpatialTableExplorer },
+		{ L"yxStripText", []() { return _(L"去除多行/单行文本格式"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdStripTextEntityFormat },
 	};
 }

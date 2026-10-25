@@ -136,6 +136,30 @@ namespace UtilText
 		mtext.text(text);
 	}
 
+	bool stripTextEntityFormat(const AcDbObjectId& id)
+	{
+		AcString text;
+		bool bSuccess = false;
+
+		if (readMText(id, text, false))
+		{
+			bSuccess = true;
+		}
+		else if (readDText(id, text, false))
+		{
+			bSuccess = true;
+		}
+
+		if (!bSuccess || text.isEmpty())
+		{
+			return false;
+		}
+
+		updateTextEntityContent(id, text);
+
+		return true;
+	}
+
 	bool getSelectedTextRawContent(AcString& content)
 	{
 		AcDbObjectId srcId;
