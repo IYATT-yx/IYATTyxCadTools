@@ -111,9 +111,17 @@ export namespace UtilBalloonNumber
 	/**
 	 * @brief 判断是否为气泡号块
 	 * @param blockRefId 块参照 ID
+	 * @param checkNumber 检查是否为数字气泡号
+	 * @param outNum 输出参数，如果为数字气泡号，则输出数字
 	 * @return true 表示是气泡号块；false 表示不是
 	 */
-	bool isBalloonNumberBlock(const AcDbObjectId& blockRefId);
+	bool isBalloonNumberBlock(const AcDbObjectId& blockRefId, bool checkIsNumber = true, int* outNum = nullptr);
+
+	/**
+	 * @brief 按气泡号数字顺序将指定的块参照对象依次用折线连接
+	 * @param idArray 气泡号块参照的 ObjectId 数组
+	 */
+	void connectBalloonNumbersByOrder(const AcDbObjectIdArray& idArray);
 }
 
 namespace UtilBalloonNumber

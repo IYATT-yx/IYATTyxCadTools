@@ -333,7 +333,7 @@ namespace UtilBalloonNumber
         delete pIt;
     }
 
-    bool isBalloonNumberBlock(const AcDbObjectId& blockRefId)
+    bool isBalloonNumberBlock(const AcDbObjectId& blockRefId, bool checkIsNumber, int* outNum)
     {
         AcDbBlockReference* pBlkRef = UtilEntity::getObject<AcDbBlockReference>(blockRefId, AcDb::kForRead);
         if (pBlkRef == nullptr)
@@ -341,7 +341,7 @@ namespace UtilBalloonNumber
             return false;
         }
 
-        bool bNameMatch = false;
+        bool bMatch = false;
         AcDbObjectId btrId = pBlkRef->blockTableRecord();
         AcDbBlockTableRecord* pBTR = UtilEntity::getObject<AcDbBlockTableRecord>(btrId, AcDb::kForRead);
 
@@ -351,20 +351,49 @@ namespace UtilBalloonNumber
             pBTR->getName(pBlockName);
             if (AcString(pBlockName) == UtilConstants::BalloonNumberBlock::getBlockName())
             {
-                bNameMatch = true;
+                if (checkIsNumber)
+                {
+                    AcString currVal;
+                    if (getBalloonAttributeValue(blockRefId, currVal))
+                    {
+                        bool bHasError = false;
+                        try
+                        {
+                            std::wstring wstr(currVal.constPtr());
+                            size_t pos = 0;
+                            int val = std::stoi(wstr, &pos);
+                            if (pos != wstr.length())
+                            {
+                                throw std::exception();
+                            }
+
+                            if (outNum != nullptr)
+                            {
+                                *outNum = val;
+                            }
+                        }
+                        catch (...)
+                        {
+                            bHasError = true;
+                        }
+                        if (!bHasError)
+                        {
+                            bMatch = true;
+                        }
+                    }
+                }
+                else
+                {
+                    bMatch = true;
+                }
             }
             acutDelString(pBlockName);
         }
-        return bNameMatch;
+        return bMatch;
     }
 
     bool getBalloonAttributeValue(const AcDbObjectId& blockRefId, AcString& outValue)
     {
-        if (!UtilBalloonNumber::isBalloonNumberBlock(blockRefId))
-        {
-            return false;;
-        }
-
         bool bFound = false;
         AcDbBlockReference* pBlkRef = UtilEntity::getObject<AcDbBlockReference>(blockRefId, AcDb::kForRead);
         if (pBlkRef == nullptr)
@@ -397,36 +426,21 @@ namespace UtilBalloonNumber
 
     void balloonNumberOffset(const AcDbObjectId& id, int offset)
     {
-        AcString currVal;
-        if (!UtilBalloonNumber::getBalloonAttributeValue(id, currVal))
+        int num = -1;
+        if (!UtilBalloonNumber::isBalloonNumberBlock(id, true, &num))
         {
+            acutPrintf(_(L"\n未找到有效的气泡号块"));
             return;
         }
 
-        acutPrintf(_(L"\n读取到气泡号编号：%s"), currVal.constPtr());
-        try
+        int newVal = num + offset;
+        if (newVal < 0)
         {
-            std::wstring wstr(currVal.constPtr());
-            size_t pos = 0;
-            int val = std::stoi(wstr, &pos);
-            if (pos != wstr.length())
-            {
-                throw std::exception();
-            }
-
-            int newVal = val + offset;
-            if (newVal < 0)
-            {
-                newVal = 0;
-                acutPrintf(_(L"\n偏置后气泡号编号小于 0，已重置为 0"));
-            }
-            acutPrintf(_(L"\n偏置后气泡号编号：%d"), newVal);
-            UtilBalloonNumber::updateBalloonNumberBlock(id, newVal);
+            newVal = 0;
+            acutPrintf(_(L"\n偏置后气泡号编号将会小于 0，已重置为 0"));
         }
-        catch (...)
-        {
-            acutPrintf(_(L"\n偏置气泡号失败，气泡号值可能不是数字"));
-        }
+        UtilBalloonNumber::updateBalloonNumberBlock(id, newVal);
+        acutPrintf(_(L"\n原气泡号：%d，偏置后气泡号：%d"), num, newVal);
     }
 
     bool meetCriteria(const AcString& attrValue, const AcString& criteria)
@@ -488,5 +502,79 @@ namespace UtilBalloonNumber
             return false;
         }
         return false;
+    }
+
+    void connectBalloonNumbersByOrder(const AcDbObjectIdArray& idArray)
+    {
+        if (idArray.isEmpty())
+        {
+            return;
+        }
+
+        // 定义结构体用于存储解析出的气泡号及对应的插入点
+        struct BalloonNode
+        {
+            int number;
+            AcGePoint3d point;
+        };
+
+        std::vector<BalloonNode> nodes;
+        int num = -1;
+        nodes.reserve(idArray.length());
+
+        // 遍历数组，过滤并提取有效气泡号及其插入点
+        for (int i = 0; i < idArray.length(); ++i)
+        {
+            const AcDbObjectId& id = idArray[i];
+            if (!isBalloonNumberBlock(id, true, &num))
+            {
+                continue;
+            }
+
+            AcDbBlockReference* pBlkRef = UtilEntity::getObject<AcDbBlockReference>(id, AcDb::kForRead);
+            if (pBlkRef != nullptr)
+            {
+                nodes.push_back({ num, pBlkRef->position() });
+            }
+        }
+
+        if (nodes.empty())
+        {
+            return;
+        }
+
+        // 按照气泡号数字升序排序
+        std::sort(nodes.begin(), nodes.end(), [](const BalloonNode& a, const BalloonNode& b) {
+            return a.number < b.number;
+            });
+
+        // 创建二维多段线 (AcDbPolyline)
+        AcDbPolyline* pPolyline = new AcDbPolyline(static_cast<Adesk::UInt32>(nodes.size()));
+
+        // 设置多项式基准标高（以第一个点为准）
+        pPolyline->setElevation(nodes[0].point.z);
+
+        for (size_t i = 0; i < nodes.size(); ++i)
+        {
+            AcGePoint2d pt2d(nodes[i].point.x, nodes[i].point.y);
+            pPolyline->addVertexAt(static_cast<unsigned int>(i), pt2d);
+        }
+
+        // 将多段线写入模型空间
+        AcDbDatabase* pDb = acdbHostApplicationServices()->workingDatabase();
+        AcDbBlockTable* pBT = nullptr;
+        if (pDb->getBlockTable(pBT, AcDb::kForWrite) == Acad::eOk)
+        {
+            AcDbBlockTableRecord* pMs = nullptr;
+            if (pBT->getAt(ACDB_MODEL_SPACE, pMs, AcDb::kForWrite) == Acad::eOk)
+            {
+                AcDbObjectId entId;
+                pMs->appendAcDbEntity(entId, pPolyline);
+                pMs->close();
+            }
+            pBT->close();
+        }
+
+        pPolyline->close();
     }
 }

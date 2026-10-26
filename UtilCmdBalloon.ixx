@@ -520,9 +520,39 @@ namespace
         }
     }
 
+    void cmdConnectBalloonNumbersByOrder()
+    {
+        UiUniversalPicker::AcRxClassVector arcv = { AcDbBlockReference::desc() };
+        AcDbObjectIdArray resultIds;
+        UiUniversalPicker::run(
+            &arcv,
+            [&resultIds](const AcDbObjectId& id)
+            {
+                if (UtilBalloonNumber::isBalloonNumberBlock(id))
+                {
+                    resultIds.append(id);
+                }
+            },
+            _(L"连接气泡号"),
+            UiUniversalPicker::SelectMode::Batch,
+            true,
+            UiUniversalPicker::SortMode::None,
+            true
+        );
+
+        if (resultIds.length() > 1)
+        {
+            UtilBalloonNumber::connectBalloonNumbersByOrder(resultIds);
+        }
+        else
+        {
+            acutPrintf(_(L"请选择至少 2 个气泡号"));
+        }
+    }
+
     FrameworkCommands::AutoRegister ar =
     {
-        { L"yxBlAdd", []() { return _(L"插入带起始编号的气泡号"); }, FrameworkCommands::CommandFlags::Base, cmdInsertBalloonNumberBlockWithStartNumber },
+        { L"yxBlAdd", []() { return _(L"插入气泡号"); }, FrameworkCommands::CommandFlags::Base, cmdInsertBalloonNumberBlockWithStartNumber },
         { L"yxBlUpd", []() { return _(L"更新气泡号"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdUpdateBalloonNumberBlock },
         { L"yxBlOff", []() { return _(L"偏置气泡号"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdBalloonNumberOffset },
         { L"yxBlFlt", []() { return _(L"筛选气泡号"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdBalloonNumberFilter },
@@ -530,5 +560,6 @@ namespace
         { L"yxBlChkDup", []() { return _(L"检查重复气泡号"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdCheckDuplicateBalloonNumbers },
         { L"yxBlChkBrk", []() { return _(L"检查气泡号断点"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdCheckBalloonNumberBreakpoints },
         { L"yxBlSel", []() { return _(L"从已选择实体中选择出气泡号"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdSelectBalloonNumberBlock },
+        { L"yxBlConn", []() { return _(L"连接气泡号"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdConnectBalloonNumbersByOrder },
     };
 }
