@@ -44,7 +44,10 @@ public:
 		AcRx::AppRetCode retCode =AcRxArxApp::On_kInitAppMsg (pkt) ;
 		
 		// TODO: Add your initialization code here
-		FrameworkLifecycleInterface::init();
+		if (!FrameworkLifecycleInterface::init())
+		{
+            retCode = AcRx::kRetError;
+		}
 
 		return (retCode) ;
 	}

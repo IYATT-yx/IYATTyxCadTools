@@ -10,7 +10,7 @@ export module FrameworkLifecycleInterface;
 export class FrameworkLifecycleInterface
 {
 public:
-	static void init();
+	static bool init();
 	static void unload();
 	static void cmdYx();
 private:

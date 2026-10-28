@@ -20,7 +20,7 @@ import FrameworkImeAutoSwitcher;
 import FrameworkMiddleClickManager;
 import UtilSystem;
 
-void FrameworkLifecycleInterface::init()
+bool FrameworkLifecycleInterface::init()
 {
     // 读取配置文件
     auto& manager = FrameworkConfigManager::getInstance();
@@ -28,13 +28,14 @@ void FrameworkLifecycleInterface::init()
     if (!appPath.has_value())
     {
         AfxMessageBox(L"Failed to get application data directory", MB_OK | MB_ICONERROR);
-        return;
+        return false;
     }
     std::filesystem::path configPathObj = appPath.value() / UtilConstants::Config::configName;
     if (!manager.loadConfig(configPathObj.wstring()))
     {
         std::wstring err = manager.getLastError();
         AfxMessageBox(err.c_str(), MB_OK | MB_ICONERROR);
+        return false;
     }
     auto& config = manager.getConfig();
 
@@ -46,13 +47,16 @@ void FrameworkLifecycleInterface::init()
     if (!translator.initialize(localesDir, config.languageSettings.languageCode))
     {
         AfxMessageBox(L"Initialize translator failed", MB_OK | MB_ICONERROR);
-        return;
+        return false;
     }
 
     FrameworkLifecycleInterface::info();
 
     // 注册命令
-    FrameworkCommands::registerYxCmds();
+    if (!FrameworkCommands::registerYxCmds())
+    {
+        return false;
+    }
 
     // 输入法语言自动切换
     if (config.imeSettings.bEnabled)
@@ -71,6 +75,8 @@ void FrameworkLifecycleInterface::init()
 
     // 显示命令报表悬浮窗
     UiMainBar::showBar(FrameworkCommands::commandInfoList);
+
+    return true;
 }
 
 void FrameworkLifecycleInterface::info()
