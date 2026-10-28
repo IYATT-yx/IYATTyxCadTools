@@ -23,17 +23,17 @@ import UtilString;
 
 namespace
 {
-	void cmdDimensionSolidify()
+	void cmdDimensionSolidify(const UiUniversalPicker::SelectMode& selectMode)
 	{
-		UiUniversalPicker::run(&UtilConstants::DimensionSubClasses, UtilDimension::dimensionSolidify, _(L"尺寸固化"));
+		UiUniversalPicker::run(&UtilConstants::DimensionSubClasses, UtilDimension::dimensionSolidify, _(L"尺寸固化"), selectMode, true);
 	}
 
-	void cmdDimensionRelink()
+	void cmdDimensionRelink(const UiUniversalPicker::SelectMode& selectMode)
 	{
-		UiUniversalPicker::run(&UtilConstants::DimensionSubClasses, UtilDimension::dimensionRelink, _(L"尺寸恢复关联"));
+		UiUniversalPicker::run(&UtilConstants::DimensionSubClasses, UtilDimension::dimensionRelink, _(L"尺寸恢复关联"), selectMode, true);
 	}
 
-	void cmdDimensionTolerancePrecision()
+	void cmdDimensionTolerancePrecision(const UiUniversalPicker::SelectMode& selectMode)
 	{
 		CAcModuleResourceOverride resOverride;
 		UiGenericPairEditDlg dlg(_(L"设置尺寸标注的主单位精度和公差精度"), _(L"主单位精度"), _(L"公差精度"), false, true, true);
@@ -97,14 +97,12 @@ namespace
 				UtilDimension::setDimensionTolerancePreccision(id, iDimPrec, iTolPrec);
 			},
 			_(L"设置尺寸标注的主单位精度和公差精度"),
-			UiUniversalPicker::SelectMode::Immediate,
-			false,
-			UiUniversalPicker::SortMode::None,
+			selectMode,
 			true
 		);
 	}
 
-	void cmdAddSurroundingCharsForDimension()
+	void cmdAddSurroundingCharsForDimension(const UiUniversalPicker::SelectMode& selectMode)
 	{
 		CAcModuleResourceOverride resOverride;
 		UiGenericPairEditDlg dlg(_(L"为标注添加前后缀"), _(L"前缀符号"), _(L"后缀符号"));
@@ -131,11 +129,12 @@ namespace
 				UtilDimension::addSurroundingCharsForDimension(objId, left, right, isLGdt, isRGdt);
 			},
 			_(L"为标注添加前后缀"),
-			UiUniversalPicker::SelectMode::Immediate
+			selectMode,
+			true
 		);
 	}
 
-	void cmdRemoveSurroundingCharsForDimension()
+	void cmdRemoveSurroundingCharsForDimension(const UiUniversalPicker::SelectMode& selectMode)
 	{
 		CAcModuleResourceOverride resOverride;
 		UiGenericPairEditDlg dlg(_(L"为标注移除前后缀"), _(L"前缀符号"), _(L"后缀符号"));
@@ -162,11 +161,12 @@ namespace
 				UtilDimension::removeSurroundingCharsForDimension(objId, left, right, isLGdt, isRGdt);
 			},
 			_(L"为标注移除前后缀"),
-			UiUniversalPicker::SelectMode::Immediate
+			selectMode,
+			true
 		);
 	}
 
-	void cmdSetBasicBox()
+	void cmdSetBasicBox(const UiUniversalPicker::SelectMode& selectMode)
 	{
 		UiUniversalPicker::run(
 			&UtilConstants::DimensionSubClasses,
@@ -175,11 +175,12 @@ namespace
 				UtilDimension::setAndUnsetBasicBox(objId, true);
 			},
 			_(L"设置理论尺寸框"),
-			UiUniversalPicker::SelectMode::Immediate
+			selectMode,
+			true
 		);
 	}
 
-	void cmdUnsetBasicBox()
+	void cmdUnsetBasicBox(const UiUniversalPicker::SelectMode& selectMode)
 	{
 		UiUniversalPicker::run(
 			&UtilConstants::DimensionSubClasses,
@@ -188,11 +189,12 @@ namespace
 				UtilDimension::setAndUnsetBasicBox(objId, false);
 			},
 			_(L"取消理论尺寸框"),
-			UiUniversalPicker::SelectMode::Immediate
+			selectMode,
+			true
 		);
 	}
 
-	void cmdSetRefDim()
+	void cmdSetRefDim(const UiUniversalPicker::SelectMode& selectMode)
 	{
 		UiUniversalPicker::run(
 			&UtilConstants::DimensionSubClasses,
@@ -201,11 +203,12 @@ namespace
 				UtilDimension::setAndUnsetRefDim(objId, true);
 			},
 			_(L"设置参考尺寸括号"),
-			UiUniversalPicker::SelectMode::Immediate
+			selectMode,
+			true
 		);
 	}
 
-	void cmdUnsetRefDim()
+	void cmdUnsetRefDim(const UiUniversalPicker::SelectMode& selectMode)
 	{
 		UiUniversalPicker::run(
 			&UtilConstants::DimensionSubClasses,
@@ -214,11 +217,12 @@ namespace
 				UtilDimension::setAndUnsetRefDim(objId, false);
 			},
 			_(L"取消理论尺寸括号"),
-			UiUniversalPicker::SelectMode::Immediate
+			selectMode,
+			true
 		);
 	}
 
-	void cmdExtractAnnotations()
+	void cmdExtractAnnotations(const UiUniversalPicker::SelectMode& selectMode)
 	{
 		UiFileDialog::FileDialogFilterBuilder fileFilterBuilder;
 		CString strFileFilter = fileFilterBuilder.addFilter(_(L"CSV 文件"), { L"*.csv" }).build();
@@ -326,8 +330,8 @@ namespace
 				}
 			},
 			_(L"提取标注到CSV文件"),
-			UiUniversalPicker::SelectMode::Immediate,
-			false,
+			selectMode,
+			true,
 			UiUniversalPicker::SortMode::RD,
 			false
 		);
@@ -335,15 +339,25 @@ namespace
 
 	FrameworkCommands::AutoRegister ar =
 	{
-		{ L"yxDimSolid", []() { return _(L"尺寸固化"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdDimensionSolidify },
-		{ L"yxDimRel", []() { return _(L"尺寸恢复关联"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdDimensionRelink },
-		{ L"yxDimPrec", []() { return _(L"设置尺寸标注的主单位精度和公差精度"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdDimensionTolerancePrecision },
-		{ L"yxDimAdd", []() { return _(L"为标注添加前后缀"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdAddSurroundingCharsForDimension },
-		{ L"yxDimDel", []() { return _(L"为标注移除前后缀"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdRemoveSurroundingCharsForDimension },
-		{ L"yxDimBox", []() { return _(L"设置理论尺寸框"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdSetBasicBox },
-		{ L"yxDimUnbox", []() { return _(L"取消理论尺寸框"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdUnsetBasicBox },
-		{ L"yxDimRef", []() { return _(L"设置参考尺寸括号"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdSetRefDim },
-		{ L"yxDimUnref", []() { return _(L"取消参考尺寸括号"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdUnsetRefDim },
-		{ L"yxDimExp", []() { return _(L"提取标注到CSV文件"); }, FrameworkCommands::CommandFlags::Base, cmdExtractAnnotations },
+		{ L"yxDimSolidB", []() { return _(L"尺寸固化(批量)"); }, FrameworkCommands::CommandFlags::PickRedraw, []() { cmdDimensionSolidify(UiUniversalPicker::SelectMode::Batch); } },
+		{ L"yxDimSolidI", []() { return _(L"尺寸固化(立即)"); }, FrameworkCommands::CommandFlags::PickRedraw, []() { cmdDimensionSolidify(UiUniversalPicker::SelectMode::Immediate); } },
+		{ L"yxDimRelB", []() { return _(L"尺寸恢复关联(批量)"); }, FrameworkCommands::CommandFlags::PickRedraw, []() { cmdDimensionRelink(UiUniversalPicker::SelectMode::Batch); } },
+		{ L"yxDimRelI", []() { return _(L"尺寸恢复关联(立即)"); }, FrameworkCommands::CommandFlags::PickRedraw, []() { cmdDimensionRelink(UiUniversalPicker::SelectMode::Immediate); } },
+		{ L"yxDimPrecB", []() { return _(L"设置尺寸标注的主单位精度和公差精度(批量)"); }, FrameworkCommands::CommandFlags::PickRedraw, []() { cmdDimensionTolerancePrecision(UiUniversalPicker::SelectMode::Batch); } },
+		{ L"yxDimPrecI", []() { return _(L"设置尺寸标注的主单位精度和公差精度(立即)"); }, FrameworkCommands::CommandFlags::PickRedraw, []() { cmdDimensionTolerancePrecision(UiUniversalPicker::SelectMode::Immediate); } },
+		{ L"yxDimAddB", []() { return _(L"为标注添加前后缀(批量)"); }, FrameworkCommands::CommandFlags::PickRedraw, []() { cmdAddSurroundingCharsForDimension(UiUniversalPicker::SelectMode::Batch); } },
+		{ L"yxDimAddI", []() { return _(L"为标注添加前后缀(立即)"); }, FrameworkCommands::CommandFlags::PickRedraw, []() { cmdAddSurroundingCharsForDimension(UiUniversalPicker::SelectMode::Immediate); } },
+		{ L"yxDimDelB", []() { return _(L"为标注移除前后缀(批量)"); }, FrameworkCommands::CommandFlags::PickRedraw, []() { cmdRemoveSurroundingCharsForDimension(UiUniversalPicker::SelectMode::Batch); } },
+		{ L"yxDimDelI", []() { return _(L"为标注移除前后缀(立即)"); }, FrameworkCommands::CommandFlags::PickRedraw, []() { cmdRemoveSurroundingCharsForDimension(UiUniversalPicker::SelectMode::Immediate); } },
+		{ L"yxDimBoxB", []() { return _(L"设置理论尺寸框(批量)"); }, FrameworkCommands::CommandFlags::PickRedraw, []() { cmdSetBasicBox(UiUniversalPicker::SelectMode::Batch); } },
+		{ L"yxDimBoxI", []() { return _(L"设置理论尺寸框(立即)"); }, FrameworkCommands::CommandFlags::PickRedraw, []() { cmdSetBasicBox(UiUniversalPicker::SelectMode::Immediate); } },
+		{ L"yxDimUnboxB", []() { return _(L"取消理论尺寸框(批量)"); }, FrameworkCommands::CommandFlags::PickRedraw, []() { cmdUnsetBasicBox(UiUniversalPicker::SelectMode::Batch); } },
+		{ L"yxDimUnboxI", []() { return _(L"取消理论尺寸框(立即)"); }, FrameworkCommands::CommandFlags::PickRedraw, []() { cmdUnsetBasicBox(UiUniversalPicker::SelectMode::Immediate); } },
+		{ L"yxDimRefB", []() { return _(L"设置参考尺寸括号(批量)"); }, FrameworkCommands::CommandFlags::PickRedraw, []() { cmdSetRefDim(UiUniversalPicker::SelectMode::Batch); } },
+		{ L"yxDimRefI", []() { return _(L"设置参考尺寸括号(立即)"); }, FrameworkCommands::CommandFlags::PickRedraw,[]() { cmdSetRefDim(UiUniversalPicker::SelectMode::Immediate); } },
+		{ L"yxDimUnrefB", []() { return _(L"取消参考尺寸括号(批量)"); }, FrameworkCommands::CommandFlags::PickRedraw, []() { cmdUnsetRefDim(UiUniversalPicker::SelectMode::Batch); } },
+		{ L"yxDimUnrefI", []() { return _(L"取消参考尺寸括号(立即)"); }, FrameworkCommands::CommandFlags::PickRedraw,[]() { cmdUnsetRefDim(UiUniversalPicker::SelectMode::Immediate); } },
+		{ L"yxDimExpB", []() { return _(L"提取标注到CSV文件(批量)"); }, FrameworkCommands::CommandFlags::Base, []() { cmdExtractAnnotations(UiUniversalPicker::SelectMode::Batch); } },
+		{ L"yxDimExpI", []() { return _(L"提取标注到CSV文件(立即)"); }, FrameworkCommands::CommandFlags::Base,[]() { cmdExtractAnnotations(UiUniversalPicker::SelectMode::Immediate); } },
 	};
 }

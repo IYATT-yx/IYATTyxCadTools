@@ -72,7 +72,7 @@ namespace
         UtilBalloonNumber::insertBalloonNumberBlockWithStartNumber(startNumber);
     }
 
-    void cmdUpdateBalloonNumberBlock()
+    void cmdUpdateBalloonNumberBlock(const UiUniversalPicker::SelectMode& selectMode)
     {
         CAcModuleResourceOverride resOverride;
         CString title = _(L"更新气泡号");
@@ -123,14 +123,14 @@ namespace
                 }
             },
             nullptr,
-            UiUniversalPicker::SelectMode::Immediate,
-            false,
+            selectMode,
+            true,
             UiUniversalPicker::SortMode::RD,
             false
         );
     }
 
-    void cmdBalloonNumberOffset()
+    void cmdBalloonNumberOffset(const UiUniversalPicker::SelectMode& selectMode)
     {
         CAcModuleResourceOverride resOverride;
         CString title = _(L"偏置气泡号");
@@ -174,9 +174,7 @@ namespace
                 UtilBalloonNumber::balloonNumberOffset(id, offset);
             },
             title,
-            UiUniversalPicker::SelectMode::Batch,
-            false,
-            UiUniversalPicker::SortMode::None,
+            selectMode,
             true
         );
     }
@@ -553,8 +551,10 @@ namespace
     FrameworkCommands::AutoRegister ar =
     {
         { L"yxBlAdd", []() { return _(L"插入气泡号"); }, FrameworkCommands::CommandFlags::Base, cmdInsertBalloonNumberBlockWithStartNumber },
-        { L"yxBlUpd", []() { return _(L"更新气泡号"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdUpdateBalloonNumberBlock },
-        { L"yxBlOff", []() { return _(L"偏置气泡号"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdBalloonNumberOffset },
+        { L"yxBlUpdB", []() { return _(L"更新气泡号(批量)"); }, FrameworkCommands::CommandFlags::PickRedraw, []() { cmdUpdateBalloonNumberBlock(UiUniversalPicker::SelectMode::Batch); } },
+        { L"yxBlUpdI", []() { return _(L"更新气泡号(立即)"); }, FrameworkCommands::CommandFlags::PickRedraw, []() { cmdUpdateBalloonNumberBlock(UiUniversalPicker::SelectMode::Immediate); } },
+        { L"yxBlOffB", []() { return _(L"偏置气泡号(批量）"); }, FrameworkCommands::CommandFlags::PickRedraw, []() { cmdBalloonNumberOffset(UiUniversalPicker::SelectMode::Batch); } },
+        { L"yxBlOffI", []() { return _(L"偏置气泡号(立即)"); }, FrameworkCommands::CommandFlags::PickRedraw, []() { cmdBalloonNumberOffset(UiUniversalPicker::SelectMode::Immediate); } },
         { L"yxBlFlt", []() { return _(L"筛选气泡号"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdBalloonNumberFilter },
         { L"yxBlMinMax", []() { return _(L"查找气泡号最大和最小序号"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdCheckBalloonNumberMaxMin },
         { L"yxBlChkDup", []() { return _(L"检查重复气泡号"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdCheckDuplicateBalloonNumbers },

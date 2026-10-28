@@ -22,7 +22,7 @@ import UtilAnnotative;
 
 namespace
 {
-	void cmdCloneText()
+	void cmdCloneText(const UiUniversalPicker::SelectMode& selectMode)
 	{
 		AcString asSrcTextContent;
 		acutPrintf(_(L"\n请选择要复制的源文本对象"));
@@ -41,9 +41,7 @@ namespace
 				UtilText::updateTextEntityContent(id, asSrcTextContent);
 			},
 			_(L"将多行/单行文本内容复制给其它多行/单行文本"),
-			UiUniversalPicker::SelectMode::Immediate,
-			false,
-			UiUniversalPicker::SortMode::None,
+			selectMode,
 			true
 		);
 	}
@@ -195,7 +193,7 @@ namespace
 		acutPrintf(_(L"\n文件位置：%s"), strFilePath);
 	}
 
-	void cmdStripTextEntityFormat()
+	void cmdStripTextEntityFormat(const UiUniversalPicker::SelectMode& selectMode)
 	{
 		size_t count = 0;
 		UiUniversalPicker::run(
@@ -208,9 +206,7 @@ namespace
 				}
 			},
 			_(L"去除多行/单行文本格式"),
-			UiUniversalPicker::SelectMode::Batch,
-			false,
-			UiUniversalPicker::SortMode::None,
+			selectMode,
 			true
 		);
         acutPrintf(_(L"\n已处理 %d 个文本"), count);
@@ -218,9 +214,11 @@ namespace
 
 	FrameworkCommands::AutoRegister ar =
 	{
-		{ L"yxTxtClone", []() { return _(L"将多行/单行文本内容复制给其它多行/单行文本"); }, FrameworkCommands::CommandFlags::Base, cmdCloneText },
+		{ L"yxTxtCloneB", []() { return _(L"将多行/单行文本内容复制给其它多行/单行文本(批量)"); }, FrameworkCommands::CommandFlags::Base, []() { cmdCloneText(UiUniversalPicker::SelectMode::Batch); }},
+		{ L"yxTxtCloneI", []() { return _(L"将多行/单行文本内容复制给其它多行/单行文本(立即)"); }, FrameworkCommands::CommandFlags::Base, []() { cmdCloneText(UiUniversalPicker::SelectMode::Immediate); }},
 		{ L"yxCsvImp", []() { return _(L"从 CSV 文件导入数据生成多行文本矩阵"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdImportCsvToMTextMatrix },
 		{ L"yxTblExp", []() { return _(L"将多行/单行文本按空间位置表格化导出到 CSV 文件"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdSpatialTableExplorer },
-		{ L"yxStripText", []() { return _(L"去除多行/单行文本格式"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdStripTextEntityFormat },
+		{ L"yxStripTextB", []() { return _(L"去除多行/单行文本格式(批量)"); }, FrameworkCommands::CommandFlags::PickRedraw, []() { cmdStripTextEntityFormat(UiUniversalPicker::SelectMode::Batch); }},
+		{ L"yxStripTextI", []() { return _(L"去除多行/单行文本格式(立即)"); }, FrameworkCommands::CommandFlags::PickRedraw, []() { cmdStripTextEntityFormat(UiUniversalPicker::SelectMode::Immediate); }},
 	};
 }

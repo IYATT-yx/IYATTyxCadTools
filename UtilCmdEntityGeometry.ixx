@@ -157,9 +157,9 @@ namespace
 		);
 	}
 
-	void cmdSetByLayer()
+	void cmdSetByLayer(const UiUniversalPicker::SelectMode& selectMode)
 	{
-		UiUniversalPicker::run(nullptr, UtilEntityStyle::setByLayer, _(L"设置实体样式为当前层样式"));
+		UiUniversalPicker::run(nullptr, UtilEntityStyle::setByLayer, _(L"设置实体样式为当前层样式"), selectMode, true);
 	}
 
 	FrameworkCommands::AutoRegister ar =
@@ -167,6 +167,7 @@ namespace
 		{ L"yxChain", []() { return _(L"选中实体后自动链式选择"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdChainSelection },
 		{ L"yxIntersect", []() { return _(L"将两条直线延伸或修剪至其交点"); }, FrameworkCommands::CommandFlags::Base, cmdIntersect },
 		{ L"yxIntPt", []() { return _(L"创建两条线(及延长线)的交点。可使用PTYPE设置点样式。"); }, FrameworkCommands::CommandFlags::Base, cmdCreateIntersectionPoints },
-		{ L"yxByLayer", []() { return _(L"设置实体样式为当前层样式"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdSetByLayer }
+		{ L"yxByLayerB", []() { return _(L"设置实体样式为当前层样式(批量)"); }, FrameworkCommands::CommandFlags::PickRedraw, []() { cmdSetByLayer(UiUniversalPicker::SelectMode::Batch); } },
+		{ L"yxByLayerI", []() { return _(L"设置实体样式为当前层样式(样式)"); }, FrameworkCommands::CommandFlags::PickRedraw, []() { cmdSetByLayer(UiUniversalPicker::SelectMode::Immediate); } }
 	};
 }

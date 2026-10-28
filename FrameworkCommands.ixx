@@ -44,6 +44,16 @@ export namespace FrameworkCommands
 	};
 
 	/**
+	 * @brief 将任意无捕获 Lambda 转换为标准函数指针 (AcRxFunctionPtr) 的模板帮手
+	 * @tparam F Lambda 类型
+	 */
+	template <auto F>
+	inline void LambdaThunk()
+	{
+		F();
+	}
+
+	/**
 	 * @brief 命令自注册中心单例
 	 */
 	class CommandRegistry
@@ -91,8 +101,9 @@ export namespace FrameworkCommands
 
 	/**
 	 * @brief 收集已自注册的命令并向 CAD 系统注册
+	 * @return bool 是否成功
 	 */
-	void registerYxCmds();
+	bool registerYxCmds();
 
 	/**
 	 * @brief 执行命令

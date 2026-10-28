@@ -54,16 +54,14 @@ namespace
         FrameworkCommands::executeCommand(pszCmdList);
     }
 
-    void cmdForceRemoveImage()
+    void cmdForceRemoveImage(const UiUniversalPicker::SelectMode& selectMode)
     {
         UiUniversalPicker::AcRxClassVector arcv = { AcDbRasterImage::desc() };
         UiUniversalPicker::run(
             &arcv,
             UtilImage::forceRemoveImageAndFile,
             _(L"删除光栅图像及图片文件（无法撤销恢复）"),
-            UiUniversalPicker::SelectMode::Immediate,
-            false,
-            UiUniversalPicker::SortMode::None,
+            selectMode,
             true
         );
     }
@@ -71,6 +69,7 @@ namespace
     FrameworkCommands::AutoRegister ar =
     {
         { L"yxImgPaste", []() { return _(L"将剪贴板中的截图/图像数据保存到文件并插入图纸中"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdPasteClipImage },
-        { L"yxImgDel", []() { return _(L"删除光栅图像及图片文件（无法撤销恢复）"); }, FrameworkCommands::CommandFlags::PickRedraw, cmdForceRemoveImage }
+        { L"yxImgDelB", []() { return _(L"删除光栅图像及图片文件，无法撤销恢复(批量)"); }, FrameworkCommands::CommandFlags::PickRedraw, []() { cmdForceRemoveImage(UiUniversalPicker::SelectMode::Batch); } },
+        { L"yxImgDelI", []() { return _(L"删除光栅图像及图片文件，无法撤销恢复(立即)"); }, FrameworkCommands::CommandFlags::PickRedraw, []() { cmdForceRemoveImage(UiUniversalPicker::SelectMode::Immediate); } },
     };
 }
