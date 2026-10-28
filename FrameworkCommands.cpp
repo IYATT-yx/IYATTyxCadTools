@@ -11,10 +11,11 @@ module;
 module FrameworkCommands;
 
 import UtilConstants;
+import FrameworkTranslator;
 
 namespace FrameworkCommands
 {
-	void registerYxCmds()
+	bool registerYxCmds()
 	{
 		CAcModuleResourceOverride resOverride;
 
@@ -34,9 +35,36 @@ namespace FrameworkCommands
 			return wcscmp(a->commandName.constPtr(), b->commandName.constPtr()) < 0;
 			});
 
+		// 用于检测重复命令的集合（AutoCAD 命令不区分大小写，统一转换为大写进行比对）
+		std::set<std::wstring> registeredCommands;
+
 		for (const auto* pSpec : sortedSpecs)
 		{
 			const auto& spec = *pSpec;
+
+			// 复制一份命令名并转换为大写，用于大小写不敏感的查重
+			std::wstring upperName = spec.commandName.constPtr();
+			for (auto& c : upperName)
+			{
+				c = static_cast<wchar_t>(towupper(c));
+			}
+
+			// 检查是否重复
+			if (registeredCommands.find(upperName) != registeredCommands.end())
+			{
+				// 构造警告弹窗提示信息
+				AcString errMsg;
+				errMsg.format(_(L"[FrameworkCommands 警告] 发现重复注册的命令: \"%s\" !\n请检查代码中是否有多次定义该命令。"), spec.commandName.constPtr());
+
+				// 弹出 AutoCAD 原生警告对话框
+				acedAlert(errMsg.constPtr());
+
+				return false; // 终止注册
+			}
+
+			// 记录已注册的命令
+			registeredCommands.insert(upperName);
+
 			CommandInfo info;
 			info.commandName = spec.commandName;
 			// 触发 Lambda 执行翻译，此时 FrameworkTranslator 已经成功 initialize
@@ -49,6 +77,7 @@ namespace FrameworkCommands
 			// 注册命令全名
 			acedRegCmds->addCommand(UtilConstants::cmdGroup, info.commandName.constPtr(), info.commandName.constPtr(), info.flags, info.proc);
 		}
+		return true;
 	}
 
 	void executeCommand(const FrameworkCommands::CommandList& cmdList, bool usePrefix, AcApDocument* pDoc)
