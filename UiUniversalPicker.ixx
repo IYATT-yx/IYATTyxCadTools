@@ -164,7 +164,7 @@ public:
 	static void setSelection(const AcDbObjectIdArray& ids);
 };
 
-export void UiUniversalPicker::batchSelect(UiUniversalPicker::AcRxClassVectorPtr arcv, UiUniversalPicker::EntityProcessor processor, SortMode defaultSortMode, bool isLocked, double sortTol)
+void UiUniversalPicker::batchSelect(UiUniversalPicker::AcRxClassVectorPtr arcv, UiUniversalPicker::EntityProcessor processor, SortMode defaultSortMode, bool isLocked, double sortTol)
 {
 	UiUniversalPicker::batchSelect(
 		arcv,
@@ -179,7 +179,7 @@ export void UiUniversalPicker::batchSelect(UiUniversalPicker::AcRxClassVectorPtr
 	);
 }
 
-export void UiUniversalPicker::immediateSelect(UiUniversalPicker::AcRxClassVectorPtr arcv, UiUniversalPicker::EntityProcessor processor)
+void UiUniversalPicker::immediateSelect(UiUniversalPicker::AcRxClassVectorPtr arcv, UiUniversalPicker::EntityProcessor processor)
 {
 	UiUniversalPicker::immediateSelect(
 		arcv,
@@ -191,7 +191,7 @@ export void UiUniversalPicker::immediateSelect(UiUniversalPicker::AcRxClassVecto
 	);
 }
 
-export void UiUniversalPicker::run(UiUniversalPicker::AcRxClassVectorPtr arcv, UiUniversalPicker::EntityProcessor processor, const wchar_t* prompt, UiUniversalPicker::SelectMode defaultSelectMode, bool lockSelectMode, SortMode defaultSortMode, bool lockSortMode, double sortTol)
+void UiUniversalPicker::run(UiUniversalPicker::AcRxClassVectorPtr arcv, UiUniversalPicker::EntityProcessor processor, const wchar_t* prompt, UiUniversalPicker::SelectMode defaultSelectMode, bool lockSelectMode, SortMode defaultSortMode, bool lockSortMode, double sortTol)
 {
 	UiUniversalPicker::run(
 		arcv,
